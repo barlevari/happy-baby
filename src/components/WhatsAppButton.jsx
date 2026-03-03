@@ -12,7 +12,7 @@ export default function WhatsAppButton() {
   return (
     <div style={{
       position: 'fixed',
-      bottom: 24,
+      bottom: 'max(24px, calc(64px + 16px))',
       left: 24,
       zIndex: 999,
       display: 'flex',

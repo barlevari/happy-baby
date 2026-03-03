@@ -40,18 +40,28 @@ export default function AboutPage() {
         {/* Hero - Roital's profile */}
         <div className="card" style={{ textAlign: 'center', marginBottom: 32, padding: '40px 32px' }}>
           <div style={{
-            width: 120,
-            height: 120,
+            width: 140,
+            height: 140,
             borderRadius: '50%',
-            background: 'linear-gradient(135deg, var(--color-sage), var(--color-sage-dark))',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            fontSize: '3.5rem',
+            overflow: 'hidden',
             margin: '0 auto 20px',
             boxShadow: 'var(--shadow-lg)',
+            border: '4px solid var(--color-sage-light)',
           }}>
-            🌿
+            <img
+              src="/roital.jpg"
+              alt="רויטל לב ארי"
+              style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+              onError={e => {
+                e.target.style.display = 'none';
+                e.target.parentElement.style.background = 'linear-gradient(135deg, var(--color-sage), var(--color-sage-dark))';
+                e.target.parentElement.style.display = 'flex';
+                e.target.parentElement.style.alignItems = 'center';
+                e.target.parentElement.style.justifyContent = 'center';
+                e.target.parentElement.style.fontSize = '4rem';
+                e.target.parentElement.innerHTML = '🌿';
+              }}
+            />
           </div>
           <h1 style={{ fontSize: 'clamp(1.6rem, 4vw, 2.2rem)', fontWeight: 900, marginBottom: 8, color: 'var(--color-sage-dark)' }}>
             רויטל לב ארי
@@ -137,13 +147,27 @@ export default function AboutPage() {
               💬 וואטסאפ
             </a>
             <a
-              href="https://www.instagram.com/pikpik"
+              href="https://www.instagram.com/pikpikit/"
               target="_blank"
               rel="noopener noreferrer"
               className="btn btn-ghost"
               style={{ display: 'inline-flex', gap: 8, alignItems: 'center', border: '2px solid #E1306C', color: '#E1306C' }}
             >
-              📸 pikpik באינסטגרם
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <defs>
+                  <radialGradient id="ig-grad" cx="30%" cy="107%" r="150%">
+                    <stop offset="0%" stopColor="#fdf497"/>
+                    <stop offset="5%" stopColor="#fdf497"/>
+                    <stop offset="45%" stopColor="#fd5949"/>
+                    <stop offset="60%" stopColor="#d6249f"/>
+                    <stop offset="90%" stopColor="#285AEB"/>
+                  </radialGradient>
+                </defs>
+                <rect x="2" y="2" width="20" height="20" rx="5" ry="5" fill="url(#ig-grad)"/>
+                <circle cx="12" cy="12" r="4.5" stroke="white" strokeWidth="1.8" fill="none"/>
+                <circle cx="17.5" cy="6.5" r="1.2" fill="white"/>
+              </svg>
+              @pikpikit
             </a>
           </div>
         </div>
