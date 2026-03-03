@@ -148,7 +148,34 @@ export default function Register() {
       justifyContent: 'center',
       padding: 24,
       direction: 'rtl',
+      position: 'relative',
     }}>
+      {/* Back button */}
+      <button
+        onClick={() => navigate('/')}
+        style={{
+          position: 'absolute',
+          top: 24,
+          right: 24,
+          background: 'rgba(255,255,255,0.9)',
+          border: '1px solid var(--color-border)',
+          borderRadius: 'var(--radius-md)',
+          padding: '8px 16px',
+          fontSize: '0.9rem',
+          fontWeight: 600,
+          color: 'var(--color-text)',
+          cursor: 'pointer',
+          transition: 'all 0.2s',
+          display: 'flex',
+          alignItems: 'center',
+          gap: 8,
+        }}
+        onMouseEnter={e => e.currentTarget.style.background = 'rgba(255,255,255,1)'}
+        onMouseLeave={e => e.currentTarget.style.background = 'rgba(255,255,255,0.9)'}
+      >
+        → חזרה
+      </button>
+
       <div style={{
         width: '100%',
         maxWidth: step === 1 ? 660 : 480,
@@ -160,7 +187,7 @@ export default function Register() {
       }}>
         {/* Logo */}
         <div style={{ textAlign: 'center', marginBottom: 24 }}>
-          <img src="/happy-baby-logo.png" alt="happy baby" style={{ height: 56, objectFit: 'contain', mixBlendMode: 'multiply' }} />
+          <img src="/happy-baby-logo.png" alt="happy baby" style={{ height: 56, objectFit: 'contain', opacity: 0.95 }} />
         </div>
 
         {/* Progress */}

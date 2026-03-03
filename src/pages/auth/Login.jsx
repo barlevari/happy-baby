@@ -49,8 +49,34 @@ export default function Login() {
         minHeight: '100vh',
         background: 'linear-gradient(160deg, var(--color-cream) 0%, var(--color-sage-ultra) 100%)',
         display: 'flex', alignItems: 'center', justifyContent: 'center',
-        padding: 24, direction: 'rtl',
+        padding: 24, direction: 'rtl', position: 'relative',
       }}>
+        {/* Back button */}
+        <button
+          onClick={() => { setShowForgot(false); setForgotSent(false); }}
+          style={{
+            position: 'absolute',
+            top: 24,
+            right: 24,
+            background: 'rgba(255,255,255,0.9)',
+            border: '1px solid var(--color-border)',
+            borderRadius: 'var(--radius-md)',
+            padding: '8px 16px',
+            fontSize: '0.9rem',
+            fontWeight: 600,
+            color: 'var(--color-text)',
+            cursor: 'pointer',
+            transition: 'all 0.2s',
+            display: 'flex',
+            alignItems: 'center',
+            gap: 8,
+          }}
+          onMouseEnter={e => e.currentTarget.style.background = 'rgba(255,255,255,1)'}
+          onMouseLeave={e => e.currentTarget.style.background = 'rgba(255,255,255,0.9)'}
+        >
+          → חזרה
+        </button>
+
         <div style={{
           width: '100%', maxWidth: 420,
           background: 'var(--color-white)',
@@ -131,7 +157,34 @@ export default function Login() {
       justifyContent: 'center',
       padding: 24,
       direction: 'rtl',
+      position: 'relative',
     }}>
+      {/* Back button */}
+      <button
+        onClick={() => navigate('/')}
+        style={{
+          position: 'absolute',
+          top: 24,
+          right: 24,
+          background: 'rgba(255,255,255,0.9)',
+          border: '1px solid var(--color-border)',
+          borderRadius: 'var(--radius-md)',
+          padding: '8px 16px',
+          fontSize: '0.9rem',
+          fontWeight: 600,
+          color: 'var(--color-text)',
+          cursor: 'pointer',
+          transition: 'all 0.2s',
+          display: 'flex',
+          alignItems: 'center',
+          gap: 8,
+        }}
+        onMouseEnter={e => e.currentTarget.style.background = 'rgba(255,255,255,1)'}
+        onMouseLeave={e => e.currentTarget.style.background = 'rgba(255,255,255,0.9)'}
+      >
+        → חזרה
+      </button>
+
       <div style={{
         width: '100%',
         maxWidth: 420,
@@ -143,7 +196,7 @@ export default function Login() {
       }}>
         {/* Logo */}
         <div style={{ textAlign: 'center', marginBottom: 32 }}>
-          <img src="/happy-baby-logo.png" alt="happy baby" style={{ height: 64, objectFit: 'contain', mixBlendMode: 'multiply' }} />
+          <img src="/happy-baby-logo.png" alt="happy baby" style={{ height: 64, objectFit: 'contain', opacity: 0.95 }} />
         </div>
 
         <h1 style={{ textAlign: 'center', fontSize: '1.4rem', fontWeight: 800, marginBottom: 28, color: 'var(--color-text)' }}>
