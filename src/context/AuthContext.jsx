@@ -75,7 +75,7 @@ export function AuthProvider({ children }) {
     if (allUsers.find(u => u.email === email)) return { ok: false, error: 'כתובת האימייל כבר רשומה במערכת' };
 
     if (role === 'admin') {
-      if (adminCode !== ADMIN_SECRET) return { ok: false, error: 'קוד המנהל שגוי' };
+      if ((adminCode || '').trim() !== ADMIN_SECRET) return { ok: false, error: 'קוד המנהל שגוי' };
     }
 
     const status = role === 'admin' ? 'approved' : 'pending';

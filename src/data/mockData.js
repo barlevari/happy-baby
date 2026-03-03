@@ -3,16 +3,26 @@
 // ============================================================
 
 export const MOCK_VIDEOS = [
-  { id: 1, title: 'הכנה ללידה – כל מה שצריך לדעת', category: 'לידה', views: 1240, thumbnail: '🤱', durationMinutes: 28 },
-  { id: 2, title: 'שינה בריאה לתינוק – שיטת Happy Baby', category: 'שינה', views: 980, thumbnail: '😴', durationMinutes: 22 },
-  { id: 3, title: 'הנקה – התחלה נכונה ומוצלחת', category: 'האכלה', views: 876, thumbnail: '🍼', durationMinutes: 35 },
-  { id: 4, title: 'התפתחות מוטורית 0–3 חודשים', category: 'התפתחות', views: 754, thumbnail: '🐣', durationMinutes: 19 },
-  { id: 5, title: 'תזונה בהריון – מה מותר ומה אסור', category: 'כללי', views: 1102, thumbnail: '🥗', durationMinutes: 31 },
-  { id: 6, title: 'טיפול בקוליק – שיטות הרגעה', category: 'שינה', views: 645, thumbnail: '😮‍💨', durationMinutes: 18 },
-  { id: 7, title: 'גמילה מחיתולים בגיל שנה וחצי', category: 'התפתחות', views: 512, thumbnail: '🌟', durationMinutes: 24 },
-  { id: 8, title: 'אוכל מוצק ראשון – מתי ואיך', category: 'האכלה', views: 689, thumbnail: '🥄', durationMinutes: 27 },
-  { id: 9, title: 'שגרת ערב מרגיעה לתינוק', category: 'שינה', views: 823, thumbnail: '🌙', durationMinutes: 15 },
-  { id: 10, title: 'חיסוני תינוקות – מדריך מלא להורים', category: 'כללי', views: 934, thumbnail: '💉', durationMinutes: 20 },
+  { id: 1,  title: 'כמה מילות הקדמה',         category: 'מבוא',    weeksMin: null, weeksMax: null, videoUrl: '/videos/1 - כמה מילות הקדמה.mp4' },
+  { id: 2,  title: 'מטרות השיטה',              category: 'מבוא',    weeksMin: 1,  weeksMax: 12,  videoUrl: '/videos/2 - מטרות השיטה.mp4' },
+  { id: 3,  title: 'למי מתאים ומתי?',          category: 'מבוא',    weeksMin: 1,  weeksMax: 8,   videoUrl: '/videos/3 - למי מתאים ומתי.mp4' },
+  { id: 4,  title: 'עקרונות השיטה',            category: 'מבוא',    weeksMin: 1,  weeksMax: 12,  videoUrl: '/videos/4 - עקרונות השיטה.mp4' },
+  { id: 5,  title: 'איך אני מאבחנת את עצמי?', category: 'אבחון',   weeksMin: 8,  weeksMax: 20,  videoUrl: '/videos/5 - אבחנה - איך אני מאבחנת את חוסר האיזון שלי.mp4' },
+  { id: 6,  title: 'סיבובי אגן בעמידה',        category: 'תנועה',   weeksMin: 12, weeksMax: 30,  videoUrl: '/videos/6 - סיבובי אגן בעמידה - הספירלה משמים לארץ.mp4' },
+  { id: 7,  title: 'רוטציה של הציר המרכזי',   category: 'תנועה',   weeksMin: 12, weeksMax: 30,  videoUrl: '/videos/7 - רוטציה של הציר המרכזי בעמידה.mp4' },
+  { id: 8,  title: 'לקטוף את הירח',            category: 'תנועה',   weeksMin: 12, weeksMax: 35,  videoUrl: '/videos/8 - לקטוף את הירח.mp4' },
+  { id: 9,  title: 'אגן מצד לצד',              category: 'תנועה',   weeksMin: 14, weeksMax: 32,  videoUrl: '/videos/9 - אגן מצד לצד.mp4' },
+  { id: 10, title: 'פתיחת הקווים',             category: 'תנועה',   weeksMin: 16, weeksMax: 36,  videoUrl: '/videos/10 - פתיחת המעגל - הקווים החוצים מקדימה ומאחורה.mp4' },
+  { id: 11, title: 'תנועה אסימטרית באגן',      category: 'תנועה',   weeksMin: 16, weeksMax: 36,  videoUrl: '/videos/11 - תנועה אסימטרית באגן.mp4' },
+  { id: 12, title: 'להאריך את הרגליים',        category: 'תנועה',   weeksMin: 14, weeksMax: 32,  videoUrl: '/videos/12 - להאריך את הרגליים.mp4' },
+  { id: 13, title: 'תרגילים בישיבה',           category: 'שכיבה/ישיבה', weeksMin: 20, weeksMax: 40, videoUrl: '/videos/13 - תרגילים בישיבה.mp4' },
+  { id: 14, title: 'תרגילים בשכיבה',           category: 'שכיבה/ישיבה', weeksMin: 16, weeksMax: 32, videoUrl: '/videos/14 - תרגילים בשכיבה.mp4' },
+  { id: 15, title: 'תרגילים בשכיבה 2',         category: 'שכיבה/ישיבה', weeksMin: 16, weeksMax: 32, videoUrl: '/videos/15 - תרגילים בשכיבה.mp4' },
+  { id: 16, title: 'תרגילים בשכיבה 3',         category: 'שכיבה/ישיבה', weeksMin: 16, weeksMax: 30, videoUrl: '/videos/16 - תרגילים בשכיבה.mp4' },
+  { id: 17, title: 'פתיחת האגן בשכיבה על הצד', category: 'שכיבה/ישיבה', weeksMin: 24, weeksMax: 40, videoUrl: '/videos/17 - פתיחת האגן בשכיבה על הצד.mp4' },
+  { id: 18, title: 'תרגול על ארבע',            category: 'רצפת אגן', weeksMin: 20, weeksMax: 38, videoUrl: '/videos/18 - תרגול על 6.mp4' },
+  { id: 19, title: 'תרגילים על כדור פיסיו',    category: 'כדור',    weeksMin: 20, weeksMax: 40,  videoUrl: '/videos/19 - תרגילים על כדור פיסיו.mp4' },
+  { id: 20, title: 'סיכום כללי',               category: 'סיכום',   weeksMin: null, weeksMax: null, videoUrl: '/videos/20 - סיכום כללי.mp4' },
 ];
 
 export const MOCK_ARTICLES = [

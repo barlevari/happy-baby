@@ -5,6 +5,7 @@ import { useState } from 'react';
 const NAV_LINKS = {
   moms: [
     { to: '/moms', label: 'בית', icon: '🏠', end: true },
+    { to: '/moms/videos', label: 'סרטונים', icon: '🎥' },
     { to: '/moms/nutrition', label: 'תזונה', icon: '🥗' },
     { to: '/moms/mental', label: 'הכנה מנטלית', icon: '🧘' },
     { to: '/settings', label: 'הגדרות', icon: '⚙️' },
@@ -69,18 +70,11 @@ export default function NavBar() {
           padding: '24px 20px 16px',
           borderBottom: '1px solid var(--color-border)',
         }}>
-          <div style={{
-            fontSize: '1.5rem',
-            fontWeight: 900,
-            color: 'var(--color-sage-dark)',
-            letterSpacing: '-0.02em',
-            display: 'flex',
-            alignItems: 'center',
-            gap: '8px',
-          }}>
-            <span style={{ fontSize: '1.8rem' }}>🌿</span>
-            <span>happy baby</span>
-          </div>
+          <img
+            src="/happy-baby-logo.png"
+            alt="happy baby"
+            style={{ height: 48, objectFit: 'contain', mixBlendMode: 'multiply' }}
+          />
         </div>
 
         {/* User Info */}

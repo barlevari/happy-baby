@@ -106,6 +106,7 @@ export default function Settings() {
             <label className="form-label">תאריך הווסת האחרון (LMP)</label>
             <input
               type="date"
+              lang="en"
               className="form-input"
               value={lmpDate}
               onChange={e => { setLmpDate(e.target.value); setLmpSaved(false); }}

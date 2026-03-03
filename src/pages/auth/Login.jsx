@@ -40,7 +40,6 @@ export default function Login() {
   const handleForgot = (e) => {
     e.preventDefault();
     if (!forgotEmail) return;
-    // In production this would send a real email
     setForgotSent(true);
   };
 
@@ -67,12 +66,25 @@ export default function Login() {
 
           {forgotSent ? (
             <div style={{ textAlign: 'center' }}>
-              <div style={{ fontSize: '3rem', marginBottom: 16 }}>📧</div>
-              <p style={{ color: 'var(--color-text-muted)', lineHeight: 1.7, marginBottom: 24 }}>
-                אם הכתובת <strong>{forgotEmail}</strong> רשומה במערכת, נשלח אליה קישור לאיפוס סיסמה.
+              <div style={{ fontSize: '3rem', marginBottom: 16 }}>💬</div>
+              <p style={{ fontWeight: 700, marginBottom: 8, color: 'var(--color-text)' }}>
+                שכחת סיסמה?
               </p>
+              <p style={{ color: 'var(--color-text-muted)', lineHeight: 1.7, marginBottom: 20, fontSize: '0.9rem' }}>
+                האתר עדיין אין לו שליחת מיילים אוטומטית.
+                לאיפוס סיסמה – פנ/י לרויטל ישירות בוואטסאפ עם כתובת האימייל שלך.
+              </p>
+              <a
+                href={`https://wa.me/972522218646?text=${encodeURIComponent(`היי רויטל, שכחתי את הסיסמה שלי, האימייל שלי: ${forgotEmail}`)}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="btn w-full"
+                style={{ background: '#25D366', color: 'white', border: 'none', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8, marginBottom: 12, textDecoration: 'none' }}
+              >
+                💬 שלח/י הודעה בוואטסאפ
+              </a>
               <button
-                className="btn btn-primary w-full"
+                className="btn btn-ghost w-full"
                 onClick={() => { setShowForgot(false); setForgotSent(false); setForgotEmail(''); }}
               >
                 חזרה לכניסה
@@ -131,14 +143,11 @@ export default function Login() {
       }}>
         {/* Logo */}
         <div style={{ textAlign: 'center', marginBottom: 32 }}>
-          <div style={{ fontSize: '2.5rem', marginBottom: 8 }}>🌿</div>
-          <div style={{ fontSize: '1.4rem', fontWeight: 900, color: 'var(--color-sage-dark)' }}>
-            happy baby
-          </div>
+          <img src="/happy-baby-logo.png" alt="happy baby" style={{ height: 64, objectFit: 'contain', mixBlendMode: 'multiply' }} />
         </div>
 
         <h1 style={{ textAlign: 'center', fontSize: '1.4rem', fontWeight: 800, marginBottom: 28, color: 'var(--color-text)' }}>
-          ברוכ/ה הבא/ה 🌿
+          ברוכ/ה הבא/ה
         </h1>
 
         {error && (

@@ -1,4 +1,5 @@
 import { useState, useMemo } from 'react';
+import { Link } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 import {
   LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer
@@ -203,6 +204,7 @@ function MetricModal({ onClose, onSave }) {
           <label className="form-label">📅 תאריך הבדיקה</label>
           <input
             type="date"
+            lang="en"
             className="form-input"
             value={form.date}
             max={today}
@@ -276,7 +278,7 @@ function TestModal({ onClose, onSave }) {
         </div>
         <div className="form-group">
           <label className="form-label">תאריך ביצוע</label>
-          <input type="date" className="form-input" value={form.date} onChange={e => setForm(f => ({ ...f, date: e.target.value }))} dir="ltr" />
+          <input type="date" lang="en" className="form-input" value={form.date} onChange={e => setForm(f => ({ ...f, date: e.target.value }))} dir="ltr" />
         </div>
         <div style={{ display: 'flex', gap: 12 }}>
           <button className="btn btn-ghost" onClick={onClose} style={{ flex: 1 }}>ביטול</button>
@@ -287,12 +289,40 @@ function TestModal({ onClose, onSave }) {
   );
 }
 
+// ── Per-user localStorage helpers ────────────────────────────
+function loadUserMetrics(userId) {
+  try {
+    const stored = localStorage.getItem(`hb_metrics_${userId}`);
+    if (stored) return JSON.parse(stored);
+  } catch {}
+  // seed data only for test user id=1
+  return userId === 1 ? MOCK_HEALTH_METRICS : [];
+}
+
+function saveUserMetrics(userId, data) {
+  localStorage.setItem(`hb_metrics_${userId}`, JSON.stringify(data));
+}
+
+function loadUserTests(userId) {
+  try {
+    const stored = localStorage.getItem(`hb_tests_${userId}`);
+    if (stored) return JSON.parse(stored);
+  } catch {}
+  return userId === 1 ? MOCK_TESTS : [];
+}
+
+function saveUserTests(userId, data) {
+  localStorage.setItem(`hb_tests_${userId}`, JSON.stringify(data));
+}
+
 // ── Main Dashboard ────────────────────────────────────────────
 export default function MomsDashboard() {
   const { user, getCurrentWeek } = useAuth();
-  const week = getCurrentWeek() || 20;
-  const [metrics, setMetrics] = useState(MOCK_HEALTH_METRICS);
-  const [tests, setTests] = useState(MOCK_TESTS);
+  const rawWeek = getCurrentWeek();
+  const week = rawWeek || 1;
+  const hasLmp = !!user?.lmpDate;
+  const [metrics, setMetrics] = useState(() => loadUserMetrics(user?.id));
+  const [tests, setTests] = useState(() => loadUserTests(user?.id));
   const [showMetricModal, setShowMetricModal] = useState(false);
   const [showTestModal, setShowTestModal] = useState(false);
 
@@ -338,6 +368,29 @@ export default function MomsDashboard() {
         </h1>
         <p style={{ color: 'var(--color-text-muted)', fontSize: 'var(--font-sm)' }}>{today}</p>
       </div>
+
+      {/* LMP missing prompt */}
+      {!hasLmp && (
+        <div style={{
+          background: '#FFF8E1',
+          border: '1px solid var(--color-warning)',
+          borderRadius: 'var(--radius-md)',
+          padding: '14px 18px',
+          marginBottom: 24,
+          display: 'flex',
+          alignItems: 'center',
+          gap: 12,
+        }}>
+          <span style={{ fontSize: '1.4rem' }}>📅</span>
+          <div style={{ flex: 1 }}>
+            <strong style={{ color: '#B45309' }}>הזן/י תאריך הווסת האחרון</strong>
+            <div style={{ fontSize: '0.82rem', color: '#92400E' }}>הנתון הזה נחוץ לחישוב שבוע ההריון ותאריך הלידה המשוער</div>
+          </div>
+          <Link to="/settings" className="btn btn-sm" style={{ background: 'var(--color-warning)', color: 'white', border: 'none', whiteSpace: 'nowrap' }}>
+            עדכן/י בהגדרות
+          </Link>
+        </div>
+      )}
 
       {/* Hero Section */}
       <div className="grid-3" style={{ marginBottom: 32 }}>
@@ -543,13 +596,21 @@ export default function MomsDashboard() {
       {showMetricModal && (
         <MetricModal
           onClose={() => setShowMetricModal(false)}
-          onSave={m => setMetrics(prev => [...prev, m])}
+          onSave={m => setMetrics(prev => {
+            const next = [...prev, m];
+            saveUserMetrics(user?.id, next);
+            return next;
+          })}
         />
       )}
       {showTestModal && (
         <TestModal
           onClose={() => setShowTestModal(false)}
-          onSave={t => setTests(prev => [...prev, t])}
+          onSave={t => setTests(prev => {
+            const next = [...prev, t];
+            saveUserTests(user?.id, next);
+            return next;
+          })}
         />
       )}
     </div>

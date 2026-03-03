@@ -11,6 +11,7 @@ import Register from './pages/auth/Register';
 import MomsDashboard from './pages/moms/MomsDashboard';
 import NutritionPage from './pages/moms/NutritionPage';
 import MentalPage from './pages/moms/MentalPage';
+import MomsVideosPage from './pages/moms/MomsVideosPage';
 import AcademyDashboard from './pages/academy/AcademyDashboard';
 import VideosPage from './pages/academy/VideosPage';
 import LibraryPage from './pages/academy/LibraryPage';
@@ -69,6 +70,11 @@ export default function App() {
       <Route path="/moms/mental" element={
         <ProtectedRoute requiredRole="moms">
           <AppShell><MentalPage /></AppShell>
+        </ProtectedRoute>
+      } />
+      <Route path="/moms/videos" element={
+        <ProtectedRoute requiredRole="moms">
+          <AppShell><MomsVideosPage /></AppShell>
         </ProtectedRoute>
       } />
 

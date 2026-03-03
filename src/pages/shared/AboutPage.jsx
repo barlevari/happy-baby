@@ -59,7 +59,7 @@ export default function AboutPage() {
                 e.target.parentElement.style.alignItems = 'center';
                 e.target.parentElement.style.justifyContent = 'center';
                 e.target.parentElement.style.fontSize = '4rem';
-                e.target.parentElement.innerHTML = '🌿';
+                e.target.parentElement.innerHTML = '<img src="/happy-baby-logo.png" style="width:80%;height:80%;object-fit:contain;mix-blend-mode:multiply" alt="happy baby"/>';
               }}
             />
           </div>

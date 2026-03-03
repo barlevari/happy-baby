@@ -1,18 +1,20 @@
 import { useState } from 'react';
 import { MOCK_VIDEOS } from '../../data/mockData';
+import VideoPlayerModal from '../../components/VideoPlayerModal';
 
-const CATEGORIES = ['כולם', 'שינה', 'האכלה', 'התפתחות', 'כללי', 'לידה'];
+const ALL_CATEGORIES = ['כולם', ...new Set(MOCK_VIDEOS.map(v => v.category))];
 
 export default function VideosPage() {
   const [activeCategory, setActiveCategory] = useState('כולם');
-  const [hoveredId, setHoveredId] = useState(null);
+  const [playingVideo, setPlayingVideo] = useState(null);
 
   const filtered = activeCategory === 'כולם'
     ? MOCK_VIDEOS
     : MOCK_VIDEOS.filter(v => v.category === activeCategory);
 
-  const handlePlay = (video) => {
-    alert(`הסרטון "${video.title}" יפתח בקרוב`);
+  const getWeeksLabel = (v) => {
+    if (v.weeksMin === null) return 'כל השבועות';
+    return `שבועות ${v.weeksMin}–${v.weeksMax}`;
   };
 
   return (
@@ -25,8 +27,8 @@ export default function VideosPage() {
       </div>
 
       {/* Category Filter */}
-      <div className="tabs">
-        {CATEGORIES.map(cat => (
+      <div className="tabs" style={{ overflowX: 'auto' }}>
+        {ALL_CATEGORIES.map(cat => (
           <button
             key={cat}
             className={`tab-btn${activeCategory === cat ? ' active' : ''}`}
@@ -44,9 +46,7 @@ export default function VideosPage() {
             key={video.id}
             className="card card-clickable"
             style={{ padding: 0, overflow: 'hidden' }}
-            onClick={() => handlePlay(video)}
-            onMouseEnter={() => setHoveredId(video.id)}
-            onMouseLeave={() => setHoveredId(null)}
+            onClick={() => setPlayingVideo(video)}
           >
             {/* Thumbnail */}
             <div style={{
@@ -56,20 +56,17 @@ export default function VideosPage() {
               alignItems: 'center',
               justifyContent: 'center',
               position: 'relative',
-              fontSize: '4rem',
-              transition: 'all 0.2s',
             }}>
-              {video.thumbnail}
+              <div style={{ fontSize: '3rem' }}>🎬</div>
+
               {/* Play Overlay */}
               <div style={{
                 position: 'absolute',
                 inset: 0,
-                background: 'rgba(45, 58, 53, 0.55)',
+                background: 'rgba(45, 58, 53, 0.35)',
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
-                opacity: hoveredId === video.id ? 1 : 0,
-                transition: 'opacity 0.2s',
               }}>
                 <div style={{
                   width: 52,
@@ -86,36 +83,47 @@ export default function VideosPage() {
                 </div>
               </div>
 
-              {/* Duration Badge */}
+              {/* Week badge */}
               <div style={{
                 position: 'absolute',
                 bottom: 8,
                 left: 8,
-                background: 'rgba(0,0,0,0.75)',
+                background: 'rgba(0,0,0,0.7)',
                 color: 'white',
                 padding: '2px 8px',
                 borderRadius: 6,
-                fontSize: '0.75rem',
+                fontSize: '0.72rem',
                 fontWeight: 700,
-                direction: 'ltr',
               }}>
-                {video.durationMinutes}:00
+                {getWeeksLabel(video)}
+              </div>
+
+              {/* Number badge */}
+              <div style={{
+                position: 'absolute',
+                top: 8,
+                right: 8,
+                background: 'var(--color-sage)',
+                color: 'white',
+                width: 28,
+                height: 28,
+                borderRadius: '50%',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                fontSize: '0.8rem',
+                fontWeight: 800,
+              }}>
+                {video.id}
               </div>
             </div>
 
             {/* Info */}
             <div style={{ padding: '14px 16px' }}>
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: 8, marginBottom: 8 }}>
-                <h3 style={{ fontSize: '0.9rem', fontWeight: 700, lineHeight: 1.4, color: 'var(--color-text)', flex: 1 }}>
-                  {video.title}
-                </h3>
-              </div>
-              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                <span className="badge badge-sage">{video.category}</span>
-                <span style={{ fontSize: '0.75rem', color: 'var(--color-text-muted)' }}>
-                  👁️ {video.views.toLocaleString()}
-                </span>
-              </div>
+              <h3 style={{ fontSize: '0.9rem', fontWeight: 700, lineHeight: 1.4, color: 'var(--color-text)', marginBottom: 8 }}>
+                {video.title}
+              </h3>
+              <span className="badge badge-sage">{video.category}</span>
             </div>
           </div>
         ))}
@@ -126,6 +134,14 @@ export default function VideosPage() {
           <div style={{ fontSize: '3rem', marginBottom: 12 }}>🎬</div>
           <p>לא נמצאו סרטונים בקטגוריה זו</p>
         </div>
+      )}
+
+      {playingVideo && (
+        <VideoPlayerModal
+          video={playingVideo}
+          onClose={() => setPlayingVideo(null)}
+          getWeeksLabel={getWeeksLabel}
+        />
       )}
     </div>
   );

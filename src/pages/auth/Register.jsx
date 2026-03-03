@@ -160,8 +160,7 @@ export default function Register() {
       }}>
         {/* Logo */}
         <div style={{ textAlign: 'center', marginBottom: 24 }}>
-          <div style={{ fontSize: '2rem' }}>🌿</div>
-          <div style={{ fontSize: '1.2rem', fontWeight: 900, color: 'var(--color-sage-dark)' }}>happy baby</div>
+          <img src="/happy-baby-logo.png" alt="happy baby" style={{ height: 56, objectFit: 'contain', mixBlendMode: 'multiply' }} />
         </div>
 
         {/* Progress */}
@@ -306,6 +305,7 @@ export default function Register() {
                   <label className="form-label">תאריך הווסת האחרון (LMP)</label>
                   <input
                     type="date"
+                    lang="en"
                     className={`form-input${errors.lmpDate ? ' error' : ''}`}
                     value={form.lmpDate}
                     onChange={e => updateField('lmpDate', e.target.value)}
@@ -323,12 +323,15 @@ export default function Register() {
                 <div className="form-group">
                   <label className="form-label">🔑 קוד מנהל</label>
                   <input
-                    type="password"
+                    type="text"
                     className={`form-input${errors.adminCode ? ' error' : ''}`}
-                    placeholder="הזן/י את קוד המנהל שקיבלת"
+                    placeholder="HAPPYBABY2025"
                     value={form.adminCode}
-                    onChange={e => updateField('adminCode', e.target.value)}
+                    onChange={e => updateField('adminCode', e.target.value.trim())}
                     dir="ltr"
+                    autoComplete="off"
+                    autoCorrect="off"
+                    autoCapitalize="none"
                   />
                   {errors.adminCode && <span className="form-error">{errors.adminCode}</span>}
                   <span style={{ fontSize: '0.75rem', color: 'var(--color-text-muted)' }}>

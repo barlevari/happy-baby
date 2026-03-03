@@ -67,16 +67,11 @@ export default function Landing() {
     }}>
       {/* Hero */}
       <div style={{ textAlign: 'center', marginBottom: 48 }}>
-        <div style={{ fontSize: '5rem', marginBottom: 8, lineHeight: 1 }}>🌿</div>
-        <h1 style={{
-          fontSize: 'clamp(2.5rem, 6vw, 4rem)',
-          fontWeight: 900,
-          color: 'var(--color-sage-dark)',
-          margin: 0,
-          letterSpacing: '-0.03em',
-        }}>
-          happy baby
-        </h1>
+        <img
+          src="/happy-baby-logo.png"
+          alt="happy baby"
+          style={{ height: 'clamp(80px, 14vw, 140px)', objectFit: 'contain', marginBottom: 8, mixBlendMode: 'multiply' }}
+        />
         <p style={{
           fontSize: 'clamp(1rem, 2.5vw, 1.3rem)',
           color: 'var(--color-text-muted)',
