@@ -2,20 +2,29 @@ import { Link } from 'react-router-dom';
 
 const CREDENTIALS = [
   {
-    emoji: '🎓',
-    title: 'הסמכה מקצועית',
-    desc: 'בוגרת לימודי ייעוץ שינה לתינוקות בהסמכה בינלאומית, עם ניסיון של מעל עשר שנים בתחום.',
+    emoji: '🏥',
+    title: 'רפואה סינית לילדים ותינוקות',
+    desc: 'מומחית ברפואה סינית המיוחדת לתינוקות, ילדים, הריון ולידה — תחום ייחודי ונדיר.',
   },
   {
-    emoji: '👶',
-    title: 'ניסיון עשיר',
-    desc: 'עבדתי עם מאות משפחות בישראל, מלוות אמהות בהריון ולאחר לידה עם תוצאות מוכחות.',
+    emoji: '⏳',
+    title: '35+ שנות ניסיון קליני',
+    desc: 'ניסיון קליני עשיר של למעלה מ-35 שנה בליווי נשים, תינוקות ומשפחות.',
   },
   {
     emoji: '🌿',
-    title: 'גישה הוליסטית',
-    desc: 'שיטת Happy Baby מאחדת מדע, אינטואיציה הורית וכלים מעשיים ליצירת שגרה בריאה לתינוק ולמשפחה.',
+    title: 'גישה הוליסטית ומחברת',
+    desc: 'שיטת Happy Baby מאחדת רפואה סינית, מדע מודרני ואינטואיציה הורית ליצירת שגרה בריאה.',
   },
+];
+
+const SPECIALTIES = [
+  'רפואה סינית לתינוקות וילדים',
+  'ליווי הריון ולידה ברפואה סינית',
+  'טיפול בבעיות שינה אצל תינוקות',
+  'תמיכה בהנקה ותזונת תינוקות',
+  'הכנה ללידה והתאוששות לאחריה',
+  'טיפול בקוליק, גזים ואי-נוחות',
 ];
 
 export default function AboutPage() {
@@ -27,8 +36,9 @@ export default function AboutPage() {
       padding: '40px 24px',
     }}>
       <div style={{ maxWidth: 800, margin: '0 auto' }}>
-        {/* Hero */}
-        <div style={{ textAlign: 'center', marginBottom: 48 }}>
+
+        {/* Hero - Roital's profile */}
+        <div className="card" style={{ textAlign: 'center', marginBottom: 32, padding: '40px 32px' }}>
           <div style={{
             width: 120,
             height: 120,
@@ -38,30 +48,25 @@ export default function AboutPage() {
             alignItems: 'center',
             justifyContent: 'center',
             fontSize: '3.5rem',
-            margin: '0 auto 24px',
+            margin: '0 auto 20px',
             boxShadow: 'var(--shadow-lg)',
           }}>
             🌿
           </div>
-          <h1 style={{ fontSize: 'clamp(1.8rem, 4vw, 2.5rem)', fontWeight: 900, marginBottom: 12, color: 'var(--color-sage-dark)' }}>
-            אודות Happy Baby
+          <h1 style={{ fontSize: 'clamp(1.6rem, 4vw, 2.2rem)', fontWeight: 900, marginBottom: 8, color: 'var(--color-sage-dark)' }}>
+            רויטל לב ארי
           </h1>
-          <p style={{ fontSize: '1.05rem', color: 'var(--color-text-muted)', maxWidth: 560, margin: '0 auto', lineHeight: 1.8 }}>
-            Happy Baby נולדה מתוך אהבה עמוקה לאמהות ולתינוקות, ומתוך הבנה שכל אמא ראויה ללווי מקצועי, חם ונגיש בכל שלב של המסע.
+          <p style={{ fontSize: '1rem', color: 'var(--color-sage)', fontWeight: 700, marginBottom: 20 }}>
+            מייסדת Happy Baby | מומחית ברפואה סינית לתינוקות, ילדים, הריון ולידה
+          </p>
+          <p style={{ lineHeight: 1.9, color: 'var(--color-text)', fontSize: '0.97rem', maxWidth: 620, margin: '0 auto' }}>
+            נעים מאוד! אני רויטל לב ארי, נשואה לשחר ואמא לבר ואביב.
+            מקדישה חיים ללימודי רפואה סינית ולממשק הייחודי של רפואה סינית לתינוקות, ילדים, הריון ולידה —
+            תחום ייחודי ונדיר שאני גאה להיות בין המובילות בו בארץ.
           </p>
         </div>
 
-        {/* Mission */}
-        <div className="card" style={{ marginBottom: 32, background: 'var(--color-white)', textAlign: 'center' }}>
-          <h2 style={{ fontSize: '1.2rem', fontWeight: 800, marginBottom: 16, color: 'var(--color-sage-dark)' }}>
-            🎯 המשימה שלנו
-          </h2>
-          <p style={{ lineHeight: 1.9, color: 'var(--color-text)', fontSize: '0.95rem' }}>
-            אנו מאמינות שכל אמא – בהריון, לאחר לידה, וטרי – ראויה לידע, לכלים ולתמיכה שיאפשרו לה לגדל תינוק מאושר ובריא. שיטת Happy Baby משלבת מחקר עדכני, ניסיון אישי עשיר וגישה אמפתית, כדי לעזור לכל משפחה ליצור שגרה שעובדת עבורה.
-          </p>
-        </div>
-
-        {/* Credentials */}
+        {/* Credentials cards */}
         <div className="grid-3" style={{ marginBottom: 32 }}>
           {CREDENTIALS.map((c, i) => (
             <div className="card" key={i} style={{ textAlign: 'center' }}>
@@ -72,44 +77,75 @@ export default function AboutPage() {
           ))}
         </div>
 
-        {/* Team */}
-        <div className="card" style={{ textAlign: 'center', marginBottom: 32 }}>
-          <h2 style={{ fontSize: '1.1rem', fontWeight: 800, marginBottom: 20, color: 'var(--color-text)' }}>
-            👩‍⚕️ הצוות שלנו
+        {/* About story */}
+        <div className="card" style={{ marginBottom: 32 }}>
+          <h2 style={{ fontSize: '1.1rem', fontWeight: 800, marginBottom: 16, color: 'var(--color-sage-dark)' }}>
+            🌱 הסיפור שלי
           </h2>
-          <div style={{
-            width: 120,
-            height: 120,
-            borderRadius: 'var(--radius-lg)',
-            background: 'var(--color-sage-ultra)',
-            border: '2px dashed var(--color-sage-light)',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            margin: '0 auto 16px',
-            color: 'var(--color-sage)',
-            fontSize: '0.85rem',
-            fontWeight: 600,
-          }}>
-            📷<br />תמונה<br />תתווסף בקרוב
-          </div>
-          <div style={{ fontWeight: 700 }}>מייסדת Happy Baby</div>
-          <div style={{ color: 'var(--color-text-muted)', fontSize: '0.875rem', marginTop: 4 }}>
-            מומחית שינה לתינוקות ויועצת הנקה
+          <p style={{ lineHeight: 1.9, color: 'var(--color-text)', fontSize: '0.95rem', marginBottom: 14 }}>
+            הדרך שלי לרפואה סינית התחילה מתוך סקרנות ואהבה עמוקה לרפואה הוליסטית.
+            לאחר שנים של לימוד ופרקטיקה, התמחיתי בתחום שגיליתי שהוא הלב שלי —
+            ליווי אמהות בהריון, לידה, ותקופת הגדילה של התינוקות.
+          </p>
+          <p style={{ lineHeight: 1.9, color: 'var(--color-text)', fontSize: '0.95rem', marginBottom: 14 }}>
+            ניסיון קליני של למעלה מ-35 שנה לימד אותי שכל אמא, כל תינוק וכל משפחה הם עולם ומלואו.
+            שיטת Happy Baby נולדה מתוך הרצון לתת לכל אמא — ולכל מי שמלווה אמהות — את הכלים, הידע והביטחון
+            שהם צריכים.
+          </p>
+          <p style={{ lineHeight: 1.9, color: 'var(--color-text)', fontSize: '0.95rem' }}>
+            Happy Baby היא לא רק שיטה — זו פילוסופיה של ליווי חם, מקצועי ומבוסס ניסיון
+            שמאמינה בכל אמא ובכל תינוק.
+          </p>
+        </div>
+
+        {/* Specialties */}
+        <div className="card" style={{ marginBottom: 32 }}>
+          <h2 style={{ fontSize: '1.1rem', fontWeight: 800, marginBottom: 16, color: 'var(--color-sage-dark)' }}>
+            ✨ תחומי התמחות
+          </h2>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(220px, 1fr))', gap: 10 }}>
+            {SPECIALTIES.map((s, i) => (
+              <div key={i} style={{
+                display: 'flex', alignItems: 'center', gap: 10,
+                padding: '10px 14px',
+                background: 'var(--color-sage-ultra)',
+                borderRadius: 'var(--radius-md)',
+                fontSize: '0.875rem',
+                fontWeight: 600,
+                color: 'var(--color-sage-dark)',
+              }}>
+                <span style={{ color: 'var(--color-sage)', flexShrink: 0 }}>✓</span>
+                {s}
+              </div>
+            ))}
           </div>
         </div>
 
-        {/* WhatsApp CTA */}
-        <div style={{ textAlign: 'center', marginBottom: 32 }}>
-          <a
-            href="https://wa.me/972501234567?text=היי%2C%20אשמח%20לקבל%20מידע%20נוסף%20על%20Happy%20Baby"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="btn btn-lg"
-            style={{ background: '#25D366', color: 'white', border: 'none', display: 'inline-flex', gap: 10 }}
-          >
-            💬 דברי איתנו בוואטסאפ
-          </a>
+        {/* Contact & Social */}
+        <div className="card" style={{ marginBottom: 32, textAlign: 'center' }}>
+          <h2 style={{ fontSize: '1.1rem', fontWeight: 800, marginBottom: 20, color: 'var(--color-text)' }}>
+            📬 בואו נתחבר
+          </h2>
+          <div style={{ display: 'flex', justifyContent: 'center', gap: 16, flexWrap: 'wrap' }}>
+            <a
+              href="https://wa.me/972522218646?text=היי%20רויטל%2C%20אשמח%20לקבל%20מידע%20נוסף%20על%20Happy%20Baby"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="btn"
+              style={{ background: '#25D366', color: 'white', border: 'none', display: 'inline-flex', gap: 8, alignItems: 'center' }}
+            >
+              💬 וואטסאפ
+            </a>
+            <a
+              href="https://www.instagram.com/pikpik"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="btn btn-ghost"
+              style={{ display: 'inline-flex', gap: 8, alignItems: 'center', border: '2px solid #E1306C', color: '#E1306C' }}
+            >
+              📸 pikpik באינסטגרם
+            </a>
+          </div>
         </div>
 
         {/* Back Link */}

@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useNavigate, useSearchParams, Link } from 'react-router-dom';
-import { useAuth } from '../../context/AuthContext';
+import { useAuth, ADMIN_SECRET } from '../../context/AuthContext';
 
 function validateIsraeliIdLocal(id) {
   const str = String(id).padStart(9, '0');
@@ -22,10 +22,11 @@ export default function Register() {
 
   const [step, setStep] = useState(preRole ? 2 : 1);
   const [role, setRole] = useState(preRole || '');
-  const [form, setForm] = useState({ name: '', email: '', password: '', idNumber: '', lmpDate: '' });
+  const [form, setForm] = useState({ name: '', email: '', password: '', idNumber: '', lmpDate: '', adminCode: '' });
   const [errors, setErrors] = useState({});
   const [submitError, setSubmitError] = useState('');
   const [loading, setLoading] = useState(false);
+  const [registered, setRegistered] = useState(false);
 
   useEffect(() => {
     if (preRole) { setRole(preRole); setStep(2); }
@@ -44,6 +45,7 @@ export default function Register() {
     if (form.password.length < 8) newErrors.password = 'הסיסמה חייבת להכיל לפחות 8 תווים';
     if (!validateIsraeliIdLocal(form.idNumber)) newErrors.idNumber = 'מספר תעודת זהות לא תקין';
     if (role === 'moms' && !form.lmpDate) newErrors.lmpDate = 'נא להזין תאריך הווסת האחרון';
+    if (role === 'admin' && !form.adminCode) newErrors.adminCode = 'נא להזין קוד מנהל';
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
@@ -55,9 +57,15 @@ export default function Register() {
     const result = register({ ...form, role });
     setLoading(false);
     if (!result.ok) { setSubmitError(result.error); return; }
-    if (role === 'moms') navigate('/moms');
-    else if (role === 'student') navigate('/academy');
-    else navigate('/');
+
+    if (role === 'admin') {
+      navigate('/admin');
+    } else if (result.pending) {
+      setRegistered(true);
+    } else {
+      if (role === 'moms') navigate('/moms');
+      else if (role === 'student') navigate('/academy');
+    }
   };
 
   const roleCards = [
@@ -77,7 +85,59 @@ export default function Register() {
       color: 'var(--color-sage-ultra)',
       border: 'var(--color-sage)',
     },
+    {
+      id: 'admin',
+      icon: '🛡️',
+      title: 'מנהל / מנהלת האתר',
+      desc: 'גישה מלאה לניהול משתמשים, תוכן ואבטחה (נדרש קוד מנהל)',
+      color: '#F0F4FF',
+      border: 'var(--color-admin)',
+    },
   ];
+
+  // Pending approval screen
+  if (registered) {
+    return (
+      <div style={{
+        minHeight: '100vh',
+        background: 'linear-gradient(160deg, var(--color-cream) 0%, var(--color-sage-ultra) 100%)',
+        display: 'flex', alignItems: 'center', justifyContent: 'center',
+        padding: 24, direction: 'rtl',
+      }}>
+        <div style={{
+          width: '100%', maxWidth: 440,
+          background: 'var(--color-white)',
+          borderRadius: 'var(--radius-xl)',
+          boxShadow: 'var(--shadow-xl)',
+          padding: '48px 36px',
+          textAlign: 'center',
+          border: '1px solid var(--color-border)',
+        }}>
+          <div style={{ fontSize: '3.5rem', marginBottom: 16 }}>⏳</div>
+          <h1 style={{ fontSize: '1.4rem', fontWeight: 900, color: 'var(--color-sage-dark)', marginBottom: 12 }}>
+            ההרשמה נשלחה!
+          </h1>
+          <p style={{ color: 'var(--color-text-muted)', lineHeight: 1.7, marginBottom: 24 }}>
+            בקשתך התקבלה ותבדק על ידי המנהלת בהקדם.
+            תקבלי הודעה ברגע שהחשבון שלך יאושר.
+          </p>
+          <div style={{
+            padding: '14px 18px',
+            background: 'var(--color-sage-ultra)',
+            borderRadius: 'var(--radius-md)',
+            fontSize: '0.85rem',
+            color: 'var(--color-sage-dark)',
+            marginBottom: 24,
+          }}>
+            📧 שמור/י את פרטי ההתחברות שלך — תצטרכ/י אותם לאחר האישור
+          </div>
+          <Link to="/login" className="btn btn-primary" style={{ display: 'block', textAlign: 'center' }}>
+            חזרה לכניסה
+          </Link>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div style={{
@@ -91,7 +151,7 @@ export default function Register() {
     }}>
       <div style={{
         width: '100%',
-        maxWidth: step === 1 ? 640 : 480,
+        maxWidth: step === 1 ? 660 : 480,
         background: 'var(--color-white)',
         borderRadius: 'var(--radius-xl)',
         boxShadow: 'var(--shadow-xl)',
@@ -109,17 +169,11 @@ export default function Register() {
           {[1, 2].map(s => (
             <div key={s} style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
               <div style={{
-                width: 28,
-                height: 28,
-                borderRadius: '50%',
+                width: 28, height: 28, borderRadius: '50%',
                 background: step >= s ? 'var(--color-sage)' : 'var(--color-border)',
                 color: step >= s ? 'white' : 'var(--color-text-muted)',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                fontWeight: 700,
-                fontSize: '0.8rem',
-                transition: 'all 0.3s',
+                display: 'flex', alignItems: 'center', justifyContent: 'center',
+                fontWeight: 700, fontSize: '0.8rem', transition: 'all 0.3s',
               }}>{s}</div>
               {s < 2 && <div style={{ width: 32, height: 2, background: step > s ? 'var(--color-sage)' : 'var(--color-border)', borderRadius: 2 }} />}
             </div>
@@ -129,7 +183,7 @@ export default function Register() {
         {step === 1 && (
           <div>
             <h1 style={{ textAlign: 'center', fontSize: '1.3rem', fontWeight: 800, marginBottom: 24, color: 'var(--color-text)' }}>
-              בחרי את המסלול שלך
+              בחר/י את המסלול שלך
             </h1>
             <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
               {roleCards.map(card => (
@@ -140,9 +194,7 @@ export default function Register() {
                     background: card.color,
                     borderColor: role === card.id ? card.border : 'transparent',
                     borderWidth: 2,
-                    display: 'flex',
-                    gap: 16,
-                    alignItems: 'flex-start',
+                    display: 'flex', gap: 16, alignItems: 'flex-start',
                     padding: 20,
                     boxShadow: role === card.id ? 'var(--shadow-md)' : 'var(--shadow-sm)',
                   }}
@@ -267,6 +319,24 @@ export default function Register() {
                 </div>
               )}
 
+              {role === 'admin' && (
+                <div className="form-group">
+                  <label className="form-label">🔑 קוד מנהל</label>
+                  <input
+                    type="password"
+                    className={`form-input${errors.adminCode ? ' error' : ''}`}
+                    placeholder="הזן/י את קוד המנהל שקיבלת"
+                    value={form.adminCode}
+                    onChange={e => updateField('adminCode', e.target.value)}
+                    dir="ltr"
+                  />
+                  {errors.adminCode && <span className="form-error">{errors.adminCode}</span>}
+                  <span style={{ fontSize: '0.75rem', color: 'var(--color-text-muted)' }}>
+                    הקוד מתקבל מהמנהלת הראשית בלבד
+                  </span>
+                </div>
+              )}
+
               <div style={{ display: 'flex', gap: 12, marginTop: 8 }}>
                 <button
                   type="button"
@@ -282,7 +352,7 @@ export default function Register() {
                   disabled={loading}
                   style={{ flex: 2 }}
                 >
-                  {loading ? 'נרשמת...' : 'הרשמה'}
+                  {loading ? 'נרשמ/ת...' : role === 'admin' ? 'הרשמה כמנהל' : 'שלח/י בקשה'}
                 </button>
               </div>
             </form>
@@ -291,7 +361,7 @@ export default function Register() {
 
         <div style={{ textAlign: 'center', marginTop: 20, fontSize: '0.875rem', color: 'var(--color-text-muted)' }}>
           יש לך כבר חשבון?{' '}
-          <Link to="/login" style={{ color: 'var(--color-sage-dark)', fontWeight: 700 }}>כנסי כאן</Link>
+          <Link to="/login" style={{ color: 'var(--color-sage-dark)', fontWeight: 700 }}>כנס/י כאן</Link>
         </div>
       </div>
     </div>

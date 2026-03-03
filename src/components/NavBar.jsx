@@ -1,4 +1,4 @@
-import { NavLink, useNavigate } from 'react-router-dom';
+import { NavLink, useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { useState } from 'react';
 
@@ -41,7 +41,12 @@ const ROLE_COLORS = {
 export default function NavBar() {
   const { user, logout } = useAuth();
   const navigate = useNavigate();
+  const location = useLocation();
   const [mobileOpen, setMobileOpen] = useState(false);
+
+  // Root paths where back button should go to home (not back in history)
+  const rootPaths = ['/moms', '/academy', '/admin'];
+  const isRoot = rootPaths.includes(location.pathname);
 
   if (!user) return null;
 
@@ -154,6 +159,32 @@ export default function NavBar() {
             </NavLink>
           ))}
         </nav>
+
+        {/* Back button */}
+        {!isRoot && (
+          <div style={{ padding: '0 12px 8px' }}>
+            <button
+              onClick={() => navigate(-1)}
+              style={{
+                width: '100%',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '10px',
+                padding: '10px 12px',
+                borderRadius: '10px',
+                border: 'none',
+                background: 'var(--color-sage-ultra)',
+                color: 'var(--color-sage-dark)',
+                fontWeight: 700,
+                fontSize: '0.875rem',
+                cursor: 'pointer',
+              }}
+            >
+              <span>→</span>
+              <span>חזרה</span>
+            </button>
+          </div>
+        )}
 
         {/* Logout */}
         <div style={{ padding: '12px', borderTop: '1px solid var(--color-border)' }}>

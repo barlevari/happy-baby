@@ -8,11 +8,16 @@ export default function Login() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
+  const [isPending, setIsPending] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [showForgot, setShowForgot] = useState(false);
+  const [forgotEmail, setForgotEmail] = useState('');
+  const [forgotSent, setForgotSent] = useState(false);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError('');
+    setIsPending(false);
     if (!email || !password) {
       setError('נא למלא את כל השדות');
       return;
@@ -21,6 +26,7 @@ export default function Login() {
     const result = login(email, password);
     setLoading(false);
     if (!result.ok) {
+      if (result.pending) setIsPending(true);
       setError(result.error);
       return;
     }
@@ -30,6 +36,79 @@ export default function Login() {
     else if (user.role === 'admin') navigate('/admin');
     else navigate('/');
   };
+
+  const handleForgot = (e) => {
+    e.preventDefault();
+    if (!forgotEmail) return;
+    // In production this would send a real email
+    setForgotSent(true);
+  };
+
+  if (showForgot) {
+    return (
+      <div style={{
+        minHeight: '100vh',
+        background: 'linear-gradient(160deg, var(--color-cream) 0%, var(--color-sage-ultra) 100%)',
+        display: 'flex', alignItems: 'center', justifyContent: 'center',
+        padding: 24, direction: 'rtl',
+      }}>
+        <div style={{
+          width: '100%', maxWidth: 420,
+          background: 'var(--color-white)',
+          borderRadius: 'var(--radius-xl)',
+          boxShadow: 'var(--shadow-xl)',
+          padding: '40px 36px',
+          border: '1px solid var(--color-border)',
+        }}>
+          <div style={{ textAlign: 'center', marginBottom: 28 }}>
+            <div style={{ fontSize: '2.5rem', marginBottom: 8 }}>🔑</div>
+            <h1 style={{ fontSize: '1.3rem', fontWeight: 900, color: 'var(--color-sage-dark)' }}>שכחתי סיסמה</h1>
+          </div>
+
+          {forgotSent ? (
+            <div style={{ textAlign: 'center' }}>
+              <div style={{ fontSize: '3rem', marginBottom: 16 }}>📧</div>
+              <p style={{ color: 'var(--color-text-muted)', lineHeight: 1.7, marginBottom: 24 }}>
+                אם הכתובת <strong>{forgotEmail}</strong> רשומה במערכת, נשלח אליה קישור לאיפוס סיסמה.
+              </p>
+              <button
+                className="btn btn-primary w-full"
+                onClick={() => { setShowForgot(false); setForgotSent(false); setForgotEmail(''); }}
+              >
+                חזרה לכניסה
+              </button>
+            </div>
+          ) : (
+            <form onSubmit={handleForgot}>
+              <div className="form-group">
+                <label className="form-label">כתובת האימייל שלך</label>
+                <input
+                  type="email"
+                  className="form-input"
+                  placeholder="your@email.com"
+                  value={forgotEmail}
+                  onChange={e => setForgotEmail(e.target.value)}
+                  dir="ltr"
+                  autoFocus
+                />
+              </div>
+              <button type="submit" className="btn btn-primary w-full" style={{ marginTop: 8 }}>
+                שלח/י קישור לאיפוס
+              </button>
+              <button
+                type="button"
+                className="btn btn-ghost w-full"
+                style={{ marginTop: 10 }}
+                onClick={() => setShowForgot(false)}
+              >
+                חזרה
+              </button>
+            </form>
+          )}
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div style={{
@@ -59,12 +138,17 @@ export default function Login() {
         </div>
 
         <h1 style={{ textAlign: 'center', fontSize: '1.4rem', fontWeight: 800, marginBottom: 28, color: 'var(--color-text)' }}>
-          ברוכה הבאה בחזרה 🌿
+          ברוכ/ה הבא/ה 🌿
         </h1>
 
         {error && (
-          <div className="alert alert-danger" style={{ marginBottom: 20 }}>
-            ⚠️ {error}
+          <div className={`alert ${isPending ? 'alert-warning' : 'alert-danger'}`} style={{ marginBottom: 20 }}>
+            {isPending ? '⏳' : '⚠️'} {error}
+            {isPending && (
+              <div style={{ fontSize: '0.8rem', marginTop: 6, color: 'var(--color-text-muted)' }}>
+                פנ/י למנהלת האתר לאישור מהיר
+              </div>
+            )}
           </div>
         )}
 
@@ -94,20 +178,30 @@ export default function Login() {
             />
           </div>
 
+          <div style={{ textAlign: 'left', marginBottom: 12 }}>
+            <button
+              type="button"
+              onClick={() => setShowForgot(true)}
+              style={{ background: 'none', border: 'none', color: 'var(--color-text-muted)', fontSize: '0.82rem', cursor: 'pointer', padding: 0 }}
+            >
+              שכחתי סיסמה
+            </button>
+          </div>
+
           <button
             type="submit"
             className="btn btn-primary w-full"
             disabled={loading}
-            style={{ marginTop: 8 }}
+            style={{ marginTop: 4 }}
           >
-            {loading ? 'מתחברת...' : 'כניסה'}
+            {loading ? 'מתחבר/ת...' : 'כניסה'}
           </button>
         </form>
 
         <div style={{ textAlign: 'center', marginTop: 24, fontSize: '0.875rem', color: 'var(--color-text-muted)' }}>
           אין לך חשבון עדיין?{' '}
           <Link to="/register" style={{ color: 'var(--color-sage-dark)', fontWeight: 700 }}>
-            הירשמי כאן
+            הירשמ/י כאן
           </Link>
         </div>
 

@@ -7,7 +7,7 @@ export default function WhatsAppButton() {
 
   const name = user?.name || 'משתמשת';
   const encodedText = encodeURIComponent(`היי, אני ${name}, אשמח להתייעץ לגבי...`);
-  const waUrl = `https://wa.me/972501234567?text=${encodedText}`;
+  const waUrl = `https://wa.me/972522218646?text=${encodedText}`;
 
   return (
     <div style={{

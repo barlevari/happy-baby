@@ -1,4 +1,6 @@
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
+import { useAuth } from '../../context/AuthContext';
+import { useNavigate } from 'react-router-dom';
 
 const VIDEO_CHART_DATA = [
   { name: 'הכנה ללידה', views: 1240 },
@@ -42,6 +44,20 @@ const ROLE_CONFIG = {
 };
 
 export default function AdminDashboard() {
+  const { getAllUsers } = useAuth();
+  const navigate = useNavigate();
+  const allUsers = getAllUsers();
+  const pendingCount = allUsers.filter(u => u.status === 'pending').length;
+  const momsCount = allUsers.filter(u => u.role === 'moms' && u.status === 'approved').length;
+  const studentCount = allUsers.filter(u => u.role === 'student' && u.status === 'approved').length;
+
+  const statCards = [
+    { label: 'מטופלות', value: momsCount, icon: '👩‍🤱', iconBg: 'var(--color-sage-ultra)', color: 'var(--color-sage-dark)' },
+    { label: 'סטודנטיות', value: studentCount, icon: '🎓', iconBg: 'var(--color-rose-light)', color: 'var(--color-rose-dark)' },
+    { label: 'ממתינים לאישור', value: pendingCount, icon: '⏳', iconBg: '#FEF3C7', color: '#B45309', onClick: () => navigate('/admin/users') },
+    { label: 'צפיות השבוע', value: 312, icon: '👁️', iconBg: 'var(--color-admin-light)', color: 'var(--color-admin)' },
+  ];
+
   return (
     <div style={{ direction: 'rtl' }}>
       {/* Page Header */}
@@ -52,10 +68,40 @@ export default function AdminDashboard() {
         </span>
       </div>
 
+      {/* Pending alert */}
+      {pendingCount > 0 && (
+        <div
+          onClick={() => navigate('/admin/users')}
+          style={{
+            background: '#FFF8E1',
+            border: '1px solid var(--color-warning)',
+            borderRadius: 'var(--radius-md)',
+            padding: '14px 18px',
+            marginBottom: 24,
+            cursor: 'pointer',
+            display: 'flex',
+            alignItems: 'center',
+            gap: 12,
+          }}
+        >
+          <span style={{ fontSize: '1.4rem' }}>⏳</span>
+          <div>
+            <strong style={{ color: '#B45309' }}>יש {pendingCount} משתמשים שממתינים לאישור</strong>
+            <div style={{ fontSize: '0.82rem', color: '#92400E' }}>לחץ/י לאישור או דחייה</div>
+          </div>
+          <span style={{ marginRight: 'auto', color: '#B45309', fontSize: '1.2rem' }}>←</span>
+        </div>
+      )}
+
       {/* Stat Cards */}
       <div className="grid-4" style={{ marginBottom: 32 }}>
-        {STAT_CARDS.map((card, i) => (
-          <div className="stat-card" key={i}>
+        {statCards.map((card, i) => (
+          <div
+            className="stat-card"
+            key={i}
+            onClick={card.onClick}
+            style={card.onClick ? { cursor: 'pointer' } : {}}
+          >
             <div className="stat-icon" style={{ background: card.iconBg, fontSize: '1.4rem' }}>
               {card.icon}
             </div>
