@@ -158,6 +158,7 @@ export default function Landing() {
             height: 'clamp(90px, 15vw, 150px)',
             objectFit: 'contain',
             marginBottom: 8,
+            opacity: 0.95,
             animation: `logoIn 1s ${SPRING} both`,
             animationDelay: '0.05s',
           }}
