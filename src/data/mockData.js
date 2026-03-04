@@ -12,7 +12,7 @@ export const MOCK_VIDEOS = [
   { id: 7,  title: 'רוטציה של הציר המרכזי',   category: 'תנועה',   weeksMin: 12, weeksMax: 30,  youtubeId: 'VIDEO_7' },
   { id: 8,  title: 'לקטוף את הירח',            category: 'תנועה',   weeksMin: 12, weeksMax: 35,  youtubeId: 'VIDEO_8' },
   { id: 9,  title: 'אגן מצד לצד',              category: 'תנועה',   weeksMin: 14, weeksMax: 32,  youtubeId: 'VIDEO_9' },
-  { id: 10, title: 'פתיחת הקווים',             category: 'תנועה',   weeksMin: 16, weeksMax: 36,  youtubeId: 'VIDEO_10' },
+  { id: 10, title: 'פתיחת הקווים',             category: 'תנועה',   weeksMin: 16, weeksMax: 36,  youtubeId: '2fzHXT0dgQU' },
   { id: 11, title: 'תנועה אסימטרית באגן',      category: 'תנועה',   weeksMin: 16, weeksMax: 36,  youtubeId: 'VIDEO_11' },
   { id: 12, title: 'להאריך את הרגליים',        category: 'תנועה',   weeksMin: 14, weeksMax: 32,  youtubeId: 'VIDEO_12' },
   { id: 13, title: 'תרגילים בישיבה',           category: 'שכיבה/ישיבה', weeksMin: 20, weeksMax: 40, youtubeId: 'VIDEO_13' },
