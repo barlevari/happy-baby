@@ -5,7 +5,7 @@ const isPlaceholder = (id) => !id || id.startsWith('VIDEO_');
 export default function VideoPlayerModal({ video, onClose, getWeeksLabel }) {
   const { lang, isRTL } = useLanguage();
   const placeholder = isPlaceholder(video.youtubeId);
-  const ccParams = lang === 'en' ? '&cc_load_policy=1&cc_lang_pref=en' : '';
+  const ccParams = lang === 'en' ? '&cc_load_policy=1&cc_lang_pref=en&hl=en' : '';
 
   return (
     <div
