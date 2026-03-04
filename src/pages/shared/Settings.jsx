@@ -1,9 +1,11 @@
 import { useState } from 'react';
 import { useAuth } from '../../context/AuthContext';
+import { useLanguage } from '../../context/LanguageContext';
 import { useNavigate } from 'react-router-dom';
 
 export default function Settings() {
   const { user, logout } = useAuth();
+  const { lang, setLang, t } = useLanguage();
   const navigate = useNavigate();
 
   const [notifications, setNotifications] = useState({
@@ -86,13 +88,31 @@ export default function Settings() {
   );
 
   return (
-    <div style={{ direction: 'rtl', maxWidth: 600 }}>
+    <div style={{ direction: lang === 'en' ? 'ltr' : 'rtl', maxWidth: 600 }}>
       <div className="page-header">
-        <h1>⚙️ הגדרות</h1>
+        <h1>{t('settingsTitle')}</h1>
       </div>
 
+      {/* Language Section */}
+      <Section title={`🌐 ${t('language')}`}>
+        <div style={{ display: 'flex', gap: 12 }}>
+          <button
+            className={`btn btn-sm ${lang === 'he' ? 'btn-primary' : 'btn-secondary'}`}
+            onClick={() => setLang('he')}
+          >
+            🇮🇱 עברית
+          </button>
+          <button
+            className={`btn btn-sm ${lang === 'en' ? 'btn-primary' : 'btn-secondary'}`}
+            onClick={() => setLang('en')}
+          >
+            🇺🇸 English
+          </button>
+        </div>
+      </Section>
+
       {/* Profile Section */}
-      <Section title="👤 פרופיל">
+      <Section title={t('profile')}>
         <Row label="שם מלא" value={user?.name} />
         <Row label="אימייל" value={user?.email} muted />
         <Row label="תעודת זהות" value={`${user?.idNumber?.slice(0, 3)}XXXXXX`} muted />
@@ -106,7 +126,7 @@ export default function Settings() {
             <label className="form-label">תאריך הווסת האחרון (LMP)</label>
             <input
               type="date"
-              lang="en"
+              lang="en-US"
               className="form-input"
               value={lmpDate}
               onChange={e => { setLmpDate(e.target.value); setLmpSaved(false); }}

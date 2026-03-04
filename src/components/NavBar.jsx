@@ -1,37 +1,7 @@
 import { NavLink, useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
+import { useLanguage } from '../context/LanguageContext';
 import { useState } from 'react';
-
-const NAV_LINKS = {
-  moms: [
-    { to: '/moms', label: 'בית', icon: '🏠', end: true },
-    { to: '/moms/videos', label: 'סרטונים', icon: '🎥' },
-    { to: '/moms/nutrition', label: 'תזונה', icon: '🥗' },
-    { to: '/moms/mental', label: 'הכנה מנטלית', icon: '🧘' },
-    { to: '/settings', label: 'הגדרות', icon: '⚙️' },
-    { to: '/about', label: 'אודות', icon: 'ℹ️' },
-  ],
-  student: [
-    { to: '/academy', label: 'סילבוס', icon: '📋', end: true },
-    { to: '/academy/videos', label: 'סרטונים', icon: '🎥' },
-    { to: '/academy/library', label: 'ספרייה', icon: '📚' },
-    { to: '/academy/practice', label: 'תרגול', icon: '✍️' },
-    { to: '/academy/events', label: 'אירועים', icon: '📅' },
-    { to: '/about', label: 'אודות', icon: 'ℹ️' },
-  ],
-  admin: [
-    { to: '/admin', label: 'לוח בקרה', icon: '📊', end: true },
-    { to: '/admin/users', label: 'משתמשים', icon: '👥' },
-    { to: '/admin/analytics', label: 'אנליטיקס', icon: '📈' },
-    { to: '/about', label: 'אודות', icon: 'ℹ️' },
-  ],
-};
-
-const ROLE_LABELS = {
-  moms: 'בהריון',
-  student: 'סטודנטית',
-  admin: 'מנהלת',
-};
 
 const ROLE_COLORS = {
   moms: { bg: 'var(--color-rose-light)', color: 'var(--color-rose-dark)' },
@@ -41,6 +11,7 @@ const ROLE_COLORS = {
 
 export default function NavBar() {
   const { user, logout } = useAuth();
+  const { t } = useLanguage();
   const navigate = useNavigate();
   const location = useLocation();
   const [mobileOpen, setMobileOpen] = useState(false);
@@ -50,6 +21,40 @@ export default function NavBar() {
   const isRoot = rootPaths.includes(location.pathname);
 
   if (!user) return null;
+
+  const NAV_LINKS = {
+    moms: [
+      { to: '/moms', label: t('home'), icon: '🏠', end: true },
+      { to: '/moms/videos', label: t('videos'), icon: '🎥' },
+      { to: '/moms/nutrition', label: t('nutrition'), icon: '🥗' },
+      { to: '/moms/mental', label: t('mental'), icon: '🧘' },
+      { to: '/chat', label: t('aiChatNav'), icon: '🤖' },
+      { to: '/settings', label: t('settings'), icon: '⚙️' },
+      { to: '/about', label: t('about'), icon: 'ℹ️' },
+    ],
+    student: [
+      { to: '/academy', label: t('syllabus'), icon: '📋', end: true },
+      { to: '/academy/videos', label: t('videos'), icon: '🎥' },
+      { to: '/academy/library', label: t('library'), icon: '📚' },
+      { to: '/academy/practice', label: t('practice'), icon: '✍️' },
+      { to: '/academy/events', label: t('events'), icon: '📅' },
+      { to: '/chat', label: t('aiChatNav'), icon: '🤖' },
+      { to: '/settings', label: t('settings'), icon: '⚙️' },
+      { to: '/about', label: t('about'), icon: 'ℹ️' },
+    ],
+    admin: [
+      { to: '/admin', label: t('dashboard'), icon: '📊', end: true },
+      { to: '/admin/users', label: t('users'), icon: '👥' },
+      { to: '/admin/analytics', label: t('analytics'), icon: '📈' },
+      { to: '/about', label: t('about'), icon: 'ℹ️' },
+    ],
+  };
+
+  const ROLE_LABELS = {
+    moms: user.role === 'moms' ? (t('home') === 'Home' ? 'Pregnant' : 'בהריון') : '',
+    student: t('home') === 'Home' ? 'Student' : 'סטודנטית',
+    admin: t('home') === 'Home' ? 'Admin' : 'מנהלת',
+  };
 
   const links = NAV_LINKS[user.role] || [];
   const roleLabel = ROLE_LABELS[user.role];
@@ -176,7 +181,7 @@ export default function NavBar() {
               }}
             >
               <span>→</span>
-              <span>חזרה</span>
+              <span>{t('back')}</span>
             </button>
           </div>
         )}
@@ -205,7 +210,7 @@ export default function NavBar() {
             title="יציאה"
           >
             <span>🚪</span>
-            <span className="nav-label">יציאה</span>
+            <span className="nav-label">{t('logout')}</span>
           </button>
         </div>
       </aside>

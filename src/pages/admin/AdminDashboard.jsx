@@ -64,7 +64,7 @@ export default function AdminDashboard() {
       <div className="page-header">
         <h1>🛡️ לוח בקרה ניהולי</h1>
         <span style={{ fontSize: '0.85rem', color: 'var(--color-text-muted)' }}>
-          {new Date().toLocaleDateString('he-IL', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' })}
+          {(() => { const d = new Date(); const days = ['ראשון','שני','שלישי','רביעי','חמישי','שישי','שבת']; const months = ['ינואר','פברואר','מרץ','אפריל','מאי','יוני','יולי','אוגוסט','ספטמבר','אוקטובר','נובמבר','דצמבר']; return `יום ${days[d.getDay()]}, ${d.getDate()} ב${months[d.getMonth()]} ${d.getFullYear()}`; })()}
         </span>
       </div>
 
@@ -188,7 +188,7 @@ export default function AdminDashboard() {
                     <td style={{ color: 'var(--color-text-muted)', direction: 'ltr', textAlign: 'right' }}>{u.email}</td>
                     <td><span className={`badge ${rc.cls}`}>{rc.label}</span></td>
                     <td style={{ color: 'var(--color-text-muted)', fontSize: '0.85rem' }}>
-                      {new Date(u.date).toLocaleDateString('he-IL')}
+                      {(() => { const d = new Date(u.date + 'T12:00:00'); return `${String(d.getDate()).padStart(2,'0')}/${String(d.getMonth()+1).padStart(2,'0')}/${d.getFullYear()}`; })()}
                     </td>
                   </tr>
                 );

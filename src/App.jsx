@@ -22,6 +22,7 @@ import UsersTable from './pages/admin/UsersTable';
 import VideoAnalytics from './pages/admin/VideoAnalytics';
 import AboutPage from './pages/shared/AboutPage';
 import Settings from './pages/shared/Settings';
+import ChatPage from './pages/shared/ChatPage';
 
 function AppShell({ children }) {
   return (
@@ -126,6 +127,11 @@ export default function App() {
       <Route path="/settings" element={
         <ProtectedRoute>
           <AppShell><Settings /></AppShell>
+        </ProtectedRoute>
+      } />
+      <Route path="/chat" element={
+        <ProtectedRoute>
+          <AppShell><ChatPage /></AppShell>
         </ProtectedRoute>
       } />
 

@@ -161,7 +161,7 @@ export default function AcademyDashboard() {
               <div style={{ flex: 1 }}>
                 <div style={{ fontWeight: 700, fontSize: '0.9rem' }}>{event.title}</div>
                 <div style={{ fontSize: '0.78rem', color: 'var(--color-text-muted)', marginTop: 2 }}>
-                  {new Date(event.date).toLocaleDateString('he-IL')} • {event.location}
+                  {(() => { const d = new Date(event.date + 'T12:00:00'); return `${String(d.getDate()).padStart(2,'0')}/${String(d.getMonth()+1).padStart(2,'0')}/${d.getFullYear()}`; })()} • {event.location}
                 </div>
               </div>
               <span className={`badge ${event.type === 'online' ? 'badge-sage' : 'badge-rose'}`}>

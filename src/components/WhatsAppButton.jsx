@@ -10,16 +10,19 @@ export default function WhatsAppButton() {
   const waUrl = `https://wa.me/972522218646?text=${encodedText}`;
 
   return (
-    <div style={{
-      position: 'fixed',
-      bottom: 'max(24px, calc(64px + 16px))',
-      left: 24,
-      zIndex: 999,
-      display: 'flex',
-      flexDirection: 'column',
-      alignItems: 'flex-start',
-      gap: 8,
-    }}>
+    <div
+      onMouseEnter={() => setHovered(true)}
+      onMouseLeave={() => setHovered(false)}
+      style={{
+        position: 'fixed',
+        bottom: 'max(24px, calc(64px + 16px))',
+        left: 24,
+        zIndex: 999,
+        display: 'flex',
+        flexDirection: 'column',
+        alignItems: 'flex-start',
+        gap: 8,
+      }}>
       {/* Tooltip */}
       {hovered && (
         <div style={{
@@ -32,6 +35,7 @@ export default function WhatsAppButton() {
           whiteSpace: 'nowrap',
           boxShadow: 'var(--shadow-md)',
           animation: 'fadeIn 0.15s ease',
+          pointerEvents: 'none',
         }}>
           צרי קשר בוואטסאפ
         </div>
@@ -43,8 +47,6 @@ export default function WhatsAppButton() {
         target="_blank"
         rel="noopener noreferrer"
         className="whatsapp-btn"
-        onMouseEnter={() => setHovered(true)}
-        onMouseLeave={() => setHovered(false)}
         style={{
           width: 56,
           height: 56,

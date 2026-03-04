@@ -34,10 +34,10 @@ function EventCard({ event }) {
         color: event.type === 'online' ? 'var(--color-sage-dark)' : 'var(--color-rose-dark)',
       }}>
         <div style={{ fontSize: '1.2rem' }}>
-          {new Date(event.date).getDate()}
+          {new Date(event.date + 'T12:00:00').getDate()}
         </div>
         <div>
-          {new Date(event.date).toLocaleDateString('he-IL', { month: 'short' })}
+          {['ינו','פבר','מרץ','אפר','מאי','יוני','יולי','אוג','ספט','אוק','נוב','דצמ'][new Date(event.date + 'T12:00:00').getMonth()]}
         </div>
       </div>
 
@@ -50,7 +50,7 @@ function EventCard({ event }) {
           </span>
         </div>
         <div style={{ fontSize: '0.8rem', color: 'var(--color-text-muted)', marginBottom: 8 }}>
-          {new Date(event.date).toLocaleDateString('he-IL', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' })}
+          {(() => { const d = new Date(event.date + 'T12:00:00'); const days = ['ראשון','שני','שלישי','רביעי','חמישי','שישי','שבת']; const months = ['ינואר','פברואר','מרץ','אפריל','מאי','יוני','יולי','אוגוסט','ספטמבר','אוקטובר','נובמבר','דצמבר']; return `יום ${days[d.getDay()]}, ${d.getDate()} ב${months[d.getMonth()]} ${d.getFullYear()}`; })()}
         </div>
         {!isPast && (
           <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
