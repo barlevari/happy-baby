@@ -264,7 +264,7 @@ export default function ChatPage() {
         >
           {showSidebar ? '✕' : '☰'}
         </button>
-        <h1 style={{ flex: 1, margin: 0 }}>🤖 {isRTL ? 'צ\'אט AI' : 'AI Chat'}</h1>
+        <h1 style={{ flex: 1, margin: 0 }}>🤰 {isRTL ? 'צ\'אט AI' : 'AI Chat'}</h1>
         <button
           className="btn btn-secondary btn-sm"
           onClick={createNewChat}
@@ -455,7 +455,7 @@ export default function ChatPage() {
                 background: 'linear-gradient(135deg, var(--color-sage), var(--color-sage-dark))',
                 display: 'flex', alignItems: 'center', justifyContent: 'center',
                 fontSize: '1rem', flexShrink: 0,
-              }}>🤖</div>
+              }}>🤰</div>
             )}
             <div style={{
               maxWidth: '72%',
@@ -490,7 +490,7 @@ export default function ChatPage() {
               width: 32, height: 32, borderRadius: '50%',
               background: 'linear-gradient(135deg, var(--color-sage), var(--color-sage-dark))',
               display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '1rem',
-            }}>🤖</div>
+            }}>🤰</div>
             <div style={{
               padding: '10px 16px',
               borderRadius: '18px 18px 18px 4px',

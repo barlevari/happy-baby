@@ -36,6 +36,14 @@ function AppShell({ children }) {
   );
 }
 
+function AboutWrapper() {
+  const { user } = useAuth();
+  if (user) {
+    return <AppShell><AboutPage /></AppShell>;
+  }
+  return <AboutPage />;
+}
+
 function RoleRedirect() {
   const { user } = useAuth();
   if (!user) return <Navigate to="/login" replace />;
@@ -52,7 +60,7 @@ export default function App() {
       <Route path="/" element={<Landing />} />
       <Route path="/login" element={<Login />} />
       <Route path="/register" element={<Register />} />
-      <Route path="/about" element={<AboutPage />} />
+      <Route path="/about" element={<AboutWrapper />} />
 
       {/* Auto-redirect after login */}
       <Route path="/dashboard" element={<RoleRedirect />} />

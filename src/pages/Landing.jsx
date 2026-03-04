@@ -44,7 +44,7 @@ const FLOATERS = [
   { emoji: '🍼', x: '74%', delay: '1.6s',  dur: '9s',   size: '1.5rem' },
 ];
 
-const CARD_ANIMS = ['cardFromRight', 'cardFromBottom', 'cardFromLeft'];
+const CARD_ANIMS = ['cardFromRight', 'cardFromLeft'];
 const SPRING = 'cubic-bezier(0.34, 1.56, 0.64, 1)';
 
 export default function Landing() {
@@ -88,16 +88,6 @@ export default function Landing() {
       border: 'var(--color-sage)',
       ctaClass: 'btn btn-primary',
       role: 'student',
-    },
-    {
-      icon: '🔑',
-      title: 'כניסה לחשבון',
-      desc: 'יש לך כבר חשבון? כנסי לאזור האישי שלך',
-      cta: 'כניסה',
-      bg: 'var(--color-white)',
-      border: 'var(--color-border)',
-      ctaClass: 'btn btn-secondary',
-      role: null,
     },
   ];
 
