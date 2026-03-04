@@ -1,10 +1,67 @@
 import { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
+import { useLanguage, usePageText } from '../../context/LanguageContext';
+
+// ── Page-level translations ─────────────────────────────────
+const PAGE_TEXT = {
+  he: {
+    fillAllFields: 'נא למלא את כל השדות',
+    backBtn: '→ חזרה',
+    forgotTitle: 'שכחתי סיסמה',
+    forgotQuestion: 'שכחת סיסמה?',
+    forgotExplanation: 'האתר עדיין אין לו שליחת מיילים אוטומטית.\nלאיפוס סיסמה – פנ/י לרויטל ישירות בוואטסאפ עם כתובת האימייל שלך.',
+    whatsappMsg: 'היי רויטל, שכחתי את הסיסמה שלי, האימייל שלי: ',
+    whatsappBtn: '💬 שלח/י הודעה בוואטסאפ',
+    backToLogin: 'חזרה לכניסה',
+    yourEmail: 'כתובת האימייל שלך',
+    sendResetLink: 'שלח/י קישור לאיפוס',
+    back: 'חזרה',
+    welcome: 'ברוכ/ה הבא/ה',
+    pendingHint: 'פנ/י למנהלת האתר לאישור מהיר',
+    emailLabel: 'כתובת אימייל',
+    passwordLabel: 'סיסמה',
+    passwordPlaceholder: 'לפחות 8 תווים',
+    forgotPassword: 'שכחתי סיסמה',
+    loading: 'מתחבר/ת...',
+    loginBtn: 'כניסה',
+    noAccount: 'אין לך חשבון עדיין?',
+    registerHere: 'הירשמ/י כאן',
+    demo: 'דמו:',
+    backBtnEn: '← Back',
+  },
+  en: {
+    fillAllFields: 'Please fill in all fields',
+    backBtn: '← Back',
+    forgotTitle: 'Forgot Password',
+    forgotQuestion: 'Forgot your password?',
+    forgotExplanation: 'The site does not yet support automatic email sending.\nTo reset your password, contact Revital directly on WhatsApp with your email address.',
+    whatsappMsg: 'Hi Revital, I forgot my password, my email is: ',
+    whatsappBtn: '💬 Send a WhatsApp message',
+    backToLogin: 'Back to Login',
+    yourEmail: 'Your email address',
+    sendResetLink: 'Send reset link',
+    back: 'Back',
+    welcome: 'Welcome',
+    pendingHint: 'Contact the site admin for quick approval',
+    emailLabel: 'Email address',
+    passwordLabel: 'Password',
+    passwordPlaceholder: 'At least 8 characters',
+    forgotPassword: 'Forgot password',
+    loading: 'Signing in...',
+    loginBtn: 'Sign In',
+    noAccount: "Don't have an account yet?",
+    registerHere: 'Register here',
+    demo: 'Demo:',
+    backBtnEn: '← Back',
+  },
+};
 
 export default function Login() {
   const { login } = useAuth();
   const navigate = useNavigate();
+  const pt = usePageText(PAGE_TEXT);
+  const { isRTL } = useLanguage();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
@@ -19,7 +76,7 @@ export default function Login() {
     setError('');
     setIsPending(false);
     if (!email || !password) {
-      setError('נא למלא את כל השדות');
+      setError(pt('fillAllFields'));
       return;
     }
     setLoading(true);
@@ -49,7 +106,7 @@ export default function Login() {
         minHeight: '100vh',
         background: 'linear-gradient(160deg, var(--color-cream) 0%, var(--color-sage-ultra) 100%)',
         display: 'flex', alignItems: 'center', justifyContent: 'center',
-        padding: 24, direction: 'rtl', position: 'relative',
+        padding: 24, direction: isRTL ? 'rtl' : 'ltr', position: 'relative',
       }}>
         {/* Back button */}
         <button
@@ -57,7 +114,7 @@ export default function Login() {
           style={{
             position: 'absolute',
             top: 24,
-            right: 24,
+            ...(isRTL ? { right: 24 } : { left: 24 }),
             background: 'rgba(255,255,255,0.9)',
             border: '1px solid var(--color-border)',
             borderRadius: 'var(--radius-md)',
@@ -74,7 +131,7 @@ export default function Login() {
           onMouseEnter={e => e.currentTarget.style.background = 'rgba(255,255,255,1)'}
           onMouseLeave={e => e.currentTarget.style.background = 'rgba(255,255,255,0.9)'}
         >
-          → חזרה
+          {pt('backBtn')}
         </button>
 
         <div style={{
@@ -87,39 +144,38 @@ export default function Login() {
         }}>
           <div style={{ textAlign: 'center', marginBottom: 28 }}>
             <div style={{ fontSize: '2.5rem', marginBottom: 8 }}>🔑</div>
-            <h1 style={{ fontSize: '1.3rem', fontWeight: 900, color: 'var(--color-sage-dark)' }}>שכחתי סיסמה</h1>
+            <h1 style={{ fontSize: '1.3rem', fontWeight: 900, color: 'var(--color-sage-dark)' }}>{pt('forgotTitle')}</h1>
           </div>
 
           {forgotSent ? (
             <div style={{ textAlign: 'center' }}>
               <div style={{ fontSize: '3rem', marginBottom: 16 }}>💬</div>
               <p style={{ fontWeight: 700, marginBottom: 8, color: 'var(--color-text)' }}>
-                שכחת סיסמה?
+                {pt('forgotQuestion')}
               </p>
-              <p style={{ color: 'var(--color-text-muted)', lineHeight: 1.7, marginBottom: 20, fontSize: '0.9rem' }}>
-                האתר עדיין אין לו שליחת מיילים אוטומטית.
-                לאיפוס סיסמה – פנ/י לרויטל ישירות בוואטסאפ עם כתובת האימייל שלך.
+              <p style={{ color: 'var(--color-text-muted)', lineHeight: 1.7, marginBottom: 20, fontSize: '0.9rem', whiteSpace: 'pre-line' }}>
+                {pt('forgotExplanation')}
               </p>
               <a
-                href={`https://wa.me/972522218646?text=${encodeURIComponent(`היי רויטל, שכחתי את הסיסמה שלי, האימייל שלי: ${forgotEmail}`)}`}
+                href={`https://wa.me/972522218646?text=${encodeURIComponent(`${pt('whatsappMsg')}${forgotEmail}`)}`}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="btn w-full"
                 style={{ background: '#25D366', color: 'white', border: 'none', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8, marginBottom: 12, textDecoration: 'none' }}
               >
-                💬 שלח/י הודעה בוואטסאפ
+                {pt('whatsappBtn')}
               </a>
               <button
                 className="btn btn-ghost w-full"
                 onClick={() => { setShowForgot(false); setForgotSent(false); setForgotEmail(''); }}
               >
-                חזרה לכניסה
+                {pt('backToLogin')}
               </button>
             </div>
           ) : (
             <form onSubmit={handleForgot}>
               <div className="form-group">
-                <label className="form-label">כתובת האימייל שלך</label>
+                <label className="form-label">{pt('yourEmail')}</label>
                 <input
                   type="email"
                   className="form-input"
@@ -131,7 +187,7 @@ export default function Login() {
                 />
               </div>
               <button type="submit" className="btn btn-primary w-full" style={{ marginTop: 8 }}>
-                שלח/י קישור לאיפוס
+                {pt('sendResetLink')}
               </button>
               <button
                 type="button"
@@ -139,7 +195,7 @@ export default function Login() {
                 style={{ marginTop: 10 }}
                 onClick={() => setShowForgot(false)}
               >
-                חזרה
+                {pt('back')}
               </button>
             </form>
           )}
@@ -156,7 +212,7 @@ export default function Login() {
       alignItems: 'center',
       justifyContent: 'center',
       padding: 24,
-      direction: 'rtl',
+      direction: isRTL ? 'rtl' : 'ltr',
       position: 'relative',
     }}>
       {/* Back button */}
@@ -165,7 +221,7 @@ export default function Login() {
         style={{
           position: 'absolute',
           top: 24,
-          right: 24,
+          ...(isRTL ? { right: 24 } : { left: 24 }),
           background: 'rgba(255,255,255,0.9)',
           border: '1px solid var(--color-border)',
           borderRadius: 'var(--radius-md)',
@@ -182,7 +238,7 @@ export default function Login() {
         onMouseEnter={e => e.currentTarget.style.background = 'rgba(255,255,255,1)'}
         onMouseLeave={e => e.currentTarget.style.background = 'rgba(255,255,255,0.9)'}
       >
-        → חזרה
+        {pt('backBtn')}
       </button>
 
       <div style={{
@@ -200,7 +256,7 @@ export default function Login() {
         </div>
 
         <h1 style={{ textAlign: 'center', fontSize: '1.4rem', fontWeight: 800, marginBottom: 28, color: 'var(--color-text)' }}>
-          ברוכ/ה הבא/ה
+          {pt('welcome')}
         </h1>
 
         {error && (
@@ -208,7 +264,7 @@ export default function Login() {
             {isPending ? '⏳' : '⚠️'} {error}
             {isPending && (
               <div style={{ fontSize: '0.8rem', marginTop: 6, color: 'var(--color-text-muted)' }}>
-                פנ/י למנהלת האתר לאישור מהיר
+                {pt('pendingHint')}
               </div>
             )}
           </div>
@@ -216,7 +272,7 @@ export default function Login() {
 
         <form onSubmit={handleSubmit}>
           <div className="form-group">
-            <label className="form-label">כתובת אימייל</label>
+            <label className="form-label">{pt('emailLabel')}</label>
             <input
               type="email"
               className="form-input"
@@ -228,11 +284,11 @@ export default function Login() {
             />
           </div>
           <div className="form-group">
-            <label className="form-label">סיסמה</label>
+            <label className="form-label">{pt('passwordLabel')}</label>
             <input
               type="password"
               className="form-input"
-              placeholder="לפחות 8 תווים"
+              placeholder={pt('passwordPlaceholder')}
               value={password}
               onChange={e => setPassword(e.target.value)}
               autoComplete="current-password"
@@ -240,13 +296,13 @@ export default function Login() {
             />
           </div>
 
-          <div style={{ textAlign: 'left', marginBottom: 12 }}>
+          <div style={{ textAlign: isRTL ? 'left' : 'right', marginBottom: 12 }}>
             <button
               type="button"
               onClick={() => setShowForgot(true)}
               style={{ background: 'none', border: 'none', color: 'var(--color-text-muted)', fontSize: '0.82rem', cursor: 'pointer', padding: 0 }}
             >
-              שכחתי סיסמה
+              {pt('forgotPassword')}
             </button>
           </div>
 
@@ -256,14 +312,14 @@ export default function Login() {
             disabled={loading}
             style={{ marginTop: 4 }}
           >
-            {loading ? 'מתחבר/ת...' : 'כניסה'}
+            {loading ? pt('loading') : pt('loginBtn')}
           </button>
         </form>
 
         <div style={{ textAlign: 'center', marginTop: 24, fontSize: '0.875rem', color: 'var(--color-text-muted)' }}>
-          אין לך חשבון עדיין?{' '}
+          {pt('noAccount')}{' '}
           <Link to="/register" style={{ color: 'var(--color-sage-dark)', fontWeight: 700 }}>
-            הירשמ/י כאן
+            {pt('registerHere')}
           </Link>
         </div>
 
@@ -277,7 +333,7 @@ export default function Login() {
           color: 'var(--color-text-muted)',
           lineHeight: 1.8,
         }}>
-          <strong style={{ color: 'var(--color-sage-dark)' }}>דמו:</strong><br />
+          <strong style={{ color: 'var(--color-sage-dark)' }}>{pt('demo')}</strong><br />
           🤰 sarah@test.com / test1234<br />
           🎓 michal@test.com / test1234<br />
           🛡️ admin@happybaby.com / admin1234

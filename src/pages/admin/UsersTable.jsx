@@ -1,13 +1,107 @@
 import { useState } from 'react';
 import { useAuth } from '../../context/AuthContext';
+import { useLanguage, usePageText } from '../../context/LanguageContext';
 
-const ROLE_LABELS = { moms: 'מטופלת', student: 'סטודנטית', admin: 'מנהלת' };
-const ROLE_BADGES = { moms: 'badge-rose', student: 'badge-sage', admin: 'badge-admin' };
-
-const STATUS_CONFIG = {
-  approved: { label: 'פעיל', cls: 'badge-success' },
-  pending:  { label: 'ממתין לאישור', cls: 'badge-warning' },
-  blocked:  { label: 'חסום', cls: 'badge-danger' },
+// ── Page-level translations ─────────────────────────────────
+const PAGE_TEXT = {
+  he: {
+    // Role labels
+    rolePatient: 'מטופלת',
+    roleStudent: 'סטודנטית',
+    roleAdmin: 'מנהלת',
+    // Status labels
+    statusApproved: 'פעיל',
+    statusPending: 'ממתין לאישור',
+    statusBlocked: 'חסום',
+    // Page header
+    pageTitle: '👥 ניהול משתמשים',
+    pendingBadge: 'ממתינים לאישור',
+    usersCount: 'משתמשים',
+    // Pending banner
+    pendingBannerPre: 'יש',
+    pendingBannerPost: 'משתמשים שממתינים לאישור הרשמה',
+    pendingBannerAction: 'לחץ/י כאן לצפייה ואישור',
+    // Search
+    searchPlaceholder: '🔍 חיפוש לפי שם או אימייל...',
+    // Tabs
+    tabAll: 'כולם',
+    tabPending: 'ממתינים לאישור',
+    tabPatients: 'מטופלות',
+    tabStudents: 'סטודנטיות',
+    tabBlocked: 'חסומים',
+    // Table headers
+    thName: 'שם',
+    thEmail: 'אימייל',
+    thRole: 'תפקיד',
+    thJoinDate: 'תאריך הצטרפות',
+    thStatus: 'סטטוס',
+    thActions: 'פעולות',
+    // Action buttons
+    btnApprove: '✅ אשר/י',
+    btnReject: '❌ דחה/י',
+    btnBlock: '🚫 חסום/י',
+    btnUnblock: '✅ בטל חסימה',
+    btnDelete: '🗑️ מחק/י',
+    // Empty state
+    noUsersFound: 'לא נמצאו משתמשים',
+    // Delete modal
+    deleteTitle: 'מחיקת משתמש',
+    deleteConfirm: 'האם את בטוחה שברצונך למחוק את המשתמש? פעולה זו אינה הפיכה.',
+    deleteCancel: 'ביטול',
+    deleteAction: 'מחק/י',
+    // Role options in dropdown
+    optionPatient: 'מטופלת',
+    optionStudent: 'סטודנטית',
+  },
+  en: {
+    // Role labels
+    rolePatient: 'Patient',
+    roleStudent: 'Student',
+    roleAdmin: 'Admin',
+    // Status labels
+    statusApproved: 'Active',
+    statusPending: 'Pending Approval',
+    statusBlocked: 'Blocked',
+    // Page header
+    pageTitle: '👥 User Management',
+    pendingBadge: 'pending approval',
+    usersCount: 'users',
+    // Pending banner
+    pendingBannerPre: '',
+    pendingBannerPost: 'users pending registration approval',
+    pendingBannerAction: 'Click here to view and approve',
+    // Search
+    searchPlaceholder: '🔍 Search by name or email...',
+    // Tabs
+    tabAll: 'All',
+    tabPending: 'Pending Approval',
+    tabPatients: 'Patients',
+    tabStudents: 'Students',
+    tabBlocked: 'Blocked',
+    // Table headers
+    thName: 'Name',
+    thEmail: 'Email',
+    thRole: 'Role',
+    thJoinDate: 'Join Date',
+    thStatus: 'Status',
+    thActions: 'Actions',
+    // Action buttons
+    btnApprove: '✅ Approve',
+    btnReject: '❌ Reject',
+    btnBlock: '🚫 Block',
+    btnUnblock: '✅ Unblock',
+    btnDelete: '🗑️ Delete',
+    // Empty state
+    noUsersFound: 'No users found',
+    // Delete modal
+    deleteTitle: 'Delete User',
+    deleteConfirm: 'Are you sure you want to delete this user? This action cannot be undone.',
+    deleteCancel: 'Cancel',
+    deleteAction: 'Delete',
+    // Role options in dropdown
+    optionPatient: 'Patient',
+    optionStudent: 'Student',
+  },
 };
 
 function formatDate(d) {
@@ -18,6 +112,8 @@ function formatDate(d) {
 
 export default function UsersTable() {
   const { getAllUsers, approveUser, blockUser, unblockUser, deleteUser, changeRole } = useAuth();
+  const pt = usePageText(PAGE_TEXT);
+  const { isRTL } = useLanguage();
   const [search, setSearch] = useState('');
   const [filter, setFilter] = useState('all');
   const [confirmDelete, setConfirmDelete] = useState(null);
@@ -35,18 +131,24 @@ export default function UsersTable() {
 
   const pendingCount = allUsers.filter(u => u.status === 'pending').length;
 
+  const STATUS_CONFIG = {
+    approved: { label: pt('statusApproved'), cls: 'badge-success' },
+    pending:  { label: pt('statusPending'), cls: 'badge-warning' },
+    blocked:  { label: pt('statusBlocked'), cls: 'badge-danger' },
+  };
+
   const tabs = [
-    { id: 'all', label: `כולם (${allUsers.length})` },
-    { id: 'pending', label: `ממתינים לאישור (${pendingCount})`, highlight: pendingCount > 0 },
-    { id: 'moms', label: `מטופלות (${allUsers.filter(u => u.role === 'moms').length})` },
-    { id: 'student', label: `סטודנטיות (${allUsers.filter(u => u.role === 'student').length})` },
-    { id: 'blocked', label: `חסומים (${allUsers.filter(u => u.status === 'blocked').length})` },
+    { id: 'all', label: `${pt('tabAll')} (${allUsers.length})` },
+    { id: 'pending', label: `${pt('tabPending')} (${pendingCount})`, highlight: pendingCount > 0 },
+    { id: 'moms', label: `${pt('tabPatients')} (${allUsers.filter(u => u.role === 'moms').length})` },
+    { id: 'student', label: `${pt('tabStudents')} (${allUsers.filter(u => u.role === 'student').length})` },
+    { id: 'blocked', label: `${pt('tabBlocked')} (${allUsers.filter(u => u.status === 'blocked').length})` },
   ];
 
   return (
-    <div style={{ direction: 'rtl' }}>
+    <div style={{ direction: isRTL ? 'rtl' : 'ltr' }}>
       <div className="page-header">
-        <h1>👥 ניהול משתמשים</h1>
+        <h1>{pt('pageTitle')}</h1>
         <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
           {pendingCount > 0 && (
             <span style={{
@@ -58,10 +160,10 @@ export default function UsersTable() {
               fontWeight: 800,
               animation: 'pulse 2s infinite',
             }}>
-              ⚠️ {pendingCount} ממתינים לאישור
+              ⚠️ {pendingCount} {pt('pendingBadge')}
             </span>
           )}
-          <span className="badge badge-sage" style={{ fontSize: '0.9rem' }}>{filtered.length} משתמשים</span>
+          <span className="badge badge-sage" style={{ fontSize: '0.9rem' }}>{filtered.length} {pt('usersCount')}</span>
         </div>
       </div>
 
@@ -83,10 +185,14 @@ export default function UsersTable() {
         >
           <span style={{ fontSize: '1.2rem' }}>⏳</span>
           <div>
-            <strong style={{ color: '#B45309' }}>יש {pendingCount} משתמשים שממתינים לאישור הרשמה</strong>
-            <div style={{ fontSize: '0.82rem', color: '#92400E' }}>לחץ/י כאן לצפייה ואישור</div>
+            <strong style={{ color: '#B45309' }}>
+              {isRTL
+                ? `${pt('pendingBannerPre')} ${pendingCount} ${pt('pendingBannerPost')}`
+                : `${pendingCount} ${pt('pendingBannerPost')}`}
+            </strong>
+            <div style={{ fontSize: '0.82rem', color: '#92400E' }}>{pt('pendingBannerAction')}</div>
           </div>
-          <span style={{ marginRight: 'auto', color: '#B45309' }}>←</span>
+          <span style={{ marginRight: isRTL ? 'auto' : undefined, marginLeft: isRTL ? undefined : 'auto', color: '#B45309' }}>{isRTL ? '←' : '→'}</span>
         </div>
       )}
 
@@ -95,7 +201,7 @@ export default function UsersTable() {
         <input
           type="text"
           className="form-input"
-          placeholder="🔍 חיפוש לפי שם או אימייל..."
+          placeholder={pt('searchPlaceholder')}
           value={search}
           onChange={e => setSearch(e.target.value)}
           style={{ maxWidth: 320 }}
@@ -119,12 +225,12 @@ export default function UsersTable() {
         <table>
           <thead>
             <tr>
-              <th>שם</th>
-              <th>אימייל</th>
-              <th>תפקיד</th>
-              <th>תאריך הצטרפות</th>
-              <th>סטטוס</th>
-              <th>פעולות</th>
+              <th>{pt('thName')}</th>
+              <th>{pt('thEmail')}</th>
+              <th>{pt('thRole')}</th>
+              <th>{pt('thJoinDate')}</th>
+              <th>{pt('thStatus')}</th>
+              <th>{pt('thActions')}</th>
             </tr>
           </thead>
           <tbody>
@@ -145,7 +251,7 @@ export default function UsersTable() {
                       <span style={{ fontWeight: 600 }}>{u.name}</span>
                     </div>
                   </td>
-                  <td style={{ color: 'var(--color-text-muted)', direction: 'ltr', textAlign: 'right' }}>{u.email}</td>
+                  <td style={{ color: 'var(--color-text-muted)', direction: 'ltr', textAlign: isRTL ? 'right' : 'left' }}>{u.email}</td>
                   <td>
                     <select
                       value={u.role}
@@ -159,8 +265,8 @@ export default function UsersTable() {
                         cursor: 'pointer',
                       }}
                     >
-                      <option value="moms">מטופלת</option>
-                      <option value="student">סטודנטית</option>
+                      <option value="moms">{pt('optionPatient')}</option>
+                      <option value="student">{pt('optionStudent')}</option>
                     </select>
                   </td>
                   <td style={{ color: 'var(--color-text-muted)', fontSize: '0.85rem' }}>
@@ -178,14 +284,14 @@ export default function UsersTable() {
                             onClick={() => approveUser(u.id)}
                             style={{ fontSize: '0.75rem', background: 'var(--color-sage)', color: 'white', border: 'none' }}
                           >
-                            ✅ אשר/י
+                            {pt('btnApprove')}
                           </button>
                           <button
                             className="btn btn-sm btn-ghost"
                             onClick={() => blockUser(u.id)}
                             style={{ fontSize: '0.75rem', color: 'var(--color-danger)' }}
                           >
-                            ❌ דחה/י
+                            {pt('btnReject')}
                           </button>
                         </>
                       )}
@@ -195,7 +301,7 @@ export default function UsersTable() {
                           onClick={() => blockUser(u.id)}
                           style={{ fontSize: '0.75rem', color: 'var(--color-danger)' }}
                         >
-                          🚫 חסום/י
+                          {pt('btnBlock')}
                         </button>
                       )}
                       {u.status === 'blocked' && (
@@ -204,7 +310,7 @@ export default function UsersTable() {
                           onClick={() => unblockUser(u.id)}
                           style={{ fontSize: '0.75rem', color: 'var(--color-sage)' }}
                         >
-                          ✅ בטל חסימה
+                          {pt('btnUnblock')}
                         </button>
                       )}
                       <button
@@ -212,7 +318,7 @@ export default function UsersTable() {
                         onClick={() => setConfirmDelete(u.id)}
                         style={{ fontSize: '0.75rem', color: 'var(--color-danger)' }}
                       >
-                        🗑️ מחק/י
+                        {pt('btnDelete')}
                       </button>
                     </div>
                   </td>
@@ -222,7 +328,7 @@ export default function UsersTable() {
             {filtered.length === 0 && (
               <tr>
                 <td colSpan={6} style={{ textAlign: 'center', padding: 32, color: 'var(--color-text-muted)' }}>
-                  לא נמצאו משתמשים
+                  {pt('noUsersFound')}
                 </td>
               </tr>
             )}
@@ -235,18 +341,18 @@ export default function UsersTable() {
         <div className="modal-overlay" onClick={() => setConfirmDelete(null)}>
           <div className="modal-box" onClick={e => e.stopPropagation()} style={{ maxWidth: 360, textAlign: 'center' }}>
             <div style={{ fontSize: '2.5rem', marginBottom: 12 }}>⚠️</div>
-            <h2 style={{ fontSize: '1.1rem', fontWeight: 800, marginBottom: 8 }}>מחיקת משתמש</h2>
+            <h2 style={{ fontSize: '1.1rem', fontWeight: 800, marginBottom: 8 }}>{pt('deleteTitle')}</h2>
             <p style={{ color: 'var(--color-text-muted)', marginBottom: 24 }}>
-              האם את בטוחה שברצונך למחוק את המשתמש? פעולה זו אינה הפיכה.
+              {pt('deleteConfirm')}
             </p>
             <div style={{ display: 'flex', gap: 12 }}>
-              <button className="btn btn-ghost" onClick={() => setConfirmDelete(null)} style={{ flex: 1 }}>ביטול</button>
+              <button className="btn btn-ghost" onClick={() => setConfirmDelete(null)} style={{ flex: 1 }}>{pt('deleteCancel')}</button>
               <button
                 className="btn"
                 onClick={() => { deleteUser(confirmDelete); setConfirmDelete(null); }}
                 style={{ flex: 1, background: 'var(--color-danger)', color: 'white', border: 'none' }}
               >
-                מחק/י
+                {pt('deleteAction')}
               </button>
             </div>
           </div>

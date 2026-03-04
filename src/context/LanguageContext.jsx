@@ -94,7 +94,8 @@ export function LanguageProvider({ children }) {
 
   useEffect(() => {
     const dir = lang === 'en' ? 'ltr' : 'rtl';
-    document.documentElement.setAttribute('lang', lang);
+    const htmlLang = lang === 'he' ? 'he-u-ca-gregory-nu-latn' : 'en';
+    document.documentElement.setAttribute('lang', htmlLang);
     document.documentElement.setAttribute('dir', dir);
   }, [lang]);
 
@@ -117,3 +118,9 @@ export const useLanguage = () => {
   if (!ctx) throw new Error('useLanguage must be used inside LanguageProvider');
   return ctx;
 };
+
+// Hook for per-page translations: each page defines its own { he: {...}, en: {...} }
+export function usePageText(pageTexts) {
+  const { lang } = useLanguage();
+  return (key) => pageTexts[lang]?.[key] ?? pageTexts['he']?.[key] ?? key;
+}

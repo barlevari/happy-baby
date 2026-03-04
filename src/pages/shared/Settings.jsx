@@ -1,11 +1,87 @@
 import { useState } from 'react';
 import { useAuth } from '../../context/AuthContext';
-import { useLanguage } from '../../context/LanguageContext';
+import { useLanguage, usePageText } from '../../context/LanguageContext';
 import { useNavigate } from 'react-router-dom';
+
+const PAGE_TEXT = {
+  he: {
+    pageTitle: '⚙️ הגדרות',
+    language: '🌐 שפה',
+    profile: '👤 פרופיל',
+    fullName: 'שם מלא',
+    email: 'אימייל',
+    idNumber: 'תעודת זהות',
+    role: 'תפקיד',
+    roleMoms: 'מטופלת',
+    roleStudent: 'סטודנטית',
+    roleAdmin: 'מנהלת',
+    pregnancyData: '🤰 נתוני הריון',
+    lmpLabel: 'תאריך הווסת האחרון (LMP)',
+    lmpSaved: '✓ עודכן בהצלחה',
+    updateDate: 'עדכן תאריך',
+    notifications: '🔔 הודעות ועדכונים',
+    weeklyTip: 'טיפ שבועי',
+    eventUpdates: 'עדכוני אירועים',
+    testReminders: 'תזכורות בדיקות',
+    newsletter: 'ניוזלטר',
+    changePassword: '🔐 שינוי סיסמה',
+    currentPassword: 'סיסמה נוכחית',
+    newPassword: 'סיסמה חדשה',
+    confirmPassword: 'אימות סיסמה חדשה',
+    savePassword: 'שמור סיסמה',
+    errPasswordShort: 'הסיסמה החדשה חייבת להכיל לפחות 8 תווים',
+    errPasswordMatch: 'הסיסמאות אינן תואמות',
+    passwordSuccess: 'הסיסמה עודכנה בהצלחה (סימולציה)',
+    switchTrack: '🔄 שינוי מסלול',
+    switchTrackDesc: 'רוצה לעבור בין מסלול מטופלות לסטודנטיות? שלחי בקשה למנהלת.',
+    switchTrackSent: '✓ הבקשה נשלחה! המנהלת תצור איתך קשר בקרוב.',
+    switchTrackBtn: 'בקשה למעבר מסלול',
+    account: '🚪 חשבון',
+    accountDesc: 'יציאה מהמערכת תנתק אותך מהחשבון הנוכחי',
+    logout: '🚪 יציאה מהמערכת',
+  },
+  en: {
+    pageTitle: '⚙️ Settings',
+    language: '🌐 Language',
+    profile: '👤 Profile',
+    fullName: 'Full Name',
+    email: 'Email',
+    idNumber: 'ID Number',
+    role: 'Role',
+    roleMoms: 'Patient',
+    roleStudent: 'Student',
+    roleAdmin: 'Admin',
+    pregnancyData: '🤰 Pregnancy Data',
+    lmpLabel: 'Last Menstrual Period (LMP)',
+    lmpSaved: '✓ Updated successfully',
+    updateDate: 'Update Date',
+    notifications: '🔔 Notifications',
+    weeklyTip: 'Weekly Tip',
+    eventUpdates: 'Event Updates',
+    testReminders: 'Test Reminders',
+    newsletter: 'Newsletter',
+    changePassword: '🔐 Change Password',
+    currentPassword: 'Current Password',
+    newPassword: 'New Password',
+    confirmPassword: 'Confirm New Password',
+    savePassword: 'Save Password',
+    errPasswordShort: 'New password must be at least 8 characters',
+    errPasswordMatch: 'Passwords do not match',
+    passwordSuccess: 'Password updated successfully (simulation)',
+    switchTrack: '🔄 Switch Track',
+    switchTrackDesc: 'Want to switch between patient and student tracks? Send a request to admin.',
+    switchTrackSent: '✓ Request sent! The admin will contact you soon.',
+    switchTrackBtn: 'Request Track Switch',
+    account: '🚪 Account',
+    accountDesc: 'Logging out will disconnect you from the current account',
+    logout: '🚪 Logout',
+  },
+};
 
 export default function Settings() {
   const { user, logout } = useAuth();
-  const { lang, setLang, t } = useLanguage();
+  const { lang, setLang, isRTL } = useLanguage();
+  const pt = usePageText(PAGE_TEXT);
   const navigate = useNavigate();
 
   const [notifications, setNotifications] = useState({
@@ -29,14 +105,14 @@ export default function Settings() {
   const handlePasswordChange = (e) => {
     e.preventDefault();
     if (passwordForm.next.length < 8) {
-      setPasswordMsg('error:הסיסמה החדשה חייבת להכיל לפחות 8 תווים');
+      setPasswordMsg('error:' + pt('errPasswordShort'));
       return;
     }
     if (passwordForm.next !== passwordForm.confirm) {
-      setPasswordMsg('error:הסיסמאות אינן תואמות');
+      setPasswordMsg('error:' + pt('errPasswordMatch'));
       return;
     }
-    setPasswordMsg('success:הסיסמה עודכנה בהצלחה (סימולציה)');
+    setPasswordMsg('success:' + pt('passwordSuccess'));
     setPasswordForm({ current: '', next: '', confirm: '' });
   };
 
@@ -87,14 +163,20 @@ export default function Settings() {
     </div>
   );
 
+  const getRoleLabel = (role) => {
+    if (role === 'moms') return pt('roleMoms');
+    if (role === 'student') return pt('roleStudent');
+    return pt('roleAdmin');
+  };
+
   return (
-    <div style={{ direction: lang === 'en' ? 'ltr' : 'rtl', maxWidth: 600 }}>
+    <div style={{ direction: isRTL ? 'rtl' : 'ltr', maxWidth: 600 }}>
       <div className="page-header">
-        <h1>{t('settingsTitle')}</h1>
+        <h1>{pt('pageTitle')}</h1>
       </div>
 
       {/* Language Section */}
-      <Section title={`🌐 ${t('language')}`}>
+      <Section title={pt('language')}>
         <div style={{ display: 'flex', gap: 12 }}>
           <button
             className={`btn btn-sm ${lang === 'he' ? 'btn-primary' : 'btn-secondary'}`}
@@ -112,18 +194,18 @@ export default function Settings() {
       </Section>
 
       {/* Profile Section */}
-      <Section title={t('profile')}>
-        <Row label="שם מלא" value={user?.name} />
-        <Row label="אימייל" value={user?.email} muted />
-        <Row label="תעודת זהות" value={`${user?.idNumber?.slice(0, 3)}XXXXXX`} muted />
-        <Row label="תפקיד" value={user?.role === 'moms' ? 'מטופלת' : user?.role === 'student' ? 'סטודנטית' : 'מנהלת'} muted />
+      <Section title={pt('profile')}>
+        <Row label={pt('fullName')} value={user?.name} />
+        <Row label={pt('email')} value={user?.email} muted />
+        <Row label={pt('idNumber')} value={`${user?.idNumber?.slice(0, 3)}XXXXXX`} muted />
+        <Row label={pt('role')} value={getRoleLabel(user?.role)} muted />
       </Section>
 
       {/* LMP Update (Moms only) */}
       {user?.role === 'moms' && (
-        <Section title="🤰 נתוני הריון">
+        <Section title={pt('pregnancyData')}>
           <div className="form-group">
-            <label className="form-label">תאריך הווסת האחרון (LMP)</label>
+            <label className="form-label">{pt('lmpLabel')}</label>
             <input
               type="date"
               lang="en-US"
@@ -133,23 +215,23 @@ export default function Settings() {
               dir="ltr"
             />
           </div>
-          {lmpSaved && <div className="alert alert-success" style={{ marginBottom: 12 }}>✓ עודכן בהצלחה</div>}
+          {lmpSaved && <div className="alert alert-success" style={{ marginBottom: 12 }}>{pt('lmpSaved')}</div>}
           <button
             className="btn btn-primary btn-sm"
             onClick={() => setLmpSaved(true)}
           >
-            עדכן תאריך
+            {pt('updateDate')}
           </button>
         </Section>
       )}
 
       {/* Notifications */}
-      <Section title="🔔 הודעות ועדכונים">
+      <Section title={pt('notifications')}>
         {[
-          { key: 'weeklyTip', label: 'טיפ שבועי' },
-          { key: 'events', label: 'עדכוני אירועים' },
-          { key: 'testReminders', label: 'תזכורות בדיקות' },
-          { key: 'newsletter', label: 'ניוזלטר' },
+          { key: 'weeklyTip', label: pt('weeklyTip') },
+          { key: 'events', label: pt('eventUpdates') },
+          { key: 'testReminders', label: pt('testReminders') },
+          { key: 'newsletter', label: pt('newsletter') },
         ].map(item => (
           <div key={item.key} style={{
             display: 'flex',
@@ -168,7 +250,7 @@ export default function Settings() {
       </Section>
 
       {/* Password Change */}
-      <Section title="🔐 שינוי סיסמה">
+      <Section title={pt('changePassword')}>
         {passwordMsg && (
           <div className={`alert alert-${msgType}`} style={{ marginBottom: 12 }}>
             {msgType === 'success' ? '✓ ' : '⚠️ '}{msgText}
@@ -176,48 +258,48 @@ export default function Settings() {
         )}
         <form onSubmit={handlePasswordChange}>
           <div className="form-group">
-            <label className="form-label">סיסמה נוכחית</label>
+            <label className="form-label">{pt('currentPassword')}</label>
             <input type="password" className="form-input" value={passwordForm.current} onChange={e => setPasswordForm(f => ({ ...f, current: e.target.value }))} dir="ltr" />
           </div>
           <div className="form-group">
-            <label className="form-label">סיסמה חדשה</label>
+            <label className="form-label">{pt('newPassword')}</label>
             <input type="password" className="form-input" value={passwordForm.next} onChange={e => setPasswordForm(f => ({ ...f, next: e.target.value }))} dir="ltr" />
           </div>
           <div className="form-group">
-            <label className="form-label">אימות סיסמה חדשה</label>
+            <label className="form-label">{pt('confirmPassword')}</label>
             <input type="password" className="form-input" value={passwordForm.confirm} onChange={e => setPasswordForm(f => ({ ...f, confirm: e.target.value }))} dir="ltr" />
           </div>
-          <button type="submit" className="btn btn-secondary btn-sm">שמור סיסמה</button>
+          <button type="submit" className="btn btn-secondary btn-sm">{pt('savePassword')}</button>
         </form>
       </Section>
 
       {/* Track Switch */}
       {user?.role !== 'admin' && (
-        <Section title="🔄 שינוי מסלול">
+        <Section title={pt('switchTrack')}>
           <p style={{ fontSize: '0.875rem', color: 'var(--color-text-muted)', marginBottom: 12 }}>
-            רוצה לעבור בין מסלול מטופלות לסטודנטיות? שלחי בקשה למנהלת.
+            {pt('switchTrackDesc')}
           </p>
           {trackRequestSent ? (
-            <div className="alert alert-success">✓ הבקשה נשלחה! המנהלת תצור איתך קשר בקרוב.</div>
+            <div className="alert alert-success">{pt('switchTrackSent')}</div>
           ) : (
             <button className="btn btn-secondary btn-sm" onClick={() => setTrackRequestSent(true)}>
-              בקשה למעבר מסלול
+              {pt('switchTrackBtn')}
             </button>
           )}
         </Section>
       )}
 
       {/* Account */}
-      <Section title="🚪 חשבון">
+      <Section title={pt('account')}>
         <p style={{ fontSize: '0.875rem', color: 'var(--color-text-muted)', marginBottom: 16 }}>
-          יציאה מהמערכת תנתק אותך מהחשבון הנוכחי
+          {pt('accountDesc')}
         </p>
         <button
           className="btn"
           onClick={handleLogout}
           style={{ background: 'var(--color-danger)', color: 'white', border: 'none' }}
         >
-          🚪 יציאה מהמערכת
+          {pt('logout')}
         </button>
       </Section>
     </div>

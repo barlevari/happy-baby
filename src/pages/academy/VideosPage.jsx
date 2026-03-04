@@ -1,28 +1,52 @@
 import { useState } from 'react';
+import { useLanguage, usePageText } from '../../context/LanguageContext';
 import { MOCK_VIDEOS } from '../../data/mockData';
 import VideoPlayerModal from '../../components/VideoPlayerModal';
 
-const ALL_CATEGORIES = ['כולם', ...new Set(MOCK_VIDEOS.map(v => v.category))];
+// ── Page-level translations ─────────────────────────────────
+const PAGE_TEXT = {
+  he: {
+    pageTitle: '🎥 ספריית סרטונים',
+    videos: 'סרטונים',
+    allCategories: 'כולם',
+    allWeeks: 'כל השבועות',
+    weeks: 'שבועות',
+    noVideosFound: 'לא נמצאו סרטונים בקטגוריה זו',
+  },
+  en: {
+    pageTitle: '🎥 Video Library',
+    videos: 'videos',
+    allCategories: 'All',
+    allWeeks: 'All weeks',
+    weeks: 'Weeks',
+    noVideosFound: 'No videos found in this category',
+  },
+};
 
 export default function VideosPage() {
-  const [activeCategory, setActiveCategory] = useState('כולם');
+  const pt = usePageText(PAGE_TEXT);
+  const { isRTL } = useLanguage();
+
+  const ALL_CATEGORIES = [pt('allCategories'), ...new Set(MOCK_VIDEOS.map(v => v.category))];
+
+  const [activeCategory, setActiveCategory] = useState(pt('allCategories'));
   const [playingVideo, setPlayingVideo] = useState(null);
 
-  const filtered = activeCategory === 'כולם'
+  const filtered = activeCategory === pt('allCategories')
     ? MOCK_VIDEOS
     : MOCK_VIDEOS.filter(v => v.category === activeCategory);
 
   const getWeeksLabel = (v) => {
-    if (v.weeksMin === null) return 'כל השבועות';
-    return `שבועות ${v.weeksMin}–${v.weeksMax}`;
+    if (v.weeksMin === null) return pt('allWeeks');
+    return `${pt('weeks')} ${v.weeksMin}–${v.weeksMax}`;
   };
 
   return (
-    <div style={{ direction: 'rtl' }}>
+    <div style={{ direction: isRTL ? 'rtl' : 'ltr' }}>
       <div className="page-header">
-        <h1>🎥 ספריית סרטונים</h1>
+        <h1>{pt('pageTitle')}</h1>
         <span style={{ fontSize: '0.85rem', color: 'var(--color-text-muted)' }}>
-          {filtered.length} סרטונים
+          {filtered.length} {pt('videos')}
         </span>
       </div>
 
@@ -132,7 +156,7 @@ export default function VideosPage() {
       {filtered.length === 0 && (
         <div style={{ textAlign: 'center', padding: 64, color: 'var(--color-text-muted)' }}>
           <div style={{ fontSize: '3rem', marginBottom: 12 }}>🎬</div>
-          <p>לא נמצאו סרטונים בקטגוריה זו</p>
+          <p>{pt('noVideosFound')}</p>
         </div>
       )}
 

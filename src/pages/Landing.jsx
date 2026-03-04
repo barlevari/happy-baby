@@ -1,16 +1,70 @@
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
+import { useLanguage, usePageText } from '../context/LanguageContext';
 import { useEffect, useState, useRef } from 'react';
+
+const PAGE_TEXT = {
+  he: {
+    tagline: 'מלווים אותך בכל שלב של המסע',
+    subtitle: 'Happy Baby | ליווי הריון ולידה מקצועי',
+    // Milestones
+    milestone4: 'פעימת לב ראשונה',
+    milestone12: 'סוף טרימסטר ראשון',
+    milestone20: 'בעיטות ראשונות',
+    milestone28: 'הכנות ללידה',
+    milestone36: 'כמעט שם!',
+    milestone40: 'יום הולדת!',
+    weekLabel: 'שבוע',
+    // Cards
+    momsTitle: 'אני בהריון / יולדת',
+    momsDesc: 'מעקב אישי, טיפים שבועיים ותמיכה לאורך כל הדרך',
+    momsCta: 'בואי נתחיל',
+    academyTitle: 'אני רוצה ללמוד Happy Baby',
+    academyDesc: 'קורס מקצועי לרכישת השיטה ולווי אמהות',
+    academyCta: 'לפרטים נוספים',
+    // Features
+    weeklyTracking: 'מעקב שבועי',
+    nutritionLabel: 'תזונה',
+    videosLabel: 'סרטונים',
+    supportLabel: 'תמיכה',
+    eventsLabel: 'אירועים',
+    // Footer
+    footer: 'happy baby \u00A9 2025 | כל הזכויות שמורות',
+  },
+  en: {
+    tagline: 'With you at every step of the journey',
+    subtitle: 'Happy Baby | Professional Pregnancy & Birth Support',
+    milestone4: 'First heartbeat',
+    milestone12: 'End of first trimester',
+    milestone20: 'First kicks',
+    milestone28: 'Birth preparations',
+    milestone36: 'Almost there!',
+    milestone40: 'Birthday!',
+    weekLabel: 'Week',
+    momsTitle: 'I\'m pregnant / a new mom',
+    momsDesc: 'Personal tracking, weekly tips and support all the way',
+    momsCta: 'Let\'s get started',
+    academyTitle: 'I want to learn Happy Baby',
+    academyDesc: 'Professional course for learning the method and supporting mothers',
+    academyCta: 'Learn more',
+    weeklyTracking: 'Weekly Tracking',
+    nutritionLabel: 'Nutrition',
+    videosLabel: 'Videos',
+    supportLabel: 'Support',
+    eventsLabel: 'Events',
+    footer: 'happy baby \u00A9 2025 | All rights reserved',
+  },
+};
 
 const SPRING = 'cubic-bezier(0.34, 1.56, 0.64, 1)';
 
-const JOURNEY_MILESTONES = [
-  { week: 4,  emoji: '💗', label: 'פעימת לב ראשונה' },
-  { week: 12, emoji: '🫒', label: 'סוף טרימסטר ראשון' },
-  { week: 20, emoji: '🦶', label: 'בעיטות ראשונות' },
-  { week: 28, emoji: '🎒', label: 'הכנות ללידה' },
-  { week: 36, emoji: '🍉', label: 'כמעט שם!' },
-  { week: 40, emoji: '👶', label: 'יום הולדת!' },
+const MILESTONE_KEYS = [
+  { week: 4,  emoji: '💗', key: 'milestone4' },
+  { week: 12, emoji: '🫒', key: 'milestone12' },
+  { week: 20, emoji: '🦶', key: 'milestone20' },
+  { week: 28, emoji: '🎒', key: 'milestone28' },
+  { week: 36, emoji: '🍉', key: 'milestone36' },
+  { week: 40, emoji: '👶', key: 'milestone40' },
 ];
 
 const BOKEH = Array.from({ length: 18 }, (_, i) => ({
@@ -25,6 +79,8 @@ const BOKEH = Array.from({ length: 18 }, (_, i) => ({
 export default function Landing() {
   const navigate = useNavigate();
   const { user } = useAuth();
+  const { isRTL } = useLanguage();
+  const pt = usePageText(PAGE_TEXT);
   const [introPhase, setIntroPhase] = useState(0);
   const [journeyProgress, setJourneyProgress] = useState(0);
   const journeyRef = useRef(null);
@@ -73,19 +129,21 @@ export default function Landing() {
   }, []);
 
   const features = [
-    { icon: '🤰', label: 'מעקב שבועי' },
-    { icon: '🥗', label: 'תזונה' },
-    { icon: '🎥', label: 'סרטונים' },
-    { icon: '🤖', label: 'תמיכה' },
-    { icon: '📅', label: 'אירועים' },
+    { icon: '🤰', label: pt('weeklyTracking') },
+    { icon: '🥗', label: pt('nutritionLabel') },
+    { icon: '🎥', label: pt('videosLabel') },
+    { icon: '🤖', label: pt('supportLabel') },
+    { icon: '📅', label: pt('eventsLabel') },
   ];
+
+  const milestones = MILESTONE_KEYS.map(m => ({ ...m, label: pt(m.key) }));
 
   const cards = [
     {
       icon: '🤰',
-      title: 'אני בהריון / יולדת',
-      desc: 'מעקב אישי, טיפים שבועיים ותמיכה לאורך כל הדרך',
-      cta: 'בואי נתחיל',
+      title: pt('momsTitle'),
+      desc: pt('momsDesc'),
+      cta: pt('momsCta'),
       bg: 'var(--color-rose-light)',
       border: 'var(--color-rose)',
       ctaClass: 'btn btn-rose',
@@ -93,9 +151,9 @@ export default function Landing() {
     },
     {
       icon: '🎓',
-      title: 'אני רוצה ללמוד Happy Baby',
-      desc: 'קורס מקצועי לרכישת השיטה ולווי אמהות',
-      cta: 'לפרטים נוספים',
+      title: pt('academyTitle'),
+      desc: pt('academyDesc'),
+      cta: pt('academyCta'),
       bg: 'var(--color-sage-ultra)',
       border: 'var(--color-sage)',
       ctaClass: 'btn btn-primary',
@@ -103,7 +161,7 @@ export default function Landing() {
     },
   ];
 
-  const tagline = 'מלווים אותך בכל שלב של המסע';
+  const tagline = pt('tagline');
 
   return (
     <div style={{
@@ -113,10 +171,46 @@ export default function Landing() {
       flexDirection: 'column',
       alignItems: 'center',
       padding: '40px 20px',
-      direction: 'rtl',
+      direction: isRTL ? 'rtl' : 'ltr',
       overflow: 'hidden',
       position: 'relative',
     }}>
+      {/* === Background Video === */}
+      <video
+        autoPlay
+        loop
+        muted
+        playsInline
+        aria-hidden="true"
+        style={{
+          position: 'fixed',
+          top: 0,
+          left: 0,
+          width: '100%',
+          height: '100%',
+          objectFit: 'cover',
+          opacity: 0.12,
+          zIndex: 0,
+          pointerEvents: 'none',
+          filter: 'blur(2px) saturate(0.7)',
+        }}
+      >
+        <source src="/bg-video.mp4" type="video/mp4" />
+      </video>
+      {/* Gradient overlay on top of video */}
+      <div
+        aria-hidden="true"
+        style={{
+          position: 'fixed',
+          top: 0,
+          left: 0,
+          width: '100%',
+          height: '100%',
+          background: 'linear-gradient(160deg, rgba(var(--color-cream-rgb, 255,250,240), 0.6) 0%, rgba(var(--color-sage-ultra-rgb, 230,240,235), 0.5) 50%, rgba(var(--color-rose-light-rgb, 252,235,240), 0.6) 100%)',
+          zIndex: 0,
+          pointerEvents: 'none',
+        }}
+      />
       <style>{`
         /* === Bokeh Particles === */
         @keyframes bokehFloat {
@@ -324,7 +418,7 @@ export default function Landing() {
           WebkitTextFillColor: 'transparent',
           animation: introPhase >= 4 ? 'shimmer 4s linear infinite' : 'none',
         }}>
-          Happy Baby | ליווי הריון ולידה מקצועי
+          {pt('subtitle')}
         </p>
       </div>
 
@@ -364,7 +458,7 @@ export default function Landing() {
           </defs>
 
           {/* Milestones */}
-          {JOURNEY_MILESTONES.map((m, i) => {
+          {milestones.map((m, i) => {
             const t = m.week / 40;
             const x = 50 + t * 600;
             const y = 50 + Math.sin(t * Math.PI * 2) * 30;
@@ -393,7 +487,7 @@ export default function Landing() {
                       fontSize="9"
                       fill="var(--color-text-muted)"
                       fontWeight="600"
-                      direction="rtl"
+                      direction={isRTL ? 'rtl' : 'ltr'}
                       opacity={journeyProgress >= t + 0.05 ? 1 : 0}
                       style={{ transition: 'opacity 0.3s ease' }}
                     >
@@ -409,7 +503,7 @@ export default function Landing() {
                       opacity={journeyProgress >= t + 0.05 ? 1 : 0}
                       style={{ transition: 'opacity 0.3s ease' }}
                     >
-                      {`שבוע ${m.week}`}
+                      {`${pt('weekLabel')} ${m.week}`}
                     </text>
                   </>
                 )}
@@ -531,7 +625,7 @@ export default function Landing() {
         position: 'relative',
         zIndex: 1,
       }}>
-        happy baby &copy; 2025 | כל הזכויות שמורות
+        {pt('footer')}
       </footer>
     </div>
   );

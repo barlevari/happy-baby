@@ -1,26 +1,67 @@
 import { useState } from 'react';
 import { useAuth } from '../../context/AuthContext';
+import { useLanguage, usePageText } from '../../context/LanguageContext';
 import { MOCK_LESSONS, MOCK_EVENTS } from '../../data/mockData';
 
-function LessonCard({ lesson, index, lessons }) {
+// ── Page-level translations ─────────────────────────────────
+const PAGE_TEXT = {
+  he: {
+    completedLabel: 'הושלם',
+    unlockedLabel: 'פתוח',
+    lockedLabel: 'נעול',
+    completePreviousAlert: 'השלימי את השיעור הקודם כדי לפתוח שיעור זה',
+    openingLesson: 'פותחת שיעור:',
+    minutes: 'דקות',
+    completePreviousHint: 'השלימי את השיעור הקודם',
+    hello: 'שלום',
+    welcomeMessage: 'ברוכה הבאה לאקדמיית Happy Baby | המשיכי את המסע שלך',
+    courseProgress: '📈 התקדמות בקורס',
+    lessonsCompleted: 'שיעורים הושלמו',
+    completed: 'הושלם',
+    syllabus: '📋 סילבוס הקורס',
+    upcomingEvents: '📅 אירועים קרובים',
+    online: 'אונליין',
+    inPerson: 'פרונטלי',
+  },
+  en: {
+    completedLabel: 'Completed',
+    unlockedLabel: 'Open',
+    lockedLabel: 'Locked',
+    completePreviousAlert: 'Complete the previous lesson to unlock this one',
+    openingLesson: 'Opening lesson:',
+    minutes: 'minutes',
+    completePreviousHint: 'Complete the previous lesson',
+    hello: 'Hello',
+    welcomeMessage: 'Welcome to Happy Baby Academy | Continue your journey',
+    courseProgress: '📈 Course Progress',
+    lessonsCompleted: 'lessons completed',
+    completed: 'completed',
+    syllabus: '📋 Course Syllabus',
+    upcomingEvents: '📅 Upcoming Events',
+    online: 'Online',
+    inPerson: 'In-Person',
+  },
+};
+
+function LessonCard({ lesson, index, lessons, pt }) {
   const isFirst = index === 0;
   const prevLesson = index > 0 ? lessons[index - 1] : null;
   const canAccess = lesson.status === 'completed' || lesson.status === 'unlocked' ||
     (prevLesson && prevLesson.status === 'completed');
 
   const statusConfig = {
-    completed: { icon: '✅', label: 'הושלם', color: 'var(--color-sage)', bg: 'var(--color-sage-ultra)' },
-    unlocked: { icon: '🔓', label: 'פתוח', color: 'var(--color-warning)', bg: '#FEF3E7' },
-    locked: { icon: '🔒', label: 'נעול', color: 'var(--color-text-muted)', bg: 'var(--color-cream)' },
+    completed: { icon: '✅', label: pt('completedLabel'), color: 'var(--color-sage)', bg: 'var(--color-sage-ultra)' },
+    unlocked: { icon: '🔓', label: pt('unlockedLabel'), color: 'var(--color-warning)', bg: '#FEF3E7' },
+    locked: { icon: '🔒', label: pt('lockedLabel'), color: 'var(--color-text-muted)', bg: 'var(--color-cream)' },
   };
   const config = statusConfig[lesson.status] || statusConfig.locked;
 
   const handleClick = () => {
     if (!canAccess) {
-      alert('השלימי את השיעור הקודם כדי לפתוח שיעור זה');
+      alert(pt('completePreviousAlert'));
       return;
     }
-    alert(`פותחת שיעור: ${lesson.title}`);
+    alert(`${pt('openingLesson')} ${lesson.title}`);
   };
 
   return (
@@ -68,9 +109,9 @@ function LessonCard({ lesson, index, lessons }) {
           {lesson.title}
         </div>
         <div style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: '0.8rem', color: 'var(--color-text-muted)' }}>
-          <span>⏱️ {lesson.estimatedMinutes} דקות</span>
+          <span>⏱️ {lesson.estimatedMinutes} {pt('minutes')}</span>
           {!canAccess && lesson.status === 'locked' && (
-            <span style={{ color: 'var(--color-text-muted)' }}>• השלימי את השיעור הקודם</span>
+            <span style={{ color: 'var(--color-text-muted)' }}>• {pt('completePreviousHint')}</span>
           )}
         </div>
       </div>
@@ -90,6 +131,8 @@ function LessonCard({ lesson, index, lessons }) {
 
 export default function AcademyDashboard() {
   const { user } = useAuth();
+  const pt = usePageText(PAGE_TEXT);
+  const { isRTL } = useLanguage();
   const [lessons] = useState(MOCK_LESSONS);
 
   const completedCount = lessons.filter(l => l.status === 'completed').length;
@@ -98,7 +141,7 @@ export default function AcademyDashboard() {
   const upcomingEvents = MOCK_EVENTS.slice(0, 3);
 
   return (
-    <div style={{ direction: 'rtl' }}>
+    <div style={{ direction: isRTL ? 'rtl' : 'ltr' }}>
       {/* Welcome Card */}
       <div className="card" style={{
         background: 'linear-gradient(135deg, var(--color-sage-ultra), var(--color-cream))',
@@ -111,10 +154,10 @@ export default function AcademyDashboard() {
         <div style={{ fontSize: '3rem' }}>🎓</div>
         <div>
           <h1 style={{ fontSize: 'var(--font-xl)', fontWeight: 900, marginBottom: 4 }}>
-            שלום {user?.name?.split(' ')[0]} 🎓
+            {pt('hello')} {user?.name?.split(' ')[0]} 🎓
           </h1>
           <p style={{ color: 'var(--color-text-muted)', margin: 0 }}>
-            ברוכה הבאה לאקדמיית Happy Baby | המשיכי את המסע שלך
+            {pt('welcomeMessage')}
           </p>
         </div>
       </div>
@@ -123,31 +166,31 @@ export default function AcademyDashboard() {
       <div className="card" style={{ marginBottom: 24 }}>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12 }}>
           <h2 style={{ fontSize: 'var(--font-base)', fontWeight: 700, margin: 0 }}>
-            📈 התקדמות בקורס
+            {pt('courseProgress')}
           </h2>
           <span className="badge badge-sage" style={{ fontSize: '0.85rem' }}>
-            {completedCount}/{lessons.length} שיעורים הושלמו
+            {completedCount}/{lessons.length} {pt('lessonsCompleted')}
           </span>
         </div>
         <div className="progress-bar-track">
           <div className="progress-bar-fill" style={{ width: `${progressPct}%` }} />
         </div>
-        <div style={{ marginTop: 8, fontSize: '0.8rem', color: 'var(--color-text-muted)', textAlign: 'left' }}>
-          {Math.round(progressPct)}% הושלם
+        <div style={{ marginTop: 8, fontSize: '0.8rem', color: 'var(--color-text-muted)', textAlign: isRTL ? 'left' : 'right' }}>
+          {Math.round(progressPct)}% {pt('completed')}
         </div>
       </div>
 
       {/* Syllabus */}
       <div className="card" style={{ marginBottom: 24 }}>
-        <h2 style={{ fontSize: 'var(--font-lg)', fontWeight: 800, marginBottom: 20 }}>📋 סילבוס הקורס</h2>
+        <h2 style={{ fontSize: 'var(--font-lg)', fontWeight: 800, marginBottom: 20 }}>{pt('syllabus')}</h2>
         {lessons.map((lesson, idx) => (
-          <LessonCard key={lesson.id} lesson={lesson} index={idx} lessons={lessons} />
+          <LessonCard key={lesson.id} lesson={lesson} index={idx} lessons={lessons} pt={pt} />
         ))}
       </div>
 
       {/* Upcoming Events Strip */}
       <div className="card">
-        <h2 style={{ fontSize: 'var(--font-lg)', fontWeight: 800, marginBottom: 16 }}>📅 אירועים קרובים</h2>
+        <h2 style={{ fontSize: 'var(--font-lg)', fontWeight: 800, marginBottom: 16 }}>{pt('upcomingEvents')}</h2>
         <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
           {upcomingEvents.map(event => (
             <div key={event.id} style={{
@@ -165,7 +208,7 @@ export default function AcademyDashboard() {
                 </div>
               </div>
               <span className={`badge ${event.type === 'online' ? 'badge-sage' : 'badge-rose'}`}>
-                {event.type === 'online' ? 'אונליין' : 'פרונטלי'}
+                {event.type === 'online' ? pt('online') : pt('inPerson')}
               </span>
             </div>
           ))}

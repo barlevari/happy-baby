@@ -1,6 +1,107 @@
 import { useState, useEffect } from 'react';
 import { useNavigate, useSearchParams, Link } from 'react-router-dom';
 import { useAuth, ADMIN_SECRET } from '../../context/AuthContext';
+import { useLanguage, usePageText } from '../../context/LanguageContext';
+
+// ── Page-level translations ─────────────────────────────────
+const PAGE_TEXT = {
+  he: {
+    backBtn: '→ חזרה',
+    chooseTrack: 'בחר/י את המסלול שלך',
+    continueBtn: 'המשך ←',
+    personalDetails: 'פרטים אישיים',
+    fullName: 'שם מלא',
+    fullNamePlaceholder: 'שם פרטי ושם משפחה',
+    emailLabel: 'כתובת אימייל',
+    idLabel: 'תעודת זהות',
+    idValid: '✓ תקין',
+    idInvalid: '✗ לא תקין',
+    idPlaceholder: '9 ספרות',
+    passwordLabel: 'סיסמה',
+    passwordPlaceholder: 'לפחות 8 תווים',
+    lmpLabel: 'תאריך הווסת האחרון (LMP)',
+    lmpHint: 'שדה זה משמש לחישוב שבוע ההריון ותאריך הלידה המשוער',
+    adminCodeLabel: '🔑 קוד מנהל',
+    adminCodePlaceholder: 'HAPPYBABY2025',
+    adminCodeHint: 'הקוד מתקבל מהמנהלת הראשית בלבד',
+    backStepBtn: 'חזרה',
+    loading: 'נרשמ/ת...',
+    registerAdmin: 'הרשמה כמנהל',
+    submitRequest: 'שלח/י בקשה',
+    haveAccount: 'יש לך כבר חשבון?',
+    loginHere: 'כנס/י כאן',
+
+    // Role cards
+    roleMomsTitle: 'אני בהריון / יולדת',
+    roleMomsDesc: 'מעקב הריון אישי, טיפים שבועיים, ניהול בדיקות ותמיכה',
+    roleStudentTitle: 'אני רוצה ללמוד Happy Baby',
+    roleStudentDesc: 'קורס מקצועי לרכישת שיטת Happy Baby ולווי אמהות',
+    roleAdminTitle: 'מנהל / מנהלת האתר',
+    roleAdminDesc: 'גישה מלאה לניהול משתמשים, תוכן ואבטחה (נדרש קוד מנהל)',
+
+    // Validation errors
+    errName: 'נא להזין שם מלא',
+    errEmail: 'כתובת אימייל לא תקינה',
+    errPassword: 'הסיסמה חייבת להכיל לפחות 8 תווים',
+    errId: 'מספר תעודת זהות לא תקין',
+    errLmp: 'נא להזין תאריך הווסת האחרון',
+    errAdminCode: 'נא להזין קוד מנהל',
+
+    // Pending approval screen
+    registrationSent: 'ההרשמה נשלחה!',
+    pendingMsg: 'בקשתך התקבלה ותבדק על ידי המנהלת בהקדם.\nתקבלי הודעה ברגע שהחשבון שלך יאושר.',
+    saveCredentials: '📧 שמור/י את פרטי ההתחברות שלך — תצטרכ/י אותם לאחר האישור',
+    backToLogin: 'חזרה לכניסה',
+  },
+  en: {
+    backBtn: '← Back',
+    chooseTrack: 'Choose your track',
+    continueBtn: 'Continue →',
+    personalDetails: 'Personal Details',
+    fullName: 'Full Name',
+    fullNamePlaceholder: 'First and last name',
+    emailLabel: 'Email address',
+    idLabel: 'ID Number',
+    idValid: '✓ Valid',
+    idInvalid: '✗ Invalid',
+    idPlaceholder: '9 digits',
+    passwordLabel: 'Password',
+    passwordPlaceholder: 'At least 8 characters',
+    lmpLabel: 'Last Menstrual Period (LMP)',
+    lmpHint: 'This field is used to calculate your pregnancy week and estimated due date',
+    adminCodeLabel: '🔑 Admin Code',
+    adminCodePlaceholder: 'HAPPYBABY2025',
+    adminCodeHint: 'The code is provided by the head admin only',
+    backStepBtn: 'Back',
+    loading: 'Registering...',
+    registerAdmin: 'Register as Admin',
+    submitRequest: 'Submit Request',
+    haveAccount: 'Already have an account?',
+    loginHere: 'Sign in here',
+
+    // Role cards
+    roleMomsTitle: "I'm pregnant / a new mom",
+    roleMomsDesc: 'Personal pregnancy tracking, weekly tips, test management, and support',
+    roleStudentTitle: 'I want to learn Happy Baby',
+    roleStudentDesc: 'Professional course to learn the Happy Baby method and support mothers',
+    roleAdminTitle: 'Site Administrator',
+    roleAdminDesc: 'Full access to manage users, content, and security (admin code required)',
+
+    // Validation errors
+    errName: 'Please enter your full name',
+    errEmail: 'Invalid email address',
+    errPassword: 'Password must be at least 8 characters',
+    errId: 'Invalid ID number',
+    errLmp: 'Please enter the date of your last period',
+    errAdminCode: 'Please enter the admin code',
+
+    // Pending approval screen
+    registrationSent: 'Registration Submitted!',
+    pendingMsg: 'Your request has been received and will be reviewed by the admin shortly.\nYou will be notified once your account is approved.',
+    saveCredentials: '📧 Save your login details — you will need them after approval',
+    backToLogin: 'Back to Login',
+  },
+};
 
 function validateIsraeliIdLocal(id) {
   const str = String(id).padStart(9, '0');
@@ -19,6 +120,8 @@ export default function Register() {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const preRole = searchParams.get('role');
+  const pt = usePageText(PAGE_TEXT);
+  const { isRTL } = useLanguage();
 
   const [step, setStep] = useState(preRole ? 2 : 1);
   const [role, setRole] = useState(preRole || '');
@@ -39,13 +142,13 @@ export default function Register() {
 
   const validateStep2 = () => {
     const newErrors = {};
-    if (!form.name.trim()) newErrors.name = 'נא להזין שם מלא';
+    if (!form.name.trim()) newErrors.name = pt('errName');
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!emailRegex.test(form.email)) newErrors.email = 'כתובת אימייל לא תקינה';
-    if (form.password.length < 8) newErrors.password = 'הסיסמה חייבת להכיל לפחות 8 תווים';
-    if (!validateIsraeliIdLocal(form.idNumber)) newErrors.idNumber = 'מספר תעודת זהות לא תקין';
-    if (role === 'moms' && !form.lmpDate) newErrors.lmpDate = 'נא להזין תאריך הווסת האחרון';
-    if (role === 'admin' && !form.adminCode) newErrors.adminCode = 'נא להזין קוד מנהל';
+    if (!emailRegex.test(form.email)) newErrors.email = pt('errEmail');
+    if (form.password.length < 8) newErrors.password = pt('errPassword');
+    if (!validateIsraeliIdLocal(form.idNumber)) newErrors.idNumber = pt('errId');
+    if (role === 'moms' && !form.lmpDate) newErrors.lmpDate = pt('errLmp');
+    if (role === 'admin' && !form.adminCode) newErrors.adminCode = pt('errAdminCode');
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
@@ -72,24 +175,24 @@ export default function Register() {
     {
       id: 'moms',
       icon: '🤰',
-      title: 'אני בהריון / יולדת',
-      desc: 'מעקב הריון אישי, טיפים שבועיים, ניהול בדיקות ותמיכה',
+      title: pt('roleMomsTitle'),
+      desc: pt('roleMomsDesc'),
       color: 'var(--color-rose-light)',
       border: 'var(--color-rose)',
     },
     {
       id: 'student',
       icon: '🎓',
-      title: 'אני רוצה ללמוד Happy Baby',
-      desc: 'קורס מקצועי לרכישת שיטת Happy Baby ולווי אמהות',
+      title: pt('roleStudentTitle'),
+      desc: pt('roleStudentDesc'),
       color: 'var(--color-sage-ultra)',
       border: 'var(--color-sage)',
     },
     {
       id: 'admin',
       icon: '🛡️',
-      title: 'מנהל / מנהלת האתר',
-      desc: 'גישה מלאה לניהול משתמשים, תוכן ואבטחה (נדרש קוד מנהל)',
+      title: pt('roleAdminTitle'),
+      desc: pt('roleAdminDesc'),
       color: '#F0F4FF',
       border: 'var(--color-admin)',
     },
@@ -102,7 +205,7 @@ export default function Register() {
         minHeight: '100vh',
         background: 'linear-gradient(160deg, var(--color-cream) 0%, var(--color-sage-ultra) 100%)',
         display: 'flex', alignItems: 'center', justifyContent: 'center',
-        padding: 24, direction: 'rtl',
+        padding: 24, direction: isRTL ? 'rtl' : 'ltr',
       }}>
         <div style={{
           width: '100%', maxWidth: 440,
@@ -115,11 +218,10 @@ export default function Register() {
         }}>
           <div style={{ fontSize: '3.5rem', marginBottom: 16 }}>⏳</div>
           <h1 style={{ fontSize: '1.4rem', fontWeight: 900, color: 'var(--color-sage-dark)', marginBottom: 12 }}>
-            ההרשמה נשלחה!
+            {pt('registrationSent')}
           </h1>
-          <p style={{ color: 'var(--color-text-muted)', lineHeight: 1.7, marginBottom: 24 }}>
-            בקשתך התקבלה ותבדק על ידי המנהלת בהקדם.
-            תקבלי הודעה ברגע שהחשבון שלך יאושר.
+          <p style={{ color: 'var(--color-text-muted)', lineHeight: 1.7, marginBottom: 24, whiteSpace: 'pre-line' }}>
+            {pt('pendingMsg')}
           </p>
           <div style={{
             padding: '14px 18px',
@@ -129,10 +231,10 @@ export default function Register() {
             color: 'var(--color-sage-dark)',
             marginBottom: 24,
           }}>
-            📧 שמור/י את פרטי ההתחברות שלך — תצטרכ/י אותם לאחר האישור
+            {pt('saveCredentials')}
           </div>
           <Link to="/login" className="btn btn-primary" style={{ display: 'block', textAlign: 'center' }}>
-            חזרה לכניסה
+            {pt('backToLogin')}
           </Link>
         </div>
       </div>
@@ -147,7 +249,7 @@ export default function Register() {
       alignItems: 'center',
       justifyContent: 'center',
       padding: 24,
-      direction: 'rtl',
+      direction: isRTL ? 'rtl' : 'ltr',
       position: 'relative',
     }}>
       {/* Back button */}
@@ -156,7 +258,7 @@ export default function Register() {
         style={{
           position: 'absolute',
           top: 24,
-          right: 24,
+          ...(isRTL ? { right: 24 } : { left: 24 }),
           background: 'rgba(255,255,255,0.9)',
           border: '1px solid var(--color-border)',
           borderRadius: 'var(--radius-md)',
@@ -173,7 +275,7 @@ export default function Register() {
         onMouseEnter={e => e.currentTarget.style.background = 'rgba(255,255,255,1)'}
         onMouseLeave={e => e.currentTarget.style.background = 'rgba(255,255,255,0.9)'}
       >
-        → חזרה
+        {pt('backBtn')}
       </button>
 
       <div style={{
@@ -209,7 +311,7 @@ export default function Register() {
         {step === 1 && (
           <div>
             <h1 style={{ textAlign: 'center', fontSize: '1.3rem', fontWeight: 800, marginBottom: 24, color: 'var(--color-text)' }}>
-              בחר/י את המסלול שלך
+              {pt('chooseTrack')}
             </h1>
             <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
               {roleCards.map(card => (
@@ -231,7 +333,7 @@ export default function Register() {
                     <div style={{ fontWeight: 800, fontSize: '1rem', color: 'var(--color-text)' }}>{card.title}</div>
                     <div style={{ color: 'var(--color-text-muted)', fontSize: '0.85rem', marginTop: 4 }}>{card.desc}</div>
                   </div>
-                  {role === card.id && <div style={{ marginRight: 'auto', fontSize: '1.2rem' }}>✅</div>}
+                  {role === card.id && <div style={{ ...(isRTL ? { marginRight: 'auto' } : { marginLeft: 'auto' }), fontSize: '1.2rem' }}>✅</div>}
                 </div>
               ))}
             </div>
@@ -241,7 +343,7 @@ export default function Register() {
               disabled={!role}
               onClick={() => setStep(2)}
             >
-              המשך ←
+              {pt('continueBtn')}
             </button>
           </div>
         )}
@@ -249,18 +351,18 @@ export default function Register() {
         {step === 2 && (
           <div>
             <h1 style={{ textAlign: 'center', fontSize: '1.3rem', fontWeight: 800, marginBottom: 24, color: 'var(--color-text)' }}>
-              פרטים אישיים
+              {pt('personalDetails')}
             </h1>
 
             {submitError && <div className="alert alert-danger" style={{ marginBottom: 16 }}>⚠️ {submitError}</div>}
 
             <form onSubmit={handleSubmit}>
               <div className="form-group">
-                <label className="form-label">שם מלא</label>
+                <label className="form-label">{pt('fullName')}</label>
                 <input
                   type="text"
                   className={`form-input${errors.name ? ' error' : ''}`}
-                  placeholder="שם פרטי ושם משפחה"
+                  placeholder={pt('fullNamePlaceholder')}
                   value={form.name}
                   onChange={e => updateField('name', e.target.value)}
                 />
@@ -268,7 +370,7 @@ export default function Register() {
               </div>
 
               <div className="form-group">
-                <label className="form-label">כתובת אימייל</label>
+                <label className="form-label">{pt('emailLabel')}</label>
                 <input
                   type="email"
                   className={`form-input${errors.email ? ' error' : ''}`}
@@ -282,17 +384,17 @@ export default function Register() {
 
               <div className="form-group">
                 <label className="form-label">
-                  תעודת זהות
+                  {pt('idLabel')}
                   {form.idNumber.length >= 7 && (
-                    <span style={{ marginRight: 8, fontSize: '0.75rem', color: validateIsraeliIdLocal(form.idNumber) ? '#2E7D32' : 'var(--color-danger)' }}>
-                      {validateIsraeliIdLocal(form.idNumber) ? '✓ תקין' : '✗ לא תקין'}
+                    <span style={{ ...(isRTL ? { marginRight: 8 } : { marginLeft: 8 }), fontSize: '0.75rem', color: validateIsraeliIdLocal(form.idNumber) ? '#2E7D32' : 'var(--color-danger)' }}>
+                      {validateIsraeliIdLocal(form.idNumber) ? pt('idValid') : pt('idInvalid')}
                     </span>
                   )}
                 </label>
                 <input
                   type="text"
                   className={`form-input${errors.idNumber ? ' error' : ''}`}
-                  placeholder="9 ספרות"
+                  placeholder={pt('idPlaceholder')}
                   value={form.idNumber}
                   onChange={e => updateField('idNumber', e.target.value.replace(/\D/g, '').slice(0, 9))}
                   dir="ltr"
@@ -302,11 +404,11 @@ export default function Register() {
               </div>
 
               <div className="form-group">
-                <label className="form-label">סיסמה</label>
+                <label className="form-label">{pt('passwordLabel')}</label>
                 <input
                   type="password"
                   className={`form-input${errors.password ? ' error' : ''}`}
-                  placeholder="לפחות 8 תווים"
+                  placeholder={pt('passwordPlaceholder')}
                   value={form.password}
                   onChange={e => updateField('password', e.target.value)}
                   dir="ltr"
@@ -329,7 +431,7 @@ export default function Register() {
 
               {role === 'moms' && (
                 <div className="form-group">
-                  <label className="form-label">תאריך הווסת האחרון (LMP)</label>
+                  <label className="form-label">{pt('lmpLabel')}</label>
                   <input
                     type="date"
                     lang="en"
@@ -341,18 +443,18 @@ export default function Register() {
                   />
                   {errors.lmpDate && <span className="form-error">{errors.lmpDate}</span>}
                   <span style={{ fontSize: '0.75rem', color: 'var(--color-text-muted)' }}>
-                    שדה זה משמש לחישוב שבוע ההריון ותאריך הלידה המשוער
+                    {pt('lmpHint')}
                   </span>
                 </div>
               )}
 
               {role === 'admin' && (
                 <div className="form-group">
-                  <label className="form-label">🔑 קוד מנהל</label>
+                  <label className="form-label">{pt('adminCodeLabel')}</label>
                   <input
                     type="text"
                     className={`form-input${errors.adminCode ? ' error' : ''}`}
-                    placeholder="HAPPYBABY2025"
+                    placeholder={pt('adminCodePlaceholder')}
                     value={form.adminCode}
                     onChange={e => updateField('adminCode', e.target.value.trim())}
                     dir="ltr"
@@ -362,7 +464,7 @@ export default function Register() {
                   />
                   {errors.adminCode && <span className="form-error">{errors.adminCode}</span>}
                   <span style={{ fontSize: '0.75rem', color: 'var(--color-text-muted)' }}>
-                    הקוד מתקבל מהמנהלת הראשית בלבד
+                    {pt('adminCodeHint')}
                   </span>
                 </div>
               )}
@@ -374,7 +476,7 @@ export default function Register() {
                   onClick={() => setStep(1)}
                   style={{ flex: 1 }}
                 >
-                  חזרה
+                  {pt('backStepBtn')}
                 </button>
                 <button
                   type="submit"
@@ -382,7 +484,7 @@ export default function Register() {
                   disabled={loading}
                   style={{ flex: 2 }}
                 >
-                  {loading ? 'נרשמ/ת...' : role === 'admin' ? 'הרשמה כמנהל' : 'שלח/י בקשה'}
+                  {loading ? pt('loading') : role === 'admin' ? pt('registerAdmin') : pt('submitRequest')}
                 </button>
               </div>
             </form>
@@ -390,8 +492,8 @@ export default function Register() {
         )}
 
         <div style={{ textAlign: 'center', marginTop: 20, fontSize: '0.875rem', color: 'var(--color-text-muted)' }}>
-          יש לך כבר חשבון?{' '}
-          <Link to="/login" style={{ color: 'var(--color-sage-dark)', fontWeight: 700 }}>כנס/י כאן</Link>
+          {pt('haveAccount')}{' '}
+          <Link to="/login" style={{ color: 'var(--color-sage-dark)', fontWeight: 700 }}>{pt('loginHere')}</Link>
         </div>
       </div>
     </div>

@@ -3,6 +3,7 @@ import { useAuth } from './context/AuthContext';
 import { ProtectedRoute } from './components/ProtectedRoute';
 import NavBar from './components/NavBar';
 import WhatsAppButton from './components/WhatsAppButton';
+import AIChatWidget from './components/AIChatWidget';
 
 // Pages
 import Landing from './pages/Landing';
@@ -31,7 +32,7 @@ function AppShell({ children }) {
       <main className="main-content">
         {children}
       </main>
-      <WhatsAppButton />
+      <AIChatWidget />
     </div>
   );
 }
@@ -39,9 +40,9 @@ function AppShell({ children }) {
 function AboutWrapper() {
   const { user } = useAuth();
   if (user) {
-    return <AppShell><AboutPage /></AppShell>;
+    return <AppShell><AboutPage /><WhatsAppButton /></AppShell>;
   }
-  return <AboutPage />;
+  return <><AboutPage /><WhatsAppButton /></>;
 }
 
 function RoleRedirect() {

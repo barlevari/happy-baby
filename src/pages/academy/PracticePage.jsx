@@ -1,4 +1,41 @@
 import { useState } from 'react';
+import { useLanguage, usePageText } from '../../context/LanguageContext';
+
+// ── Page-level translations ─────────────────────────────────
+const PAGE_TEXT = {
+  he: {
+    pageTitle: '✍️ בחינה מבוא',
+    questionOf: 'שאלה',
+    outOf: 'מתוך',
+    nextQuestion: 'שאלה הבאה ←',
+    finishAndViewResults: 'סיום וצפייה בתוצאות',
+    correct: 'נכון!',
+    incorrect: 'לא בדיוק...',
+    greatJob: 'כל הכבוד!',
+    almostThere: 'כמעט!',
+    passedMessage: 'השגת תוצאה מצוינת. את מוכנה להמשיך לשלב הבא!',
+    failedMessage: 'מומלץ לחזור על החומר ולנסות שוב.',
+    question: 'שאלה',
+    tryAgain: 'נסי שוב',
+    backToMaterial: 'חזרי לחומר',
+  },
+  en: {
+    pageTitle: '✍️ Intro Exam',
+    questionOf: 'Question',
+    outOf: 'of',
+    nextQuestion: 'Next Question →',
+    finishAndViewResults: 'Finish & View Results',
+    correct: 'Correct!',
+    incorrect: 'Not quite...',
+    greatJob: 'Great Job!',
+    almostThere: 'Almost!',
+    passedMessage: 'You achieved an excellent score. You\'re ready for the next stage!',
+    failedMessage: 'We recommend reviewing the material and trying again.',
+    question: 'Question',
+    tryAgain: 'Try Again',
+    backToMaterial: 'Back to Material',
+  },
+};
 
 const QUESTIONS = [
   {
@@ -64,6 +101,9 @@ const QUESTIONS = [
 ];
 
 export default function PracticePage() {
+  const pt = usePageText(PAGE_TEXT);
+  const { isRTL } = useLanguage();
+
   const [currentQ, setCurrentQ] = useState(0);
   const [selected, setSelected] = useState(null);
   const [answers, setAnswers] = useState([]);
@@ -104,18 +144,16 @@ export default function PracticePage() {
     const passed = pct >= 80;
 
     return (
-      <div style={{ direction: 'rtl', maxWidth: 560, margin: '40px auto', textAlign: 'center' }}>
+      <div style={{ direction: isRTL ? 'rtl' : 'ltr', maxWidth: 560, margin: '40px auto', textAlign: 'center' }}>
         <div className="card" style={{ padding: 48 }}>
           <div style={{ fontSize: '4rem', marginBottom: 16 }}>
             {passed ? '🎉' : '📖'}
           </div>
           <h1 style={{ fontSize: '1.6rem', fontWeight: 900, marginBottom: 8, color: passed ? 'var(--color-sage-dark)' : 'var(--color-text)' }}>
-            {passed ? 'כל הכבוד!' : 'כמעט!'}
+            {passed ? pt('greatJob') : pt('almostThere')}
           </h1>
           <p style={{ color: 'var(--color-text-muted)', marginBottom: 24 }}>
-            {passed
-              ? 'השגת תוצאה מצוינת. את מוכנה להמשיך לשלב הבא!'
-              : 'מומלץ לחזור על החומר ולנסות שוב.'}
+            {passed ? pt('passedMessage') : pt('failedMessage')}
           </p>
 
           {/* Score Circle */}
@@ -135,25 +173,25 @@ export default function PracticePage() {
           </div>
 
           {/* Answer Review */}
-          <div style={{ textAlign: 'right', marginBottom: 24 }}>
+          <div style={{ textAlign: isRTL ? 'right' : 'left', marginBottom: 24 }}>
             {answers.map((a, i) => (
               <div key={i} style={{
                 display: 'flex', alignItems: 'center', gap: 10,
                 padding: '8px 0', borderBottom: '1px solid var(--color-border)',
               }}>
                 <span>{a.correct ? '✅' : '❌'}</span>
-                <span style={{ fontSize: '0.85rem', color: 'var(--color-text)' }}>שאלה {i + 1}</span>
+                <span style={{ fontSize: '0.85rem', color: 'var(--color-text)' }}>{pt('question')} {i + 1}</span>
               </div>
             ))}
           </div>
 
           <div style={{ display: 'flex', gap: 12, justifyContent: 'center' }}>
             <button className="btn btn-secondary" onClick={handleRestart}>
-              נסי שוב
+              {pt('tryAgain')}
             </button>
             {!passed && (
               <button className="btn btn-ghost" onClick={() => window.history.back()}>
-                חזרי לחומר
+                {pt('backToMaterial')}
               </button>
             )}
           </div>
@@ -163,9 +201,9 @@ export default function PracticePage() {
   }
 
   return (
-    <div style={{ direction: 'rtl', maxWidth: 660, margin: '0 auto' }}>
+    <div style={{ direction: isRTL ? 'rtl' : 'ltr', maxWidth: 660, margin: '0 auto' }}>
       <div className="page-header">
-        <h1>✍️ בחינה מבוא</h1>
+        <h1>{pt('pageTitle')}</h1>
         <span className="badge badge-sage">{currentQ + 1} / {QUESTIONS.length}</span>
       </div>
 
@@ -177,7 +215,7 @@ export default function PracticePage() {
       {/* Question Card */}
       <div className="card" style={{ marginBottom: 20 }}>
         <div style={{ fontSize: '0.8rem', fontWeight: 700, color: 'var(--color-sage)', marginBottom: 10 }}>
-          שאלה {currentQ + 1} מתוך {QUESTIONS.length}
+          {pt('questionOf')} {currentQ + 1} {pt('outOf')} {QUESTIONS.length}
         </div>
         <h2 style={{ fontSize: '1.05rem', fontWeight: 800, lineHeight: 1.6, marginBottom: 20, color: 'var(--color-text)' }}>
           {question.question}
@@ -218,7 +256,7 @@ export default function PracticePage() {
                   fontWeight: 600,
                   fontSize: '0.9rem',
                   cursor: selected !== null ? 'default' : 'pointer',
-                  textAlign: 'right',
+                  textAlign: isRTL ? 'right' : 'left',
                   transition: 'all 0.2s',
                 }}
               >
@@ -245,7 +283,7 @@ export default function PracticePage() {
         <div className={`alert ${selected === question.correct ? 'alert-success' : 'alert-warning'}`} style={{ marginBottom: 20 }}>
           <span>{selected === question.correct ? '🌟' : '💡'}</span>
           <div>
-            <strong>{selected === question.correct ? 'נכון!' : 'לא בדיוק...'}</strong>
+            <strong>{selected === question.correct ? pt('correct') : pt('incorrect')}</strong>
             <p style={{ margin: '4px 0 0', fontSize: '0.875rem' }}>{question.explanation}</p>
           </div>
         </div>
@@ -254,7 +292,7 @@ export default function PracticePage() {
       {/* Next Button */}
       {selected !== null && (
         <button className="btn btn-primary w-full" onClick={handleNext}>
-          {currentQ < QUESTIONS.length - 1 ? 'שאלה הבאה ←' : 'סיום וצפייה בתוצאות'}
+          {currentQ < QUESTIONS.length - 1 ? pt('nextQuestion') : pt('finishAndViewResults')}
         </button>
       )}
     </div>

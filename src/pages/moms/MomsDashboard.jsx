@@ -1,6 +1,7 @@
 import { useState, useMemo } from 'react';
 import { Link } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
+import { useLanguage, usePageText } from '../../context/LanguageContext';
 import {
   LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer
 } from 'recharts';
@@ -11,6 +12,240 @@ import {
   WEEKLY_TIPS,
 } from '../../data/mockData';
 
+// ── Page-level translations ─────────────────────────────────
+const T = {
+  he: {
+    week: 'שבוע',
+    trimester1: 'טרימסטר ראשון',
+    trimester2: 'טרימסטר שני',
+    trimester3: 'טרימסטר שלישי',
+    day: 'יום',
+    daySunday: 'ראשון',
+    dayMonday: 'שני',
+    dayTuesday: 'שלישי',
+    dayWednesday: 'רביעי',
+    dayThursday: 'חמישי',
+    dayFriday: 'שישי',
+    daySaturday: 'שבת',
+    monthJan: 'ינואר',
+    monthFeb: 'פברואר',
+    monthMar: 'מרץ',
+    monthApr: 'אפריל',
+    monthMay: 'מאי',
+    monthJun: 'יוני',
+    monthJul: 'יולי',
+    monthAug: 'אוגוסט',
+    monthSep: 'ספטמבר',
+    monthOct: 'אוקטובר',
+    monthNov: 'נובמבר',
+    monthDec: 'דצמבר',
+    hello: 'שלום',
+    daysToDate: 'ימים ללידה',
+    pregnancyStage: 'שלב ההריון',
+    nextTest: 'הבדיקה הבאה',
+    noTests: 'אין בדיקות',
+    lastWeightKg: 'משקל אחרון (ק"ג)',
+    sizeOf: 'כגודל',
+    dueDate: 'לידה משוערת:',
+    tipForWeek: 'טיפ לשבוע',
+    healthMetrics: 'מדדי בריאות',
+    addMetric: '+ הוסיפי מדד',
+    weightKg: 'משקל (ק"ג)',
+    bloodPressureMmhg: 'לחץ דם (מ"מ כספית)',
+    bloodSugarMgdl: 'סוכר בדם (mg/dL)',
+    pregnancyTests: 'בדיקות הריון',
+    addTest: '+ הוסיפי בדיקה',
+    testName: 'שם הבדיקה',
+    recommendedWeek: 'שבוע מומלץ',
+    status: 'סטטוס',
+    date: 'תאריך',
+    urgent: 'דחוף',
+    done: 'בוצע',
+    pending: 'ממתין',
+    addHealthMetric: 'הוספת מדד בריאות',
+    testDate: 'תאריך הבדיקה',
+    fillAtLeastOne: 'יש למלא לפחות מדד אחד',
+    diastolicRequired: 'נדרש גם לחץ דם דיאסטולי',
+    systolicRequired: 'נדרש גם לחץ דם סיסטולי',
+    cancel: 'ביטול',
+    saveMetric: 'שמור מדד',
+    addTestModal: 'הוספת בדיקה',
+    selectTest: 'בחרי בדיקה',
+    selectTestPlaceholder: '-- בחרי בדיקה --',
+    other: 'אחר...',
+    testNameLabel: 'שם הבדיקה',
+    typeTestName: 'הקלידי שם בדיקה...',
+    recommendedWeekLabel: 'שבוע מומלץ',
+    completionDate: 'תאריך ביצוע',
+    save: 'שמור',
+    // METRIC_CONFIG labels/hints
+    metricWeightLabel: 'משקל (ק"ג)',
+    metricWeightPlaceholder: 'לדוגמה: 68.5',
+    metricWeightHint: 'טווח תקין בהריון: עלייה של 0.3–0.5 ק"ג לשבוע בטרימסטר 2–3',
+    metricBpSysLabel: 'לחץ דם סיסטולי (מ"מ כספית)',
+    metricBpSysPlaceholder: 'לדוגמה: 115',
+    metricBpSysHint: 'תקין: 90–120 | גבוה: מעל 140 | דחוף: מעל 160',
+    metricBpDiaLabel: 'לחץ דם דיאסטולי (מ"מ כספית)',
+    metricBpDiaPlaceholder: 'לדוגמה: 75',
+    metricBpDiaHint: 'תקין: 60–80 | גבוה: מעל 90 | דחוף: מעל 110',
+    metricBloodSugarLabel: 'סוכר בדם (mg/dL)',
+    metricBloodSugarPlaceholder: 'לדוגמה: 90',
+    metricBloodSugarHint: 'תקין בצום: 70–95 | אחרי ארוחה: עד 120',
+    // Alert texts
+    alertBpEmergency: 'פנייה לחדר מיון מיידית!',
+    alertBpHigh: 'מומלץ להתייעץ עם רופא בהקדם.',
+    alertBpLabel: 'לחץ דם',
+    alertBpMmhg: 'מ"מ כספית',
+    alertSugarHigh: 'מומלץ לדון עם הרופא על תוצאות עקומת הסוכר.',
+    alertSugarAboveNorm: 'שימי לב לתזונה.',
+    alertSugarLevelHigh: 'רמת סוכר גבוהה',
+    alertSugarAboveNormLabel: 'רמת סוכר מעל הנורמה',
+    alertWeightGain: 'עלייה של',
+    alertWeightFromLast: 'מהמדידה האחרונה – מומלץ לדון עם הרופא.',
+    alertWeightKg: 'ק"ג',
+    // LMP prompt
+    enterLmp: 'הזן/י תאריך הווסת האחרון',
+    lmpNeeded: 'הנתון הזה נחוץ לחישוב שבוע ההריון ותאריך הלידה המשוער',
+    updateInSettings: 'עדכן/י בהגדרות',
+    // Tooltip formatters
+    tooltipKg: 'ק"ג',
+    tooltipWeight: 'משקל',
+    tooltipSystolic: 'סיסטולי',
+    tooltipDiastolic: 'דיאסטולי',
+    tooltipSugar: 'סוכר',
+    // Predefined tests
+    testBloodGeneral: 'בדיקות דם כלליות',
+    testNT: 'שקיפות עורפית + NT',
+    testNIFTY: 'סקר גנטי – NIFTY',
+    testEarlyAnatomy: 'סקירת מערכות מוקדמת',
+    testLateAnatomy: 'סקירת מערכות מאוחרת',
+    testIronFerritin: 'בדיקת ברזל ופריטין',
+    testGCT: 'עקומת סוכר – GCT',
+    testUrinalysis: 'בדיקת שתן ותרבית',
+    testCBCAntibodies: 'ספירת דם + בדיקת נוגדנים',
+    testPlacentaUS: 'אולטרסאונד לתפקוד שליה',
+    testGBS: 'בדיקת סטרפטוקוק – GBS',
+    testCTG: 'CTG – ניטור עוברי',
+    testTSH: 'בדיקת TSH – בלוטת התריס',
+    testProteinUrine: 'בדיקת חלבון בשתן',
+  },
+  en: {
+    week: 'Week',
+    trimester1: 'First Trimester',
+    trimester2: 'Second Trimester',
+    trimester3: 'Third Trimester',
+    day: 'Day',
+    daySunday: 'Sunday',
+    dayMonday: 'Monday',
+    dayTuesday: 'Tuesday',
+    dayWednesday: 'Wednesday',
+    dayThursday: 'Thursday',
+    dayFriday: 'Friday',
+    daySaturday: 'Saturday',
+    monthJan: 'January',
+    monthFeb: 'February',
+    monthMar: 'March',
+    monthApr: 'April',
+    monthMay: 'May',
+    monthJun: 'June',
+    monthJul: 'July',
+    monthAug: 'August',
+    monthSep: 'September',
+    monthOct: 'October',
+    monthNov: 'November',
+    monthDec: 'December',
+    hello: 'Hello',
+    daysToDate: 'Days to due date',
+    pregnancyStage: 'Pregnancy stage',
+    nextTest: 'Next test',
+    noTests: 'No tests',
+    lastWeightKg: 'Last weight (kg)',
+    sizeOf: 'Size of',
+    dueDate: 'Due date:',
+    tipForWeek: 'Tip for week',
+    healthMetrics: 'Health Metrics',
+    addMetric: '+ Add Metric',
+    weightKg: 'Weight (kg)',
+    bloodPressureMmhg: 'Blood Pressure (mmHg)',
+    bloodSugarMgdl: 'Blood Sugar (mg/dL)',
+    pregnancyTests: 'Pregnancy Tests',
+    addTest: '+ Add Test',
+    testName: 'Test Name',
+    recommendedWeek: 'Recommended Week',
+    status: 'Status',
+    date: 'Date',
+    urgent: 'Urgent',
+    done: 'Done',
+    pending: 'Pending',
+    addHealthMetric: 'Add Health Metric',
+    testDate: 'Test Date',
+    fillAtLeastOne: 'Fill at least one metric',
+    diastolicRequired: 'Diastolic BP also required',
+    systolicRequired: 'Systolic BP also required',
+    cancel: 'Cancel',
+    saveMetric: 'Save Metric',
+    addTestModal: 'Add Test',
+    selectTest: 'Select Test',
+    selectTestPlaceholder: '-- Select Test --',
+    other: 'Other...',
+    testNameLabel: 'Test Name',
+    typeTestName: 'Type test name...',
+    recommendedWeekLabel: 'Recommended Week',
+    completionDate: 'Completion Date',
+    save: 'Save',
+    // METRIC_CONFIG labels/hints
+    metricWeightLabel: 'Weight (kg)',
+    metricWeightPlaceholder: 'e.g.: 68.5',
+    metricWeightHint: 'Normal range in pregnancy: 0.3–0.5 kg/week gain in trimester 2–3',
+    metricBpSysLabel: 'Systolic BP (mmHg)',
+    metricBpSysPlaceholder: 'e.g.: 115',
+    metricBpSysHint: 'Normal: 90–120 | High: above 140 | Urgent: above 160',
+    metricBpDiaLabel: 'Diastolic BP (mmHg)',
+    metricBpDiaPlaceholder: 'e.g.: 75',
+    metricBpDiaHint: 'Normal: 60–80 | High: above 90 | Urgent: above 110',
+    metricBloodSugarLabel: 'Blood Sugar (mg/dL)',
+    metricBloodSugarPlaceholder: 'e.g.: 90',
+    metricBloodSugarHint: 'Normal fasting: 70–95 | Post-meal: up to 120',
+    // Alert texts
+    alertBpEmergency: 'Go to the emergency room immediately!',
+    alertBpHigh: 'Consult a doctor as soon as possible.',
+    alertBpLabel: 'Blood Pressure',
+    alertBpMmhg: 'mmHg',
+    alertSugarHigh: 'Discuss glucose tolerance test results with your doctor.',
+    alertSugarAboveNorm: 'Watch your diet.',
+    alertSugarLevelHigh: 'High blood sugar level',
+    alertSugarAboveNormLabel: 'Blood sugar above normal',
+    alertWeightGain: 'Gained',
+    alertWeightFromLast: 'since last measurement \u2013 consult your doctor.',
+    alertWeightKg: 'kg',
+    // LMP prompt
+    enterLmp: 'Enter last menstrual period date',
+    lmpNeeded: 'This data is needed to calculate pregnancy week and estimated due date',
+    updateInSettings: 'Update in Settings',
+    // Tooltip formatters
+    tooltipKg: 'kg',
+    tooltipWeight: 'Weight',
+    tooltipSystolic: 'Systolic',
+    tooltipDiastolic: 'Diastolic',
+    tooltipSugar: 'Sugar',
+    // Predefined tests
+    testBloodGeneral: 'General Blood Tests',
+    testNT: 'Nuchal Translucency + NT',
+    testNIFTY: 'Genetic Screening \u2013 NIFTY',
+    testEarlyAnatomy: 'Early Anatomy Scan',
+    testLateAnatomy: 'Late Anatomy Scan',
+    testIronFerritin: 'Iron & Ferritin Test',
+    testGCT: 'Glucose Challenge Test \u2013 GCT',
+    testUrinalysis: 'Urinalysis & Culture',
+    testCBCAntibodies: 'CBC + Antibody Test',
+    testPlacentaUS: 'Placental Function Ultrasound',
+    testGBS: 'Group B Strep \u2013 GBS',
+    testCTG: 'CTG \u2013 Fetal Monitoring',
+    testTSH: 'TSH \u2013 Thyroid Test',
+    testProteinUrine: 'Urine Protein Test',
+  },
+};
+
 // ── Helpers ──────────────────────────────────────────────────
 function getBabySize(week) {
   const keys = Object.keys(BABY_SIZES).map(Number).sort((a, b) => a - b);
@@ -19,53 +254,63 @@ function getBabySize(week) {
   return BABY_SIZES[chosen];
 }
 
-function getTrimester(week) {
-  if (week <= 12) return { label: 'טרימסטר ראשון', num: 1 };
-  if (week <= 26) return { label: 'טרימסטר שני', num: 2 };
-  return { label: 'טרימסטר שלישי', num: 3 };
+function getTrimester(week, pt) {
+  if (week <= 12) return { label: pt('trimester1'), num: 1 };
+  if (week <= 26) return { label: pt('trimester2'), num: 2 };
+  return { label: pt('trimester3'), num: 3 };
 }
 
-// תמיד dd/mm/yyyy בספרות ערביות – ללא תלות ב-locale של הדפדפן
+// dd/mm/yyyy in Arabic numerals - no browser locale dependency
 function formatDate(dateStr) {
-  if (!dateStr) return '–';
+  if (!dateStr) return '\u2013';
   const d = new Date(dateStr + 'T12:00:00');
   return `${String(d.getDate()).padStart(2,'0')}/${String(d.getMonth()+1).padStart(2,'0')}/${d.getFullYear()}`;
 }
 
-// תאריך היום בעברית עם ספרות ערביות בלבד
-function todayHebrewString() {
+// Today's date string
+function todayDateString(pt, isRTL) {
   const d = new Date();
-  const days = ['ראשון','שני','שלישי','רביעי','חמישי','שישי','שבת'];
-  const months = ['ינואר','פברואר','מרץ','אפריל','מאי','יוני','יולי','אוגוסט','ספטמבר','אוקטובר','נובמבר','דצמבר'];
-  return `יום ${days[d.getDay()]}, ${d.getDate()} ב${months[d.getMonth()]} ${d.getFullYear()}`;
+  const days = [
+    pt('daySunday'), pt('dayMonday'), pt('dayTuesday'),
+    pt('dayWednesday'), pt('dayThursday'), pt('dayFriday'), pt('daySaturday'),
+  ];
+  const months = [
+    pt('monthJan'), pt('monthFeb'), pt('monthMar'), pt('monthApr'),
+    pt('monthMay'), pt('monthJun'), pt('monthJul'), pt('monthAug'),
+    pt('monthSep'), pt('monthOct'), pt('monthNov'), pt('monthDec'),
+  ];
+  if (isRTL) {
+    return `${pt('day')} ${days[d.getDay()]}, ${d.getDate()} \u05D1${months[d.getMonth()]} ${d.getFullYear()}`;
+  }
+  return `${days[d.getDay()]}, ${months[d.getMonth()]} ${d.getDate()}, ${d.getFullYear()}`;
 }
 
-// ── לוגיקת התראות מדדים ──────────────────────────────────────
-function getMetricAlerts(metrics) {
+// Metric alerts logic
+function getMetricAlerts(metrics, pt) {
   if (!metrics.length) return [];
   const latest = metrics[metrics.length - 1];
   const prev = metrics.length >= 2 ? metrics[metrics.length - 2] : null;
   const alerts = [];
 
-  // לחץ דם
+  // Blood pressure
   if (latest.bpSystolic > 160 || latest.bpDiastolic > 110) {
-    alerts.push({ level: 'danger', icon: '🚨', text: `לחץ דם ${latest.bpSystolic}/${latest.bpDiastolic} – פנייה לחדר מיון מיידית!` });
+    alerts.push({ level: 'danger', icon: '\uD83D\uDEA8', text: `${pt('alertBpLabel')} ${latest.bpSystolic}/${latest.bpDiastolic} \u2013 ${pt('alertBpEmergency')}` });
   } else if (latest.bpSystolic > 140 || latest.bpDiastolic > 90) {
-    alerts.push({ level: 'warning', icon: '⚠️', text: `לחץ דם גבוה (${latest.bpSystolic}/${latest.bpDiastolic} מ"מ כספית) – מומלץ להתייעץ עם רופא בהקדם.` });
+    alerts.push({ level: 'warning', icon: '\u26A0\uFE0F', text: `${pt('alertBpLabel')} (${latest.bpSystolic}/${latest.bpDiastolic} ${pt('alertBpMmhg')}) \u2013 ${pt('alertBpHigh')}` });
   }
 
-  // סוכר בדם
+  // Blood sugar
   if (latest.bloodSugar > 140) {
-    alerts.push({ level: 'warning', icon: '🍬', text: `רמת סוכר גבוהה (${latest.bloodSugar} mg/dL) – מומלץ לדון עם הרופא על תוצאות עקומת הסוכר.` });
+    alerts.push({ level: 'warning', icon: '\uD83C\uDF6C', text: `${pt('alertSugarLevelHigh')} (${latest.bloodSugar} mg/dL) \u2013 ${pt('alertSugarHigh')}` });
   } else if (latest.bloodSugar > 120) {
-    alerts.push({ level: 'warning', icon: '🍬', text: `רמת סוכר מעל הנורמה (${latest.bloodSugar} mg/dL) – שימי לב לתזונה.` });
+    alerts.push({ level: 'warning', icon: '\uD83C\uDF6C', text: `${pt('alertSugarAboveNormLabel')} (${latest.bloodSugar} mg/dL) \u2013 ${pt('alertSugarAboveNorm')}` });
   }
 
-  // עלייה במשקל (מהמדידה הקודמת)
+  // Weight gain (from previous measurement)
   if (prev && latest.weight && prev.weight) {
     const gain = parseFloat((latest.weight - prev.weight).toFixed(1));
     if (gain > 3) {
-      alerts.push({ level: 'warning', icon: '⚖️', text: `עלייה של ${gain} ק"ג מהמדידה האחרונה – מומלץ לדון עם הרופא.` });
+      alerts.push({ level: 'warning', icon: '\u2696\uFE0F', text: `${pt('alertWeightGain')} ${gain} ${pt('alertWeightKg')} ${pt('alertWeightFromLast')}` });
     }
   }
 
@@ -80,7 +325,7 @@ function getDueDate(lmpDate) {
 }
 
 // ── Progress Ring Component ───────────────────────────────────
-function ProgressRing({ week }) {
+function ProgressRing({ week, pt }) {
   const r = 80, cx = 100, cy = 100;
   const circ = 2 * Math.PI * r;
   const progress = Math.min(week / 40, 1);
@@ -115,7 +360,7 @@ function ProgressRing({ week }) {
         <div style={{ fontSize: '2.5rem', fontWeight: 900, color: 'var(--color-sage-dark)', lineHeight: 1 }}>
           {week}
         </div>
-        <div style={{ fontSize: '0.75rem', fontWeight: 600, color: 'var(--color-text-muted)' }}>שבוע</div>
+        <div style={{ fontSize: '0.75rem', fontWeight: 600, color: 'var(--color-text-muted)' }}>{pt('week')}</div>
         <div style={{ fontSize: '1.5rem' }}>{babySize.emoji}</div>
       </div>
     </div>
@@ -123,42 +368,42 @@ function ProgressRing({ week }) {
 }
 
 // ── Add Metric Modal ──────────────────────────────────────────
-const METRIC_CONFIG = [
-  {
-    field: 'weight',
-    label: 'משקל (ק"ג)',
-    placeholder: 'לדוגמה: 68.5',
-    hint: 'טווח תקין בהריון: עלייה של 0.3–0.5 ק"ג לשבוע בטרימסטר 2–3',
-    min: 40, max: 140, step: 0.1,
-    icon: '⚖️',
-  },
-  {
-    field: 'bpSystolic',
-    label: 'לחץ דם סיסטולי (מ"מ כספית)',
-    placeholder: 'לדוגמה: 115',
-    hint: 'תקין: 90–120 | גבוה: מעל 140 | דחוף: מעל 160',
-    min: 60, max: 200, step: 1,
-    icon: '💉',
-  },
-  {
-    field: 'bpDiastolic',
-    label: 'לחץ דם דיאסטולי (מ"מ כספית)',
-    placeholder: 'לדוגמה: 75',
-    hint: 'תקין: 60–80 | גבוה: מעל 90 | דחוף: מעל 110',
-    min: 40, max: 130, step: 1,
-    icon: '💉',
-  },
-  {
-    field: 'bloodSugar',
-    label: 'סוכר בדם (mg/dL)',
-    placeholder: 'לדוגמה: 90',
-    hint: 'תקין בצום: 70–95 | אחרי ארוחה: עד 120',
-    min: 50, max: 400, step: 1,
-    icon: '🍬',
-  },
-];
+function MetricModal({ onClose, onSave, pt, isRTL }) {
+  const metricConfig = [
+    {
+      field: 'weight',
+      label: pt('metricWeightLabel'),
+      placeholder: pt('metricWeightPlaceholder'),
+      hint: pt('metricWeightHint'),
+      min: 40, max: 140, step: 0.1,
+      icon: '\u2696\uFE0F',
+    },
+    {
+      field: 'bpSystolic',
+      label: pt('metricBpSysLabel'),
+      placeholder: pt('metricBpSysPlaceholder'),
+      hint: pt('metricBpSysHint'),
+      min: 60, max: 200, step: 1,
+      icon: '\uD83D\uDC89',
+    },
+    {
+      field: 'bpDiastolic',
+      label: pt('metricBpDiaLabel'),
+      placeholder: pt('metricBpDiaPlaceholder'),
+      hint: pt('metricBpDiaHint'),
+      min: 40, max: 130, step: 1,
+      icon: '\uD83D\uDC89',
+    },
+    {
+      field: 'bloodSugar',
+      label: pt('metricBloodSugarLabel'),
+      placeholder: pt('metricBloodSugarPlaceholder'),
+      hint: pt('metricBloodSugarHint'),
+      min: 50, max: 400, step: 1,
+      icon: '\uD83C\uDF6C',
+    },
+  ];
 
-function MetricModal({ onClose, onSave }) {
   const today = new Date().toISOString().split('T')[0];
   const [form, setForm] = useState({ date: today, weight: '', bpSystolic: '', bpDiastolic: '', bloodSugar: '' });
   const [errors, setErrors] = useState({});
@@ -166,17 +411,16 @@ function MetricModal({ onClose, onSave }) {
   function validate() {
     const errs = {};
     if (!form.weight && !form.bpSystolic && !form.bloodSugar) {
-      errs.general = 'יש למלא לפחות מדד אחד';
+      errs.general = pt('fillAtLeastOne');
     }
-    if (form.bpSystolic && !form.bpDiastolic) errs.bpDiastolic = 'נדרש גם לחץ דם דיאסטולי';
-    if (!form.bpSystolic && form.bpDiastolic) errs.bpSystolic = 'נדרש גם לחץ דם סיסטולי';
+    if (form.bpSystolic && !form.bpDiastolic) errs.bpDiastolic = pt('diastolicRequired');
+    if (!form.bpSystolic && form.bpDiastolic) errs.bpSystolic = pt('systolicRequired');
     return errs;
   }
 
   function handleSave() {
     const errs = validate();
     if (Object.keys(errs).length) { setErrors(errs); return; }
-    // Convert strings to numbers
     const data = {
       date: form.date,
       weight: form.weight ? parseFloat(form.weight) : null,
@@ -188,20 +432,19 @@ function MetricModal({ onClose, onSave }) {
     onClose();
   }
 
-  // Format date for display in the date field
   const displayDate = form.date ? formatDate(form.date) : '';
 
   return (
     <div className="modal-overlay" onClick={onClose}>
       <div className="modal-box" onClick={e => e.stopPropagation()}>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20 }}>
-          <h2 style={{ fontSize: '1.2rem', fontWeight: 800 }}>📊 הוספת מדד בריאות</h2>
-          <button onClick={onClose} style={{ border: 'none', background: 'none', fontSize: '1.2rem', cursor: 'pointer', color: 'var(--color-text-muted)' }}>✕</button>
+          <h2 style={{ fontSize: '1.2rem', fontWeight: 800 }}>{'\uD83D\uDCCA'} {pt('addHealthMetric')}</h2>
+          <button onClick={onClose} style={{ border: 'none', background: 'none', fontSize: '1.2rem', cursor: 'pointer', color: 'var(--color-text-muted)' }}>{'\u2715'}</button>
         </div>
 
         {/* Date picker */}
         <div className="form-group">
-          <label className="form-label">📅 תאריך הבדיקה</label>
+          <label className="form-label">{'\uD83D\uDCC5'} {pt('testDate')}</label>
           <input
             type="date"
             lang="en"
@@ -210,22 +453,22 @@ function MetricModal({ onClose, onSave }) {
             max={today}
             onChange={e => setForm(f => ({ ...f, date: e.target.value }))}
             dir="ltr"
-            style={{ textAlign: 'right' }}
+            style={{ textAlign: isRTL ? 'right' : 'left' }}
           />
           {form.date && (
             <div style={{ fontSize: '0.78rem', color: 'var(--color-sage-dark)', fontWeight: 600 }}>
-              ✓ {displayDate}
+              {'\u2713'} {displayDate}
             </div>
           )}
         </div>
 
         {errors.general && (
           <div className="alert alert-warning" style={{ marginBottom: 16, fontSize: '0.85rem' }}>
-            ⚠️ {errors.general}
+            {'\u26A0\uFE0F'} {errors.general}
           </div>
         )}
 
-        {METRIC_CONFIG.map(cfg => (
+        {metricConfig.map(cfg => (
           <div className="form-group" key={cfg.field}>
             <label className="form-label">
               {cfg.icon} {cfg.label}
@@ -240,7 +483,7 @@ function MetricModal({ onClose, onSave }) {
               max={cfg.max}
               step={cfg.step}
               dir="ltr"
-              style={{ textAlign: 'right' }}
+              style={{ textAlign: isRTL ? 'right' : 'left' }}
               onKeyDown={e => {
                 if (!/[0-9.]/.test(e.key) && !['Backspace','Tab','Enter','ArrowLeft','ArrowRight','ArrowUp','ArrowDown','Delete'].includes(e.key)) {
                   e.preventDefault();
@@ -255,7 +498,7 @@ function MetricModal({ onClose, onSave }) {
                 setErrors(prev => ({ ...prev, [cfg.field]: undefined }));
               }}
             />
-            {errors[cfg.field] && <span className="form-error">⚠️ {errors[cfg.field]}</span>}
+            {errors[cfg.field] && <span className="form-error">{'\u26A0\uFE0F'} {errors[cfg.field]}</span>}
             <div style={{ fontSize: '0.73rem', color: 'var(--color-text-muted)', marginTop: 2 }}>
               {cfg.hint}
             </div>
@@ -263,8 +506,8 @@ function MetricModal({ onClose, onSave }) {
         ))}
 
         <div style={{ display: 'flex', gap: 12, marginTop: 20 }}>
-          <button className="btn btn-ghost" onClick={onClose} style={{ flex: 1 }}>ביטול</button>
-          <button className="btn btn-primary" onClick={handleSave} style={{ flex: 2 }}>💾 שמור מדד</button>
+          <button className="btn btn-ghost" onClick={onClose} style={{ flex: 1 }}>{pt('cancel')}</button>
+          <button className="btn btn-primary" onClick={handleSave} style={{ flex: 2 }}>{'\uD83D\uDCBE'} {pt('saveMetric')}</button>
         </div>
       </div>
     </div>
@@ -272,24 +515,24 @@ function MetricModal({ onClose, onSave }) {
 }
 
 // ── Add Test Modal ────────────────────────────────────────────
-const PREDEFINED_TESTS = [
-  { name: 'בדיקות דם כלליות', week: 8 },
-  { name: 'שקיפות עורפית + NT', week: 12 },
-  { name: 'סקר גנטי – NIFTY', week: 14 },
-  { name: 'סקירת מערכות מוקדמת', week: 16 },
-  { name: 'סקירת מערכות מאוחרת', week: 22 },
-  { name: 'בדיקת ברזל ופריטין', week: 24 },
-  { name: 'עקומת סוכר – GCT', week: 26 },
-  { name: 'בדיקת שתן ותרבית', week: 28 },
-  { name: 'ספירת דם + בדיקת נוגדנים', week: 30 },
-  { name: 'אולטרסאונד לתפקוד שליה', week: 32 },
-  { name: 'בדיקת סטרפטוקוק – GBS', week: 35 },
-  { name: 'CTG – ניטור עוברי', week: 38 },
-  { name: 'בדיקת TSH – בלוטת התריס', week: 10 },
-  { name: 'בדיקת חלבון בשתן', week: 20 },
-];
+function TestModal({ onClose, onSave, pt, isRTL }) {
+  const predefinedTests = [
+    { name: pt('testBloodGeneral'), week: 8 },
+    { name: pt('testNT'), week: 12 },
+    { name: pt('testNIFTY'), week: 14 },
+    { name: pt('testEarlyAnatomy'), week: 16 },
+    { name: pt('testLateAnatomy'), week: 22 },
+    { name: pt('testIronFerritin'), week: 24 },
+    { name: pt('testGCT'), week: 26 },
+    { name: pt('testUrinalysis'), week: 28 },
+    { name: pt('testCBCAntibodies'), week: 30 },
+    { name: pt('testPlacentaUS'), week: 32 },
+    { name: pt('testGBS'), week: 35 },
+    { name: pt('testCTG'), week: 38 },
+    { name: pt('testTSH'), week: 10 },
+    { name: pt('testProteinUrine'), week: 20 },
+  ];
 
-function TestModal({ onClose, onSave }) {
   const [form, setForm] = useState({ name: '', recommendedWeek: '', date: new Date().toISOString().split('T')[0] });
   const [isOther, setIsOther] = useState(false);
 
@@ -299,7 +542,7 @@ function TestModal({ onClose, onSave }) {
       setForm(f => ({ ...f, name: '', recommendedWeek: '' }));
     } else {
       setIsOther(false);
-      const test = PREDEFINED_TESTS.find(t => t.name === value);
+      const test = predefinedTests.find(t => t.name === value);
       setForm(f => ({ ...f, name: value, recommendedWeek: test ? String(test.week) : '' }));
     }
   };
@@ -307,29 +550,29 @@ function TestModal({ onClose, onSave }) {
   return (
     <div className="modal-overlay" onClick={onClose}>
       <div className="modal-box" onClick={e => e.stopPropagation()}>
-        <h2 style={{ marginBottom: 20, fontSize: '1.2rem', fontWeight: 800 }}>הוספת בדיקה</h2>
+        <h2 style={{ marginBottom: 20, fontSize: '1.2rem', fontWeight: 800 }}>{pt('addTestModal')}</h2>
         <div className="form-group">
-          <label className="form-label">בחרי בדיקה</label>
+          <label className="form-label">{pt('selectTest')}</label>
           <select
             className="form-input"
             value={isOther ? 'other' : form.name}
             onChange={e => handleSelectTest(e.target.value)}
           >
-            <option value="">-- בחרי בדיקה --</option>
-            {PREDEFINED_TESTS.map(t => (
-              <option key={t.name} value={t.name}>{t.name} (שבוע {t.week})</option>
+            <option value="">{pt('selectTestPlaceholder')}</option>
+            {predefinedTests.map(t => (
+              <option key={t.name} value={t.name}>{t.name} ({pt('week')} {t.week})</option>
             ))}
-            <option value="other">אחר...</option>
+            <option value="other">{pt('other')}</option>
           </select>
         </div>
         {isOther && (
           <div className="form-group">
-            <label className="form-label">שם הבדיקה</label>
-            <input type="text" className="form-input" value={form.name} placeholder="הקלידי שם בדיקה..." onChange={e => setForm(f => ({ ...f, name: e.target.value }))} />
+            <label className="form-label">{pt('testNameLabel')}</label>
+            <input type="text" className="form-input" value={form.name} placeholder={pt('typeTestName')} onChange={e => setForm(f => ({ ...f, name: e.target.value }))} />
           </div>
         )}
         <div className="form-group">
-          <label className="form-label">שבוע מומלץ</label>
+          <label className="form-label">{pt('recommendedWeekLabel')}</label>
           <input
             type="number"
             inputMode="numeric"
@@ -350,17 +593,17 @@ function TestModal({ onClose, onSave }) {
           />
         </div>
         <div className="form-group">
-          <label className="form-label">תאריך ביצוע</label>
+          <label className="form-label">{pt('completionDate')}</label>
           <input type="date" lang="en" className="form-input" value={form.date} onChange={e => setForm(f => ({ ...f, date: e.target.value }))} dir="ltr" />
         </div>
         <div style={{ display: 'flex', gap: 12 }}>
-          <button className="btn btn-ghost" onClick={onClose} style={{ flex: 1 }}>ביטול</button>
+          <button className="btn btn-ghost" onClick={onClose} style={{ flex: 1 }}>{pt('cancel')}</button>
           <button
             className="btn btn-primary"
             disabled={!form.name.trim()}
             onClick={() => { onSave({ ...form, status: 'done', id: Date.now() }); onClose(); }}
             style={{ flex: 2 }}
-          >שמור</button>
+          >{pt('save')}</button>
         </div>
       </div>
     </div>
@@ -395,6 +638,9 @@ function saveUserTests(userId, data) {
 // ── Main Dashboard ────────────────────────────────────────────
 export default function MomsDashboard() {
   const { user, getCurrentWeek } = useAuth();
+  const { lang, isRTL } = useLanguage();
+  const pt = usePageText(T);
+
   const rawWeek = getCurrentWeek();
   const week = rawWeek || 1;
   const hasLmp = !!user?.lmpDate;
@@ -404,13 +650,13 @@ export default function MomsDashboard() {
   const [showTestModal, setShowTestModal] = useState(false);
 
   const babySize = getBabySize(week);
-  const trimester = getTrimester(week);
+  const trimester = getTrimester(week, pt);
   const dueDate = getDueDate(user?.lmpDate);
   const daysLeft = dueDate ? Math.max(0, Math.floor((dueDate - new Date()) / (1000 * 60 * 60 * 24))) : null;
   const latestWeight = metrics[metrics.length - 1]?.weight;
   const latestBP = metrics[metrics.length - 1];
   const highBP = latestBP && latestBP.bpSystolic > 140;
-  const metricAlerts = getMetricAlerts(metrics);
+  const metricAlerts = getMetricAlerts(metrics, pt);
 
   const tip = useMemo(() => {
     const keys = WEEKLY_TIPS.map(t => t.week).sort((a, b) => a - b);
@@ -434,14 +680,14 @@ export default function MomsDashboard() {
     [tests, week]
   );
 
-  const today = todayHebrewString();
+  const today = todayDateString(pt, isRTL);
 
   return (
-    <div style={{ direction: 'rtl' }}>
+    <div style={{ direction: isRTL ? 'rtl' : 'ltr' }}>
       {/* Greeting */}
       <div style={{ marginBottom: 24 }}>
         <h1 style={{ fontSize: 'var(--font-2xl)', fontWeight: 900, marginBottom: 4 }}>
-          שלום {user?.name?.split(' ')[0]}! 🌸
+          {pt('hello')} {user?.name?.split(' ')[0]}! {'\uD83C\uDF38'}
         </h1>
         <p style={{ color: 'var(--color-text-muted)', fontSize: 'var(--font-sm)' }}>{today}</p>
       </div>
@@ -458,13 +704,13 @@ export default function MomsDashboard() {
           alignItems: 'center',
           gap: 12,
         }}>
-          <span style={{ fontSize: '1.4rem' }}>📅</span>
+          <span style={{ fontSize: '1.4rem' }}>{'\uD83D\uDCC5'}</span>
           <div style={{ flex: 1 }}>
-            <strong style={{ color: '#B45309' }}>הזן/י תאריך הווסת האחרון</strong>
-            <div style={{ fontSize: '0.82rem', color: '#92400E' }}>הנתון הזה נחוץ לחישוב שבוע ההריון ותאריך הלידה המשוער</div>
+            <strong style={{ color: '#B45309' }}>{pt('enterLmp')}</strong>
+            <div style={{ fontSize: '0.82rem', color: '#92400E' }}>{pt('lmpNeeded')}</div>
           </div>
           <Link to="/settings" className="btn btn-sm" style={{ background: 'var(--color-warning)', color: 'white', border: 'none', whiteSpace: 'nowrap' }}>
-            עדכן/י בהגדרות
+            {pt('updateInSettings')}
           </Link>
         </div>
       )}
@@ -473,14 +719,14 @@ export default function MomsDashboard() {
       <div className="grid-3" style={{ marginBottom: 32 }}>
         {/* Column 1 - Progress Ring */}
         <div className="card" style={{ textAlign: 'center', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 16 }}>
-          <ProgressRing week={week} />
+          <ProgressRing week={week} pt={pt} />
           <div>
             <div style={{ fontSize: '0.9rem', fontWeight: 700, color: 'var(--color-text-muted)' }}>
-              כגודל {babySize.name} {babySize.emoji}
+              {pt('sizeOf')} {babySize.name} {babySize.emoji}
             </div>
             {dueDate && (
               <div style={{ marginTop: 8, fontSize: '0.8rem', color: 'var(--color-text-muted)' }}>
-                לידה משוערת: {formatDate(dueDate.toISOString().split('T')[0])}
+                {pt('dueDate')} {formatDate(dueDate.toISOString().split('T')[0])}
               </div>
             )}
           </div>
@@ -489,24 +735,24 @@ export default function MomsDashboard() {
         {/* Column 2 - Quick Stats */}
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 }}>
           <div className="stat-card">
-            <div className="stat-icon" style={{ background: 'var(--color-rose-light)' }}>⏳</div>
-            <div className="stat-value" style={{ fontSize: '1.5rem' }}>{daysLeft ?? '–'}</div>
-            <div className="stat-label">ימים ללידה</div>
+            <div className="stat-icon" style={{ background: 'var(--color-rose-light)' }}>{'\u23F3'}</div>
+            <div className="stat-value" style={{ fontSize: '1.5rem' }}>{daysLeft ?? '\u2013'}</div>
+            <div className="stat-label">{pt('daysToDate')}</div>
           </div>
           <div className="stat-card">
-            <div className="stat-icon" style={{ background: 'var(--color-sage-ultra)' }}>📅</div>
+            <div className="stat-icon" style={{ background: 'var(--color-sage-ultra)' }}>{'\uD83D\uDCC5'}</div>
             <div className="stat-value" style={{ fontSize: '1.1rem' }}>{trimester.label}</div>
-            <div className="stat-label">שלב ההריון</div>
+            <div className="stat-label">{pt('pregnancyStage')}</div>
           </div>
           <div className="stat-card">
-            <div className="stat-icon" style={{ background: '#FEF3E7' }}>🏥</div>
-            <div className="stat-value" style={{ fontSize: '0.9rem' }}>{nextTest ? nextTest.name : 'אין בדיקות'}</div>
-            <div className="stat-label">הבדיקה הבאה</div>
+            <div className="stat-icon" style={{ background: '#FEF3E7' }}>{'\uD83C\uDFE5'}</div>
+            <div className="stat-value" style={{ fontSize: '0.9rem' }}>{nextTest ? nextTest.name : pt('noTests')}</div>
+            <div className="stat-label">{pt('nextTest')}</div>
           </div>
           <div className="stat-card">
-            <div className="stat-icon" style={{ background: 'var(--color-sage-ultra)' }}>⚖️</div>
-            <div className="stat-value" style={{ fontSize: '1.5rem' }}>{latestWeight ? `${latestWeight}` : '–'}</div>
-            <div className="stat-label">משקל אחרון (ק"ג)</div>
+            <div className="stat-icon" style={{ background: 'var(--color-sage-ultra)' }}>{'\u2696\uFE0F'}</div>
+            <div className="stat-value" style={{ fontSize: '1.5rem' }}>{latestWeight ? `${latestWeight}` : '\u2013'}</div>
+            <div className="stat-label">{pt('lastWeightKg')}</div>
           </div>
         </div>
 
@@ -514,7 +760,7 @@ export default function MomsDashboard() {
         {tip && (
           <div className="card" style={{ background: 'linear-gradient(135deg, var(--color-sage-ultra), var(--color-rose-light))', border: '1px solid var(--color-sage-light)' }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 12 }}>
-              <span className="badge badge-sage">טיפ לשבוע {week}</span>
+              <span className="badge badge-sage">{pt('tipForWeek')} {week}</span>
               <span className="badge badge-rose">{tip.category}</span>
             </div>
             <div style={{ fontSize: '2.5rem', marginBottom: 12 }}>{tip.emoji}</div>
@@ -544,9 +790,9 @@ export default function MomsDashboard() {
       {/* Health Metrics */}
       <div className="card" style={{ marginBottom: 24 }}>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20 }}>
-          <h2 style={{ fontSize: 'var(--font-lg)', fontWeight: 800 }}>📊 מדדי בריאות</h2>
+          <h2 style={{ fontSize: 'var(--font-lg)', fontWeight: 800 }}>{'\uD83D\uDCCA'} {pt('healthMetrics')}</h2>
           <button className="btn btn-secondary btn-sm" onClick={() => setShowMetricModal(true)}>
-            + הוסיפי מדד
+            {pt('addMetric')}
           </button>
         </div>
 
@@ -554,8 +800,8 @@ export default function MomsDashboard() {
           {/* Weight chart */}
           <div>
             <div style={{ display:'flex', justifyContent:'space-between', alignItems:'baseline', marginBottom: 6 }}>
-              <div style={{ fontSize: '0.8rem', fontWeight: 700, color: 'var(--color-text-muted)' }}>⚖️ משקל (ק"ג)</div>
-              {metrics.length > 0 && <div style={{ fontSize:'0.8rem', fontWeight:800, color:'var(--color-text)' }}>{metrics[metrics.length-1].weight} ק"ג</div>}
+              <div style={{ fontSize: '0.8rem', fontWeight: 700, color: 'var(--color-text-muted)' }}>{'\u2696\uFE0F'} {pt('weightKg')}</div>
+              {metrics.length > 0 && <div style={{ fontSize:'0.8rem', fontWeight:800, color:'var(--color-text)' }}>{metrics[metrics.length-1].weight} {pt('tooltipKg')}</div>}
             </div>
             <ResponsiveContainer width="100%" height={120}>
               <LineChart data={metrics.filter(m => m.weight)}>
@@ -563,9 +809,9 @@ export default function MomsDashboard() {
                 <XAxis dataKey="date" tickFormatter={d => formatDate(d).slice(0,5)} tick={{ fontSize: 9, fill:'var(--color-text-muted)' }} />
                 <YAxis domain={['auto', 'auto']} width={32} tick={{ fontSize: 9, fill:'var(--color-text-muted)' }} />
                 <Tooltip
-                  formatter={v => [`${v} ק"ג`, 'משקל']}
+                  formatter={v => [`${v} ${pt('tooltipKg')}`, pt('tooltipWeight')]}
                   labelFormatter={l => formatDate(l)}
-                  contentStyle={{ borderRadius:8, fontSize:12, direction:'rtl' }}
+                  contentStyle={{ borderRadius:8, fontSize:12, direction: isRTL ? 'rtl' : 'ltr' }}
                 />
                 <Line type="monotone" dataKey="weight" stroke="var(--color-sage)" strokeWidth={2.5} dot={{ r: 4, fill:'var(--color-sage)' }} activeDot={{ r: 6 }} />
               </LineChart>
@@ -575,7 +821,7 @@ export default function MomsDashboard() {
           {/* BP chart */}
           <div>
             <div style={{ display:'flex', justifyContent:'space-between', alignItems:'baseline', marginBottom: 6 }}>
-              <div style={{ fontSize: '0.8rem', fontWeight: 700, color: 'var(--color-text-muted)' }}>💉 לחץ דם (מ"מ כספית)</div>
+              <div style={{ fontSize: '0.8rem', fontWeight: 700, color: 'var(--color-text-muted)' }}>{'\uD83D\uDC89'} {pt('bloodPressureMmhg')}</div>
               {metrics.length > 0 && metrics[metrics.length-1].bpSystolic && (
                 <div style={{ fontSize:'0.8rem', fontWeight:800, color: metrics[metrics.length-1].bpSystolic > 140 ? 'var(--color-warning)' : 'var(--color-text)' }}>
                   {metrics[metrics.length-1].bpSystolic}/{metrics[metrics.length-1].bpDiastolic}
@@ -589,10 +835,10 @@ export default function MomsDashboard() {
                 <YAxis domain={['auto', 'auto']} width={32} tick={{ fontSize: 9, fill:'var(--color-text-muted)' }} />
                 <Tooltip
                   labelFormatter={l => formatDate(l)}
-                  contentStyle={{ borderRadius:8, fontSize:12, direction:'rtl' }}
+                  contentStyle={{ borderRadius:8, fontSize:12, direction: isRTL ? 'rtl' : 'ltr' }}
                 />
-                <Line type="monotone" dataKey="bpSystolic" stroke="var(--color-rose)" strokeWidth={2.5} dot={{ r: 4 }} activeDot={{ r: 6 }} name="סיסטולי" />
-                <Line type="monotone" dataKey="bpDiastolic" stroke="var(--color-rose-dark)" strokeWidth={2} dot={{ r: 3 }} strokeDasharray="4 2" name="דיאסטולי" />
+                <Line type="monotone" dataKey="bpSystolic" stroke="var(--color-rose)" strokeWidth={2.5} dot={{ r: 4 }} activeDot={{ r: 6 }} name={pt('tooltipSystolic')} />
+                <Line type="monotone" dataKey="bpDiastolic" stroke="var(--color-rose-dark)" strokeWidth={2} dot={{ r: 3 }} strokeDasharray="4 2" name={pt('tooltipDiastolic')} />
               </LineChart>
             </ResponsiveContainer>
           </div>
@@ -600,7 +846,7 @@ export default function MomsDashboard() {
           {/* Blood Sugar chart */}
           <div>
             <div style={{ display:'flex', justifyContent:'space-between', alignItems:'baseline', marginBottom: 6 }}>
-              <div style={{ fontSize: '0.8rem', fontWeight: 700, color: 'var(--color-text-muted)' }}>🍬 סוכר בדם (mg/dL)</div>
+              <div style={{ fontSize: '0.8rem', fontWeight: 700, color: 'var(--color-text-muted)' }}>{'\uD83C\uDF6C'} {pt('bloodSugarMgdl')}</div>
               {metrics.length > 0 && metrics[metrics.length-1].bloodSugar && (
                 <div style={{ fontSize:'0.8rem', fontWeight:800, color: metrics[metrics.length-1].bloodSugar > 120 ? 'var(--color-warning)' : 'var(--color-text)' }}>
                   {metrics[metrics.length-1].bloodSugar} mg/dL
@@ -613,9 +859,9 @@ export default function MomsDashboard() {
                 <XAxis dataKey="date" tickFormatter={d => formatDate(d).slice(0,5)} tick={{ fontSize: 9, fill:'var(--color-text-muted)' }} />
                 <YAxis domain={['auto', 'auto']} width={32} tick={{ fontSize: 9, fill:'var(--color-text-muted)' }} />
                 <Tooltip
-                  formatter={v => [`${v} mg/dL`, 'סוכר']}
+                  formatter={v => [`${v} mg/dL`, pt('tooltipSugar')]}
                   labelFormatter={l => formatDate(l)}
-                  contentStyle={{ borderRadius:8, fontSize:12, direction:'rtl' }}
+                  contentStyle={{ borderRadius:8, fontSize:12, direction: isRTL ? 'rtl' : 'ltr' }}
                 />
                 <Line type="monotone" dataKey="bloodSugar" stroke="var(--color-warning)" strokeWidth={2.5} dot={{ r: 4, fill:'var(--color-warning)' }} activeDot={{ r: 6 }} />
               </LineChart>
@@ -627,19 +873,19 @@ export default function MomsDashboard() {
       {/* Tests Panel */}
       <div className="card">
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20 }}>
-          <h2 style={{ fontSize: 'var(--font-lg)', fontWeight: 800 }}>🏥 בדיקות הריון</h2>
+          <h2 style={{ fontSize: 'var(--font-lg)', fontWeight: 800 }}>{'\uD83C\uDFE5'} {pt('pregnancyTests')}</h2>
           <button className="btn btn-secondary btn-sm" onClick={() => setShowTestModal(true)}>
-            + הוסיפי בדיקה
+            {pt('addTest')}
           </button>
         </div>
         <div className="table-wrapper">
           <table>
             <thead>
               <tr>
-                <th>שם הבדיקה</th>
-                <th>שבוע מומלץ</th>
-                <th>סטטוס</th>
-                <th>תאריך</th>
+                <th>{pt('testName')}</th>
+                <th>{pt('recommendedWeek')}</th>
+                <th>{pt('status')}</th>
+                <th>{pt('date')}</th>
               </tr>
             </thead>
             <tbody>
@@ -648,18 +894,18 @@ export default function MomsDashboard() {
                 return (
                   <tr key={test.id}>
                     <td style={{ fontWeight: 600 }}>{test.name}</td>
-                    <td style={{ color: 'var(--color-text-muted)' }}>שבוע {test.recommendedWeek}</td>
+                    <td style={{ color: 'var(--color-text-muted)' }}>{pt('week')} {test.recommendedWeek}</td>
                     <td>
                       {overdue ? (
-                        <span className="badge badge-danger">דחוף</span>
+                        <span className="badge badge-danger">{pt('urgent')}</span>
                       ) : test.status === 'done' ? (
-                        <span className="badge badge-success">בוצע</span>
+                        <span className="badge badge-success">{pt('done')}</span>
                       ) : (
-                        <span className="badge badge-warning">ממתין</span>
+                        <span className="badge badge-warning">{pt('pending')}</span>
                       )}
                     </td>
                     <td style={{ color: 'var(--color-text-muted)', fontSize: '0.85rem' }}>
-                      {test.date ? formatDate(test.date) : '–'}
+                      {test.date ? formatDate(test.date) : '\u2013'}
                     </td>
                   </tr>
                 );
@@ -672,6 +918,8 @@ export default function MomsDashboard() {
       {/* Modals */}
       {showMetricModal && (
         <MetricModal
+          pt={pt}
+          isRTL={isRTL}
           onClose={() => setShowMetricModal(false)}
           onSave={m => setMetrics(prev => {
             const next = [...prev, m];
@@ -682,6 +930,8 @@ export default function MomsDashboard() {
       )}
       {showTestModal && (
         <TestModal
+          pt={pt}
+          isRTL={isRTL}
           onClose={() => setShowTestModal(false)}
           onSave={t => setTests(prev => {
             const next = [...prev, t];

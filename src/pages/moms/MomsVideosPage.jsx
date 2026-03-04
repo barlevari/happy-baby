@@ -1,10 +1,37 @@
 import { useState } from 'react';
 import { useAuth } from '../../context/AuthContext';
+import { useLanguage, usePageText } from '../../context/LanguageContext';
 import { MOCK_VIDEOS } from '../../data/mockData';
 import VideoPlayerModal from '../../components/VideoPlayerModal';
 
+// ── Page-level translations ─────────────────────────────────
+const PAGE_TEXT = {
+  he: {
+    pageTitle: '🎥 סרטוני שיטת Happy Baby',
+    videosCount: 'סרטונים',
+    allWeeks: 'כל השבועות',
+    weeksRange: 'שבועות',
+    relevantForWeek: 'מתאים לשבוע',
+    mine: 'שלי',
+    allVideos: 'כל הסרטונים',
+    noVideosFound: 'לא נמצאו סרטונים לשבוע זה',
+  },
+  en: {
+    pageTitle: '🎥 Happy Baby Method Videos',
+    videosCount: 'videos',
+    allWeeks: 'All weeks',
+    weeksRange: 'Weeks',
+    relevantForWeek: 'Relevant for my week',
+    mine: '',
+    allVideos: 'All videos',
+    noVideosFound: 'No videos found for this week',
+  },
+};
+
 export default function MomsVideosPage() {
   const { getCurrentWeek } = useAuth();
+  const { isRTL } = useLanguage();
+  const pt = usePageText(PAGE_TEXT);
   const week = getCurrentWeek() || 1;
   const [filter, setFilter] = useState('relevant');
   const [playingVideo, setPlayingVideo] = useState(null);
@@ -17,16 +44,23 @@ export default function MomsVideosPage() {
   const displayed = filter === 'relevant' ? relevant : MOCK_VIDEOS;
 
   const getWeeksLabel = (v) => {
-    if (v.weeksMin === null) return 'כל השבועות';
-    return `שבועות ${v.weeksMin}–${v.weeksMax}`;
+    if (v.weeksMin === null) return pt('allWeeks');
+    return `${pt('weeksRange')} ${v.weeksMin}–${v.weeksMax}`;
+  };
+
+  const getRelevantLabel = () => {
+    if (isRTL) {
+      return `${pt('relevantForWeek')} ${week} ${pt('mine')} (${relevant.length})`;
+    }
+    return `${pt('relevantForWeek')} ${week} (${relevant.length})`;
   };
 
   return (
-    <div style={{ direction: 'rtl' }}>
+    <div style={{ direction: isRTL ? 'rtl' : 'ltr' }}>
       <div className="page-header">
-        <h1>🎥 סרטוני שיטת Happy Baby</h1>
+        <h1>{pt('pageTitle')}</h1>
         <span style={{ fontSize: '0.85rem', color: 'var(--color-text-muted)' }}>
-          {displayed.length} סרטונים
+          {displayed.length} {pt('videosCount')}
         </span>
       </div>
 
@@ -36,13 +70,13 @@ export default function MomsVideosPage() {
           className={`tab-btn${filter === 'relevant' ? ' active' : ''}`}
           onClick={() => setFilter('relevant')}
         >
-          מתאים לשבוע {week} שלי ({relevant.length})
+          {getRelevantLabel()}
         </button>
         <button
           className={`tab-btn${filter === 'all' ? ' active' : ''}`}
           onClick={() => setFilter('all')}
         >
-          כל הסרטונים ({MOCK_VIDEOS.length})
+          {pt('allVideos')} ({MOCK_VIDEOS.length})
         </button>
       </div>
 
@@ -118,7 +152,7 @@ export default function MomsVideosPage() {
       {displayed.length === 0 && (
         <div style={{ textAlign: 'center', padding: 64, color: 'var(--color-text-muted)' }}>
           <div style={{ fontSize: '3rem', marginBottom: 12 }}>🎬</div>
-          <p>לא נמצאו סרטונים לשבוע זה</p>
+          <p>{pt('noVideosFound')}</p>
         </div>
       )}
 

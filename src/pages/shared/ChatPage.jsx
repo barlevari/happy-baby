@@ -1,6 +1,6 @@
 import { useState, useRef, useEffect, useCallback } from 'react';
 import { useAuth } from '../../context/AuthContext';
-import { useLanguage } from '../../context/LanguageContext';
+import { useLanguage, usePageText } from '../../context/LanguageContext';
 
 const SYSTEM_PROMPT = `אתה עוזר AI של Happy Baby – פלטפורמה ישראלית לליווי הריון, לידה וגידול תינוקות.
 אתה מדבר עברית בצורה חמה, תומכת ומקצועית.
@@ -15,15 +15,89 @@ const SYSTEM_PROMPT = `אתה עוזר AI של Happy Baby – פלטפורמה �
 
 const API_ENABLED = true;
 
-const SUGGESTIONS = [
-  'מה מותר לאכול בהריון?',
-  'איך מתמודדים עם בחילות בוקר?',
-  'מה גודל התינוק בשבוע 20?',
-  'מה חשוב לדעת לפני הלידה?',
-  'כמה שינה צריך תינוק?',
-];
-
 const STORAGE_KEY = 'hb_chat_conversations';
+
+// ── Page-level translations ─────────────────────────────────
+const PAGE_TEXT = {
+  he: {
+    // Suggestions
+    sug1: 'מה מותר לאכול בהריון?',
+    sug2: 'איך מתמודדים עם בחילות בוקר?',
+    sug3: 'מה גודל התינוק בשבוע 20?',
+    sug4: 'מה חשוב לדעת לפני הלידה?',
+    sug5: 'כמה שינה צריך תינוק?',
+
+    // Chat UI
+    chatHistory: 'היסטוריית שיחות',
+    pageTitle: '🤰 צ\'אט AI',
+    newChat: '✨ שיחה חדשה',
+    clearAll: '🗑️ מחק הכל',
+    noConversations: 'אין שיחות עדיין',
+    messages: 'הודעות',
+    rename: 'שנה שם',
+    delete: 'מחק',
+    inputPlaceholder: 'כתבי הודעה...',
+    send: 'שלחי',
+    newConversation: 'שיחה חדשה',
+    today: 'היום',
+    yesterday: 'אתמול',
+    daysAgo: 'ימים',
+    daysAgoPrefix: 'לפני',
+
+    // Welcome & errors
+    welcomeMessage: (name) => `שלום ${name}! 👋 אני העוזר של Happy Baby. אשמח לעזור לך בכל שאלה על הריון, לידה וגידול תינוקות. במה אוכל לסייע?`,
+    errorPrefix: 'שגיאה',
+    connectionError: 'שגיאה בחיבור לAI',
+    retryError: '⚠️ אירעה שגיאה. נסי שוב מאוחר יותר.',
+
+    // Auto responses
+    autoNausea: 'בחילות בוקר נפוצות בטרימסטר הראשון. טיפים שעוזרים: אכלי ביסקוויטים לפני שקמי מהמיטה, שתי מים קרים, הימני ממאכלים חריפים. אם הבחילה חמורה – דברי עם הרופאה שלך. 💚',
+    autoFood: 'בהריון חשוב לאכול:\n✅ פירות וירקות טריים\n✅ חלבונים (ביצים, עוף, דגים)\n✅ פחמימות מורכבות\n✅ מוצרי חלב (סידן)\n\n❌ להימנע: אלכוהול, דגים גדולים (כספית), גבינות רכות לא מפוסטרות.',
+    autoSize: 'גודל התינוק משתנה מדי שבוע! 🍓 שבוע 8 – פטל, שבוע 12 – ליים, שבוע 20 – בננה, שבוע 28 – חציל, שבוע 36 – פפאיה, שבוע 40 – אבטיח! 🍉\n\nכנסי לדשבורד שלך לראות את השבוע המדויק שלך.',
+    autoBirth: 'לקראת הלידה כדאי:\n• להכין תיק לבית חולים\n• ללמוד טכניקות נשימה\n• לתאם הסעה לבית החולים\n• לכתוב תכנית לידה\n• לישון טוב ולנוח\n\nAcademy של Happy Baby מכיל קורס מלא על הכנה ללידה! 🌸',
+    autoSleep: 'תינוק ישן:\n• 0-3 חודשים: 14-17 שעות ביממה\n• 3-6 חודשים: 12-15 שעות\n• 6-12 חודשים: 11-14 שעות\n\nטיפ: שגרת ערב קבועה (אמבטיה → האכלה → שיר → שינה) עוזרת מאוד לתינוקות לישון טוב יותר! 😴',
+    autoDefault: 'תודה על שאלתך! אשמח לעזור עם שאלות נוספות על הריון ותינוקות! 💝',
+  },
+  en: {
+    // Suggestions
+    sug1: 'What can I eat during pregnancy?',
+    sug2: 'How to deal with morning sickness?',
+    sug3: 'What is the baby\'s size at week 20?',
+    sug4: 'What\'s important to know before birth?',
+    sug5: 'How much sleep does a baby need?',
+
+    // Chat UI
+    chatHistory: 'Chat History',
+    pageTitle: '🤰 AI Chat',
+    newChat: '✨ New Chat',
+    clearAll: '🗑️ Clear all',
+    noConversations: 'No conversations yet',
+    messages: 'messages',
+    rename: 'Rename',
+    delete: 'Delete',
+    inputPlaceholder: 'Type a message...',
+    send: 'Send',
+    newConversation: 'New conversation',
+    today: 'Today',
+    yesterday: 'Yesterday',
+    daysAgo: 'days',
+    daysAgoPrefix: '',
+
+    // Welcome & errors
+    welcomeMessage: (name) => `Hi ${name}! 👋 I'm the Happy Baby assistant. I'd love to help you with any questions about pregnancy, birth, and baby care. How can I help?`,
+    errorPrefix: 'Error',
+    connectionError: 'Error connecting to AI',
+    retryError: '⚠️ An error occurred. Please try again later.',
+
+    // Auto responses
+    autoNausea: 'Morning sickness is common in the first trimester. Helpful tips: eat crackers before getting out of bed, drink cold water, avoid spicy foods. If nausea is severe, talk to your doctor. 💚',
+    autoFood: 'During pregnancy, it\'s important to eat:\n✅ Fresh fruits and vegetables\n✅ Proteins (eggs, chicken, fish)\n✅ Complex carbohydrates\n✅ Dairy products (calcium)\n\n❌ Avoid: alcohol, large fish (mercury), unpasteurized soft cheeses.',
+    autoSize: 'Your baby\'s size changes every week! 🍓 Week 8 – raspberry, Week 12 – lime, Week 20 – banana, Week 28 – eggplant, Week 36 – papaya, Week 40 – watermelon! 🍉\n\nCheck your dashboard to see your exact week.',
+    autoBirth: 'Before birth, it\'s good to:\n• Pack a hospital bag\n• Learn breathing techniques\n• Arrange transportation to the hospital\n• Write a birth plan\n• Get plenty of sleep and rest\n\nThe Happy Baby Academy has a full course on birth preparation! 🌸',
+    autoSleep: 'Baby sleep:\n• 0-3 months: 14-17 hours per day\n• 3-6 months: 12-15 hours\n• 6-12 months: 11-14 hours\n\nTip: A consistent evening routine (bath → feeding → song → sleep) really helps babies sleep better! 😴',
+    autoDefault: 'Thank you for your question! I\'d love to help with more questions about pregnancy and babies! 💝',
+  },
+};
 
 function generateId() {
   return Date.now().toString(36) + Math.random().toString(36).slice(2, 7);
@@ -40,25 +114,34 @@ function saveConversations(convs) {
   localStorage.setItem(STORAGE_KEY, JSON.stringify(convs));
 }
 
-function getWelcomeMessage(userName) {
-  return {
-    role: 'assistant',
-    content: `שלום ${userName}! 👋 אני העוזר של Happy Baby. אשמח לעזור לך בכל שאלה על הריון, לידה וגידול תינוקות. במה אוכל לסייע?`,
-  };
-}
-
-function autoTitle(messages) {
-  const firstUser = messages.find(m => m.role === 'user');
-  if (!firstUser) return 'שיחה חדשה';
-  const text = firstUser.content;
-  return text.length > 40 ? text.slice(0, 40) + '...' : text;
-}
-
 export default function ChatPage() {
   const { user } = useAuth();
-  const { lang } = useLanguage();
-  const isRTL = lang === 'he';
+  const { isRTL, lang } = useLanguage();
+  const pt = usePageText(PAGE_TEXT);
   const userName = user?.name?.split(' ')[0] || '';
+
+  const SUGGESTIONS = [
+    pt('sug1'),
+    pt('sug2'),
+    pt('sug3'),
+    pt('sug4'),
+    pt('sug5'),
+  ];
+
+  function getWelcomeMessage() {
+    const msgFn = PAGE_TEXT[lang]?.welcomeMessage ?? PAGE_TEXT['he'].welcomeMessage;
+    return {
+      role: 'assistant',
+      content: msgFn(userName),
+    };
+  }
+
+  function autoTitle(messages) {
+    const firstUser = messages.find(m => m.role === 'user');
+    if (!firstUser) return pt('newConversation');
+    const text = firstUser.content;
+    return text.length > 40 ? text.slice(0, 40) + '...' : text;
+  }
 
   const [conversations, setConversations] = useState(() => loadConversations());
   const [activeId, setActiveId] = useState(() => {
@@ -75,7 +158,7 @@ export default function ChatPage() {
   const editInputRef = useRef(null);
 
   const activeConv = conversations.find(c => c.id === activeId);
-  const messages = activeConv?.messages || [getWelcomeMessage(userName)];
+  const messages = activeConv?.messages || [getWelcomeMessage()];
 
   // Save conversations to localStorage whenever they change
   useEffect(() => {
@@ -100,8 +183,8 @@ export default function ChatPage() {
   const createNewChat = useCallback(() => {
     const newConv = {
       id: generateId(),
-      title: 'שיחה חדשה',
-      messages: [getWelcomeMessage(userName)],
+      title: pt('newConversation'),
+      messages: [getWelcomeMessage()],
       createdAt: Date.now(),
       updatedAt: Date.now(),
     };
@@ -110,7 +193,7 @@ export default function ChatPage() {
     setShowSidebar(false);
     setInput('');
     setError('');
-  }, [userName]);
+  }, [userName, lang]);
 
   const deleteConversation = useCallback((id) => {
     setConversations(prev => {
@@ -154,8 +237,8 @@ export default function ChatPage() {
     if (!currentId) {
       const newConv = {
         id: generateId(),
-        title: 'שיחה חדשה',
-        messages: [getWelcomeMessage(userName)],
+        title: pt('newConversation'),
+        messages: [getWelcomeMessage()],
         createdAt: Date.now(),
         updatedAt: Date.now(),
       };
@@ -164,14 +247,14 @@ export default function ChatPage() {
       setActiveId(currentId);
     }
 
-    const currentMessages = conversations.find(c => c.id === currentId)?.messages || [getWelcomeMessage(userName)];
+    const currentMessages = conversations.find(c => c.id === currentId)?.messages || [getWelcomeMessage()];
     const newMessages = [...currentMessages, { role: 'user', content: userText }];
 
     // Update messages immediately
     updateConversation(currentId, c => ({
       ...c,
       messages: newMessages,
-      title: c.title === 'שיחה חדשה' ? autoTitle(newMessages) : c.title,
+      title: c.title === pt('newConversation') ? autoTitle(newMessages) : c.title,
       updatedAt: Date.now(),
     }));
     setLoading(true);
@@ -209,7 +292,7 @@ export default function ChatPage() {
 
       if (!res.ok) {
         const err = await res.json().catch(() => ({}));
-        throw new Error(err.error?.message || `שגיאה ${res.status}`);
+        throw new Error(err.error?.message || `${pt('errorPrefix')} ${res.status}`);
       }
 
       const data = await res.json();
@@ -220,10 +303,10 @@ export default function ChatPage() {
         updatedAt: Date.now(),
       }));
     } catch (err) {
-      setError(err.message || 'שגיאה בחיבור לAI');
+      setError(err.message || pt('connectionError'));
       updateConversation(currentId, c => ({
         ...c,
-        messages: [...c.messages, { role: 'assistant', content: '⚠️ אירעה שגיאה. נסי שוב מאוחר יותר.' }],
+        messages: [...c.messages, { role: 'assistant', content: pt('retryError') }],
         updatedAt: Date.now(),
       }));
     } finally {
@@ -246,11 +329,36 @@ export default function ChatPage() {
     const d = new Date(ts);
     const now = new Date();
     const diffDays = Math.floor((now - d) / 86400000);
-    if (diffDays === 0) return 'היום';
-    if (diffDays === 1) return 'אתמול';
-    if (diffDays < 7) return `לפני ${diffDays} ימים`;
-    return d.toLocaleDateString('he-IL', { day: 'numeric', month: 'short' });
+    if (diffDays === 0) return pt('today');
+    if (diffDays === 1) return pt('yesterday');
+    if (diffDays < 7) {
+      const prefix = pt('daysAgoPrefix');
+      const suffix = `${diffDays} ${pt('daysAgo')}`;
+      return prefix ? `${prefix} ${suffix}` : `${suffix} ago`;
+    }
+    return d.toLocaleDateString(lang === 'he' ? 'he-IL' : 'en-US', { day: 'numeric', month: 'short' });
   };
+
+  // Fallback auto-responses when no API key
+  function getAutoResponse(text) {
+    const lower = text.toLowerCase();
+    if (lower.includes('בחילה') || lower.includes('בחילות') || lower.includes('nausea') || lower.includes('morning sickness')) {
+      return pt('autoNausea');
+    }
+    if (lower.includes('אכל') || lower.includes('תזונה') || lower.includes('eat') || lower.includes('food') || lower.includes('nutrition')) {
+      return pt('autoFood');
+    }
+    if (lower.includes('שבוע') || lower.includes('גודל') || lower.includes('week') || lower.includes('size')) {
+      return pt('autoSize');
+    }
+    if (lower.includes('לידה') || lower.includes('לפני') || lower.includes('birth') || lower.includes('before')) {
+      return pt('autoBirth');
+    }
+    if (lower.includes('שינה') || lower.includes('תינוק') || lower.includes('sleep') || lower.includes('baby')) {
+      return pt('autoSleep');
+    }
+    return pt('autoDefault');
+  }
 
   return (
     <div style={{ direction: isRTL ? 'rtl' : 'ltr', height: 'calc(100vh - 80px)', display: 'flex', flexDirection: 'column', position: 'relative' }}>
@@ -259,18 +367,18 @@ export default function ChatPage() {
         <button
           className="btn btn-ghost btn-sm"
           onClick={() => setShowSidebar(s => !s)}
-          title={isRTL ? 'היסטוריית שיחות' : 'Chat history'}
+          title={pt('chatHistory')}
           style={{ fontSize: '1.1rem', padding: '4px 8px' }}
         >
           {showSidebar ? '✕' : '☰'}
         </button>
-        <h1 style={{ flex: 1, margin: 0 }}>🤰 {isRTL ? 'צ\'אט AI' : 'AI Chat'}</h1>
+        <h1 style={{ flex: 1, margin: 0 }}>{pt('pageTitle')}</h1>
         <button
           className="btn btn-secondary btn-sm"
           onClick={createNewChat}
-          title={isRTL ? 'שיחה חדשה' : 'New chat'}
+          title={pt('newConversation')}
         >
-          ✨ {isRTL ? 'שיחה חדשה' : 'New Chat'}
+          {pt('newChat')}
         </button>
       </div>
 
@@ -316,7 +424,7 @@ export default function ChatPage() {
             background: 'var(--color-sage-ultra)',
           }}>
             <span style={{ fontWeight: 700, fontSize: '0.95rem', color: 'var(--color-sage-dark)' }}>
-              📋 {isRTL ? 'היסטוריית שיחות' : 'Chat History'}
+              📋 {pt('chatHistory')}
             </span>
             {conversations.length > 0 && (
               <button
@@ -325,9 +433,9 @@ export default function ChatPage() {
                   background: 'none', border: 'none', color: 'var(--color-danger)',
                   fontSize: '0.75rem', cursor: 'pointer', padding: '2px 6px',
                 }}
-                title={isRTL ? 'מחק הכל' : 'Clear all'}
+                title={pt('clearAll')}
               >
-                🗑️ {isRTL ? 'מחק הכל' : 'Clear all'}
+                {pt('clearAll')}
               </button>
             )}
           </div>
@@ -336,7 +444,7 @@ export default function ChatPage() {
           <div style={{ flex: 1, overflowY: 'auto', padding: '8px 0' }}>
             {conversations.length === 0 ? (
               <div style={{ textAlign: 'center', padding: 24, color: 'var(--color-text-muted)', fontSize: '0.85rem' }}>
-                {isRTL ? 'אין שיחות עדיין' : 'No conversations yet'}
+                {pt('noConversations')}
               </div>
             ) : (
               conversations.map(conv => (
@@ -382,7 +490,7 @@ export default function ChatPage() {
                           💬 {conv.title}
                         </div>
                         <div style={{ fontSize: '0.72rem', color: 'var(--color-text-muted)', marginTop: 2 }}>
-                          {formatDate(conv.updatedAt)} · {conv.messages.filter(m => m.role === 'user').length} {isRTL ? 'הודעות' : 'messages'}
+                          {formatDate(conv.updatedAt)} · {conv.messages.filter(m => m.role === 'user').length} {pt('messages')}
                         </div>
                       </>
                     )}
@@ -396,7 +504,7 @@ export default function ChatPage() {
                           background: 'none', border: 'none', cursor: 'pointer',
                           padding: '2px 4px', fontSize: '0.75rem', opacity: 0.5,
                         }}
-                        title={isRTL ? 'שנה שם' : 'Rename'}
+                        title={pt('rename')}
                       >
                         ✏️
                       </button>
@@ -406,7 +514,7 @@ export default function ChatPage() {
                           background: 'none', border: 'none', cursor: 'pointer',
                           padding: '2px 4px', fontSize: '0.75rem', opacity: 0.5,
                         }}
-                        title={isRTL ? 'מחק' : 'Delete'}
+                        title={pt('delete')}
                       >
                         🗑️
                       </button>
@@ -424,7 +532,7 @@ export default function ChatPage() {
               onClick={createNewChat}
               style={{ width: '100%' }}
             >
-              ✨ {isRTL ? 'שיחה חדשה' : 'New Chat'}
+              {pt('newChat')}
             </button>
           </div>
         </div>
@@ -547,7 +655,7 @@ export default function ChatPage() {
           className="form-input"
           value={input}
           onChange={e => setInput(e.target.value)}
-          placeholder={isRTL ? 'כתבי הודעה...' : 'Type a message...'}
+          placeholder={pt('inputPlaceholder')}
           disabled={loading}
           style={{ flex: 1 }}
         />
@@ -557,7 +665,7 @@ export default function ChatPage() {
           disabled={loading || !input.trim()}
           style={{ flexShrink: 0 }}
         >
-          {isRTL ? 'שלחי' : 'Send'} →
+          {pt('send')} →
         </button>
       </form>
 
@@ -575,25 +683,4 @@ export default function ChatPage() {
       `}</style>
     </div>
   );
-}
-
-// Fallback auto-responses when no API key
-function getAutoResponse(text) {
-  const lower = text.toLowerCase();
-  if (lower.includes('בחילה') || lower.includes('בחילות')) {
-    return 'בחילות בוקר נפוצות בטרימסטר הראשון. טיפים שעוזרים: אכלי ביסקוויטים לפני שקמי מהמיטה, שתי מים קרים, הימני ממאכלים חריפים. אם הבחילה חמורה – דברי עם הרופאה שלך. 💚';
-  }
-  if (lower.includes('אכל') || lower.includes('תזונה')) {
-    return 'בהריון חשוב לאכול:\n✅ פירות וירקות טריים\n✅ חלבונים (ביצים, עוף, דגים)\n✅ פחמימות מורכבות\n✅ מוצרי חלב (סידן)\n\n❌ להימנע: אלכוהול, דגים גדולים (כספית), גבינות רכות לא מפוסטרות.';
-  }
-  if (lower.includes('שבוע') || lower.includes('גודל')) {
-    return 'גודל התינוק משתנה מדי שבוע! 🍓 שבוע 8 – פטל, שבוע 12 – ליים, שבוע 20 – בננה, שבוע 28 – חציל, שבוע 36 – פפאיה, שבוע 40 – אבטיח! 🍉\n\nכנסי לדשבורד שלך לראות את השבוע המדויק שלך.';
-  }
-  if (lower.includes('לידה') || lower.includes('לפני')) {
-    return 'לקראת הלידה כדאי:\n• להכין תיק לבית חולים\n• ללמוד טכניקות נשימה\n• לתאם הסעה לבית החולים\n• לכתוב תכנית לידה\n• לישון טוב ולנוח\n\nAcademy של Happy Baby מכיל קורס מלא על הכנה ללידה! 🌸';
-  }
-  if (lower.includes('שינה') || lower.includes('תינוק')) {
-    return 'תינוק ישן:\n• 0-3 חודשים: 14-17 שעות ביממה\n• 3-6 חודשים: 12-15 שעות\n• 6-12 חודשים: 11-14 שעות\n\nטיפ: שגרת ערב קבועה (אמבטיה → האכלה → שיר → שינה) עוזרת מאוד לתינוקות לישון טוב יותר! 😴';
-  }
-  return 'תודה על שאלתך! אשמח לעזור עם שאלות נוספות על הריון ותינוקות! 💝';
 }
