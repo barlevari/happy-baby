@@ -1,6 +1,35 @@
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
+
+function useTransparentLogo(src) {
+  const [logoSrc, setLogoSrc] = useState(src);
+  useEffect(() => {
+    const img = new Image();
+    img.onload = () => {
+      const canvas = document.createElement('canvas');
+      canvas.width = img.naturalWidth;
+      canvas.height = img.naturalHeight;
+      const ctx = canvas.getContext('2d');
+      ctx.drawImage(img, 0, 0);
+      const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+      const data = imageData.data;
+      for (let i = 0; i < data.length; i += 4) {
+        const whiteness = Math.min(data[i], data[i + 1], data[i + 2]) / 255;
+        if (whiteness > 0.9) {
+          data[i + 3] = 0;
+        } else if (whiteness > 0.80) {
+          const t = (whiteness - 0.80) / 0.10;
+          data[i + 3] = Math.round(data[i + 3] * (1 - t));
+        }
+      }
+      ctx.putImageData(imageData, 0, 0);
+      setLogoSrc(canvas.toDataURL('image/png'));
+    };
+    img.src = src;
+  }, [src]);
+  return logoSrc;
+}
 
 const FLOATERS = [
   { emoji: '🍼', x: '4%',  delay: '0s',    dur: '8s',   size: '1.9rem' },
@@ -21,6 +50,7 @@ const SPRING = 'cubic-bezier(0.34, 1.56, 0.64, 1)';
 export default function Landing() {
   const navigate = useNavigate();
   const { user } = useAuth();
+  const logoSrc = useTransparentLogo('/happy-baby-logo.png');
 
   useEffect(() => {
     if (user) {
@@ -152,13 +182,12 @@ export default function Landing() {
       {/* Hero */}
       <div style={{ textAlign: 'center', marginBottom: 48, position: 'relative', zIndex: 1 }}>
         <img
-          src="/happy-baby-logo.png"
+          src={logoSrc}
           alt="happy baby"
           style={{
             height: 'clamp(90px, 15vw, 150px)',
             objectFit: 'contain',
             marginBottom: 8,
-            mixBlendMode: 'multiply',
             animation: `logoIn 1s ${SPRING} both`,
             animationDelay: '0.05s',
           }}

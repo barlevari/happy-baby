@@ -196,7 +196,7 @@ export default function Login() {
       }}>
         {/* Logo */}
         <div style={{ textAlign: 'center', marginBottom: 32 }}>
-          <img src="/happy-baby-logo.png" alt="happy baby" style={{ height: 64, objectFit: 'contain', mixBlendMode: 'multiply' }} />
+          <img src="/happy-baby-logo.png" alt="happy baby" style={{ height: 64, objectFit: 'contain' }} />
         </div>
 
         <h1 style={{ textAlign: 'center', fontSize: '1.4rem', fontWeight: 800, marginBottom: 28, color: 'var(--color-text)' }}>
