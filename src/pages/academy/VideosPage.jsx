@@ -75,13 +75,17 @@ export default function VideosPage() {
             {/* Thumbnail */}
             <div style={{
               height: 160,
-              background: 'linear-gradient(135deg, var(--color-sage-ultra), var(--color-cream))',
+              background: video.youtubeId && !video.youtubeId.startsWith('VIDEO_')
+                ? `url(https://img.youtube.com/vi/${video.youtubeId}/mqdefault.jpg) center/cover`
+                : 'linear-gradient(135deg, var(--color-sage-ultra), var(--color-cream))',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
               position: 'relative',
             }}>
-              <div style={{ fontSize: '3rem' }}>🎬</div>
+              {(!video.youtubeId || video.youtubeId.startsWith('VIDEO_')) && (
+                <div style={{ fontSize: '3rem' }}>🎬</div>
+              )}
 
               {/* Play Overlay */}
               <div style={{

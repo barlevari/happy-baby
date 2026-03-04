@@ -1,7 +1,10 @@
-import { useState } from 'react';
+import { useLanguage } from '../context/LanguageContext';
+
+const isPlaceholder = (id) => !id || id.startsWith('VIDEO_');
 
 export default function VideoPlayerModal({ video, onClose, getWeeksLabel }) {
-  const [videoError, setVideoError] = useState(false);
+  const { isRTL } = useLanguage();
+  const placeholder = isPlaceholder(video.youtubeId);
 
   return (
     <div
@@ -21,6 +24,7 @@ export default function VideoPlayerModal({ video, onClose, getWeeksLabel }) {
           alignItems: 'center',
           padding: '16px 20px',
           borderBottom: '1px solid var(--color-border)',
+          direction: isRTL ? 'rtl' : 'ltr',
         }}>
           <div>
             <h2 style={{ fontSize: '1rem', fontWeight: 800, margin: 0 }}>{video.title}</h2>
@@ -36,21 +40,22 @@ export default function VideoPlayerModal({ video, onClose, getWeeksLabel }) {
           </button>
         </div>
 
-        {/* Video or placeholder */}
-        {videoError ? (
+        {/* YouTube embed or placeholder */}
+        {placeholder ? (
           <div style={{
             padding: '48px 32px',
             textAlign: 'center',
             background: 'var(--color-sage-ultra)',
-            direction: 'rtl',
+            direction: isRTL ? 'rtl' : 'ltr',
           }}>
             <div style={{ fontSize: '3rem', marginBottom: 16 }}>🎬</div>
             <p style={{ fontWeight: 700, fontSize: '1rem', marginBottom: 8, color: 'var(--color-sage-dark)' }}>
-              הסרטון זמין רק בגרסה המקומית
+              {isRTL ? 'הסרטון עדיין לא הועלה ל-YouTube' : 'Video not yet uploaded to YouTube'}
             </p>
             <p style={{ fontSize: '0.85rem', color: 'var(--color-text-muted)', lineHeight: 1.7 }}>
-              הסרטונים עדיין לא הועלו לשרת האינטרנט.
-              לצפייה בסרטון — פנ/י לרויטל בוואטסאפ.
+              {isRTL
+                ? 'הסרטון יהיה זמין בקרוב. לצפייה מוקדמת — פנ/י לרויטל בוואטסאפ.'
+                : 'The video will be available soon. For early access — contact Reital on WhatsApp.'}
             </p>
             <a
               href="https://wa.me/972522218646"
@@ -59,17 +64,26 @@ export default function VideoPlayerModal({ video, onClose, getWeeksLabel }) {
               className="btn"
               style={{ background: '#25D366', color: 'white', border: 'none', display: 'inline-flex', alignItems: 'center', gap: 8, marginTop: 20, textDecoration: 'none' }}
             >
-              💬 צרי קשר בוואטסאפ
+              {isRTL ? '💬 צרי קשר בוואטסאפ' : '💬 Contact on WhatsApp'}
             </a>
           </div>
         ) : (
-          <video
-            src={video.videoUrl}
-            controls
-            autoPlay
-            onError={() => setVideoError(true)}
-            style={{ width: '100%', display: 'block', maxHeight: '60vh', background: '#000' }}
-          />
+          <div style={{ position: 'relative', paddingBottom: '56.25%', height: 0, background: '#000' }}>
+            <iframe
+              src={`https://www.youtube.com/embed/${video.youtubeId}?autoplay=1&rel=0`}
+              title={video.title}
+              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+              allowFullScreen
+              style={{
+                position: 'absolute',
+                top: 0,
+                left: 0,
+                width: '100%',
+                height: '100%',
+                border: 'none',
+              }}
+            />
+          </div>
         )}
       </div>
     </div>

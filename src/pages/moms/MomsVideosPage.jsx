@@ -92,13 +92,17 @@ export default function MomsVideosPage() {
             {/* Thumbnail */}
             <div style={{
               height: 150,
-              background: 'linear-gradient(135deg, var(--color-sage-ultra), var(--color-rose-light))',
+              background: video.youtubeId && !video.youtubeId.startsWith('VIDEO_')
+                ? `url(https://img.youtube.com/vi/${video.youtubeId}/mqdefault.jpg) center/cover`
+                : 'linear-gradient(135deg, var(--color-sage-ultra), var(--color-rose-light))',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
               position: 'relative',
             }}>
-              <div style={{ fontSize: '3rem' }}>🤰</div>
+              {(!video.youtubeId || video.youtubeId.startsWith('VIDEO_')) && (
+                <div style={{ fontSize: '3rem' }}>🤰</div>
+              )}
               <div style={{
                 position: 'absolute',
                 inset: 0,
