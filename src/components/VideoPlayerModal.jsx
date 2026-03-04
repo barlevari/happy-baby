@@ -1,11 +1,68 @@
+import { useEffect, useRef } from 'react';
 import { useLanguage } from '../context/LanguageContext';
 
 const isPlaceholder = (id) => !id || id.startsWith('VIDEO_');
 
+// Load YouTube IFrame API once
+let ytApiLoaded = false;
+const loadYTApi = () => {
+  if (ytApiLoaded) return;
+  ytApiLoaded = true;
+  const tag = document.createElement('script');
+  tag.src = 'https://www.youtube.com/iframe_api';
+  document.head.appendChild(tag);
+};
+
 export default function VideoPlayerModal({ video, onClose, getWeeksLabel }) {
   const { lang, isRTL } = useLanguage();
   const placeholder = isPlaceholder(video.youtubeId);
-  const ccParams = lang === 'en' ? '&cc_load_policy=1&cc_lang_pref=en&hl=en' : '';
+  const playerRef = useRef(null);
+  const containerRef = useRef(null);
+
+  useEffect(() => {
+    if (placeholder) return;
+
+    loadYTApi();
+
+    const createPlayer = () => {
+      if (!containerRef.current) return;
+      playerRef.current = new window.YT.Player(containerRef.current, {
+        videoId: video.youtubeId,
+        playerVars: {
+          autoplay: 1,
+          rel: 0,
+          cc_load_policy: 1,
+          cc_lang_pref: lang === 'en' ? 'en' : 'iw',
+          hl: lang === 'en' ? 'en' : 'iw',
+        },
+        events: {
+          onReady: (event) => {
+            if (lang === 'en') {
+              // Force auto-translated English captions
+              event.target.setOption('captions', 'track', { languageCode: 'en' });
+            }
+          },
+        },
+      });
+    };
+
+    if (window.YT && window.YT.Player) {
+      createPlayer();
+    } else {
+      // Wait for API to load
+      const prev = window.onYouTubeIframeAPIReady;
+      window.onYouTubeIframeAPIReady = () => {
+        if (prev) prev();
+        createPlayer();
+      };
+    }
+
+    return () => {
+      if (playerRef.current && playerRef.current.destroy) {
+        playerRef.current.destroy();
+      }
+    };
+  }, [video.youtubeId, lang, placeholder]);
 
   return (
     <div
@@ -70,18 +127,14 @@ export default function VideoPlayerModal({ video, onClose, getWeeksLabel }) {
           </div>
         ) : (
           <div style={{ position: 'relative', paddingBottom: '56.25%', height: 0, background: '#000' }}>
-            <iframe
-              src={`https://www.youtube.com/embed/${video.youtubeId}?autoplay=1&rel=0${ccParams}`}
-              title={video.title}
-              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-              allowFullScreen
+            <div
+              ref={containerRef}
               style={{
                 position: 'absolute',
                 top: 0,
                 left: 0,
                 width: '100%',
                 height: '100%',
-                border: 'none',
               }}
             />
           </div>
