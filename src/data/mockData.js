@@ -3,10 +3,10 @@
 // ============================================================
 
 export const MOCK_VIDEOS = [
-  { id: 1,  title: 'כמה מילות הקדמה',         category: 'מבוא',    weeksMin: null, weeksMax: null, youtubeId: 'VIDEO_1' },
-  { id: 2,  title: 'מטרות השיטה',              category: 'מבוא',    weeksMin: 1,  weeksMax: 12,  youtubeId: 'VIDEO_2' },
-  { id: 3,  title: 'למי מתאים ומתי?',          category: 'מבוא',    weeksMin: 1,  weeksMax: 8,   youtubeId: 'VIDEO_3' },
-  { id: 4,  title: 'עקרונות השיטה',            category: 'מבוא',    weeksMin: 1,  weeksMax: 12,  youtubeId: 'VIDEO_4' },
+  { id: 1,  title: 'כמה מילות הקדמה',         category: 'מבוא',    weeksMin: null, weeksMax: null, youtubeId: 'ignegwm0Moc' },
+  { id: 2,  title: 'מטרות השיטה',              category: 'מבוא',    weeksMin: 1,  weeksMax: 12,  youtubeId: '3xQEvNXnjhc' },
+  { id: 3,  title: 'למי מתאים ומתי?',          category: 'מבוא',    weeksMin: 1,  weeksMax: 8,   youtubeId: '3u35PF5iM1U' },
+  { id: 4,  title: 'עקרונות השיטה',            category: 'מבוא',    weeksMin: 1,  weeksMax: 12,  youtubeId: '3K0zGQ9p95Y' },
   { id: 5,  title: 'איך אני מאבחנת את עצמי?', category: 'אבחון',   weeksMin: 8,  weeksMax: 20,  youtubeId: 'ujnSF0nCbAY' },
   { id: 6,  title: 'סיבובי אגן בעמידה',        category: 'תנועה',   weeksMin: 12, weeksMax: 30,  youtubeId: '-3snf7nVLuc' },
   { id: 7,  title: 'רוטציה של הציר המרכזי',   category: 'תנועה',   weeksMin: 12, weeksMax: 30,  youtubeId: 'ZBX3CgG9VOw' },
