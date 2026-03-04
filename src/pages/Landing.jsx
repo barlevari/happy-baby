@@ -1,56 +1,33 @@
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
 
-function useTransparentLogo(src) {
-  const [logoSrc, setLogoSrc] = useState(src);
-  useEffect(() => {
-    const img = new Image();
-    img.onload = () => {
-      const canvas = document.createElement('canvas');
-      canvas.width = img.naturalWidth;
-      canvas.height = img.naturalHeight;
-      const ctx = canvas.getContext('2d');
-      ctx.drawImage(img, 0, 0);
-      const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
-      const data = imageData.data;
-      for (let i = 0; i < data.length; i += 4) {
-        const whiteness = Math.min(data[i], data[i + 1], data[i + 2]) / 255;
-        if (whiteness > 0.9) {
-          data[i + 3] = 0;
-        } else if (whiteness > 0.80) {
-          const t = (whiteness - 0.80) / 0.10;
-          data[i + 3] = Math.round(data[i + 3] * (1 - t));
-        }
-      }
-      ctx.putImageData(imageData, 0, 0);
-      setLogoSrc(canvas.toDataURL('image/png'));
-    };
-    img.src = src;
-  }, [src]);
-  return logoSrc;
-}
+const SPRING = 'cubic-bezier(0.34, 1.56, 0.64, 1)';
 
-const FLOATERS = [
-  { emoji: '🍼', x: '4%',  delay: '0s',    dur: '8s',   size: '1.9rem' },
-  { emoji: '👶', x: '14%', delay: '2.3s',  dur: '7s',   size: '1.7rem' },
-  { emoji: '🌸', x: '27%', delay: '0.7s',  dur: '9.5s', size: '1.5rem' },
-  { emoji: '⭐', x: '41%', delay: '3.8s',  dur: '7.5s', size: '1.4rem' },
-  { emoji: '💫', x: '56%', delay: '1.2s',  dur: '8.5s', size: '1.6rem' },
-  { emoji: '🎀', x: '68%', delay: '4.5s',  dur: '6.5s', size: '1.8rem' },
-  { emoji: '✨', x: '80%', delay: '0.4s',  dur: '10s',  size: '1.4rem' },
-  { emoji: '💝', x: '91%', delay: '2.9s',  dur: '7.5s', size: '2rem'   },
-  { emoji: '🌟', x: '35%', delay: '6s',    dur: '8s',   size: '1.3rem' },
-  { emoji: '🍼', x: '74%', delay: '1.6s',  dur: '9s',   size: '1.5rem' },
+const JOURNEY_MILESTONES = [
+  { week: 4,  emoji: '💗', label: 'פעימת לב ראשונה' },
+  { week: 12, emoji: '🫒', label: 'סוף טרימסטר ראשון' },
+  { week: 20, emoji: '🦶', label: 'בעיטות ראשונות' },
+  { week: 28, emoji: '🎒', label: 'הכנות ללידה' },
+  { week: 36, emoji: '🍉', label: 'כמעט שם!' },
+  { week: 40, emoji: '👶', label: 'יום הולדת!' },
 ];
 
-const CARD_ANIMS = ['cardFromRight', 'cardFromLeft'];
-const SPRING = 'cubic-bezier(0.34, 1.56, 0.64, 1)';
+const BOKEH = Array.from({ length: 18 }, (_, i) => ({
+  x: Math.random() * 100,
+  y: Math.random() * 100,
+  size: 30 + Math.random() * 80,
+  delay: Math.random() * 8,
+  dur: 6 + Math.random() * 6,
+  color: i % 3 === 0 ? 'var(--color-rose)' : i % 3 === 1 ? 'var(--color-sage)' : '#e8b4d0',
+}));
 
 export default function Landing() {
   const navigate = useNavigate();
   const { user } = useAuth();
-  const logoSrc = useTransparentLogo('/happy-baby-logo.png');
+  const [introPhase, setIntroPhase] = useState(0);
+  const [journeyProgress, setJourneyProgress] = useState(0);
+  const journeyRef = useRef(null);
 
   useEffect(() => {
     if (user) {
@@ -59,6 +36,41 @@ export default function Landing() {
       else if (user.role === 'admin') navigate('/admin', { replace: true });
     }
   }, [user, navigate]);
+
+  // Cinematic intro sequence
+  useEffect(() => {
+    const t1 = setTimeout(() => setIntroPhase(1), 200);
+    const t2 = setTimeout(() => setIntroPhase(2), 800);
+    const t3 = setTimeout(() => setIntroPhase(3), 1400);
+    const t4 = setTimeout(() => setIntroPhase(4), 2000);
+    return () => { clearTimeout(t1); clearTimeout(t2); clearTimeout(t3); clearTimeout(t4); };
+  }, []);
+
+  // Journey path animation on scroll
+  useEffect(() => {
+    const el = journeyRef.current;
+    if (!el) return;
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          let start = null;
+          const duration = 2500;
+          const animate = (ts) => {
+            if (!start) start = ts;
+            const progress = Math.min((ts - start) / duration, 1);
+            const eased = 1 - Math.pow(1 - progress, 3);
+            setJourneyProgress(eased);
+            if (progress < 1) requestAnimationFrame(animate);
+          };
+          requestAnimationFrame(animate);
+          observer.disconnect();
+        }
+      },
+      { threshold: 0.3 }
+    );
+    observer.observe(el);
+    return () => observer.disconnect();
+  }, []);
 
   const features = [
     { icon: '🤰', label: 'מעקב שבועי' },
@@ -91,6 +103,8 @@ export default function Landing() {
     },
   ];
 
+  const tagline = 'מלווים אותך בכל שלב של המסע';
+
   return (
     <div style={{
       minHeight: '100vh',
@@ -104,103 +118,314 @@ export default function Landing() {
       position: 'relative',
     }}>
       <style>{`
-        @keyframes logoIn {
-          0%   { transform: scale(0) rotate(-15deg); opacity: 0; }
-          50%  { transform: scale(1.32) rotate(5deg); opacity: 1; }
-          68%  { transform: scale(0.88) rotate(-3deg); }
-          84%  { transform: scale(1.09) rotate(2deg); }
-          93%  { transform: scale(0.97) rotate(-1deg); }
-          100% { transform: scale(1) rotate(0deg); opacity: 1; }
+        /* === Bokeh Particles === */
+        @keyframes bokehFloat {
+          0%, 100% { transform: translate(0, 0) scale(1); }
+          25%  { transform: translate(30px, -20px) scale(1.1); }
+          50%  { transform: translate(-15px, 15px) scale(0.9); }
+          75%  { transform: translate(20px, 25px) scale(1.05); }
         }
-        @keyframes fadeUp {
-          from { opacity: 0; transform: translateY(32px); }
-          to   { opacity: 1; transform: translateY(0); }
+        @keyframes bokehPulse {
+          0%, 100% { opacity: 0.12; }
+          50% { opacity: 0.25; }
         }
-        @keyframes cardFromRight {
-          from { opacity: 0; transform: translateX(70px) scale(0.85); }
-          to   { opacity: 1; transform: translateX(0)   scale(1);    }
+
+        /* === Heartbeat Pulse === */
+        @keyframes heartbeat {
+          0%   { transform: scale(1); opacity: 0.3; }
+          14%  { transform: scale(1.08); opacity: 0.5; }
+          28%  { transform: scale(1); opacity: 0.3; }
+          42%  { transform: scale(1.12); opacity: 0.55; }
+          70%  { transform: scale(1); opacity: 0.25; }
+          100% { transform: scale(1); opacity: 0.25; }
         }
-        @keyframes cardFromBottom {
-          from { opacity: 0; transform: translateY(80px) scale(0.85); }
-          to   { opacity: 1; transform: translateY(0)   scale(1);    }
+
+        /* === Logo Bloom === */
+        @keyframes logoBloom {
+          0%   { transform: scale(0); opacity: 0; filter: blur(20px); }
+          40%  { filter: blur(0px); }
+          60%  { transform: scale(1.15); opacity: 1; }
+          80%  { transform: scale(0.95); }
+          100% { transform: scale(1); opacity: 1; }
         }
-        @keyframes cardFromLeft {
-          from { opacity: 0; transform: translateX(-70px) scale(0.85); }
-          to   { opacity: 1; transform: translateX(0)    scale(1);    }
+
+        /* === Text Reveal === */
+        @keyframes textReveal {
+          from { opacity: 0; transform: translateY(20px); filter: blur(8px); }
+          to   { opacity: 1; transform: translateY(0); filter: blur(0px); }
         }
+
+        /* === Glow Ring === */
+        @keyframes glowPulse {
+          0%, 100% { box-shadow: 0 0 40px 10px rgba(var(--color-rose-rgb, 232,180,208), 0.2), 0 0 80px 20px rgba(var(--color-sage-rgb, 155,187,172), 0.1); }
+          50%      { box-shadow: 0 0 60px 20px rgba(var(--color-rose-rgb, 232,180,208), 0.35), 0 0 100px 30px rgba(var(--color-sage-rgb, 155,187,172), 0.2); }
+        }
+
+        /* === Card Animations === */
+        @keyframes cardReveal {
+          from { opacity: 0; transform: translateY(60px) scale(0.9) rotateX(10deg); }
+          to   { opacity: 1; transform: translateY(0) scale(1) rotateX(0deg); }
+        }
+        .landing-card {
+          perspective: 800px;
+          transition: transform 0.35s ${SPRING}, box-shadow 0.35s ease !important;
+        }
+        .landing-card:hover {
+          transform: translateY(-8px) scale(1.03) !important;
+          box-shadow: 0 20px 50px rgba(0,0,0,0.12) !important;
+        }
+
+        /* === Pill Pop === */
         @keyframes pillPop {
           from { opacity: 0; transform: scale(0.2) translateY(10px); }
           to   { opacity: 1; transform: scale(1)   translateY(0);    }
         }
+
+        /* === Journey Path === */
+        @keyframes milestonePop {
+          0%   { transform: scale(0) rotate(-20deg); opacity: 0; }
+          60%  { transform: scale(1.3) rotate(5deg); opacity: 1; }
+          100% { transform: scale(1) rotate(0deg); opacity: 1; }
+        }
+
+        /* === Floating Emojis === */
         @keyframes floatUp {
           0%   { transform: translateY(110vh) rotate(0deg);   opacity: 0; }
-          6%   { opacity: 0.6; }
-          94%  { opacity: 0.55; }
+          6%   { opacity: 0.5; }
+          94%  { opacity: 0.4; }
           100% { transform: translateY(-10vh) rotate(400deg); opacity: 0; }
         }
-        @keyframes cardHover {
-          from { transform: translateY(0) scale(1); }
-          to   { transform: translateY(-6px) scale(1.02); }
+
+        /* === Shimmer === */
+        @keyframes shimmer {
+          0%   { background-position: -200% center; }
+          100% { background-position: 200% center;  }
         }
-        .landing-card:hover {
-          transform: translateY(-6px) scale(1.02) !important;
-          box-shadow: 0 12px 40px rgba(0,0,0,0.14) !important;
-          transition: transform 0.25s ${SPRING}, box-shadow 0.25s ease;
+
+        /* === Typing cursor === */
+        @keyframes blink {
+          0%, 50% { border-color: var(--color-sage); }
+          51%, 100% { border-color: transparent; }
         }
       `}</style>
 
-      {/* Background floating baby emojis */}
-      {FLOATERS.map((p, i) => (
-        <span
-          key={i}
+      {/* === Bokeh Background Particles === */}
+      {BOKEH.map((b, i) => (
+        <div
+          key={`bokeh-${i}`}
           aria-hidden="true"
           style={{
             position: 'fixed',
-            left: p.x,
+            left: `${b.x}%`,
+            top: `${b.y}%`,
+            width: b.size,
+            height: b.size,
+            borderRadius: '50%',
+            background: `radial-gradient(circle, ${b.color} 0%, transparent 70%)`,
+            opacity: 0.15,
+            animation: `bokehFloat ${b.dur}s ease-in-out ${b.delay}s infinite, bokehPulse ${b.dur * 0.7}s ease-in-out ${b.delay}s infinite`,
+            pointerEvents: 'none',
+            zIndex: 0,
+            filter: 'blur(2px)',
+          }}
+        />
+      ))}
+
+      {/* === Floating Emojis (refined) === */}
+      {['🍼','👶','🌸','⭐','💫','🎀','✨','💝'].map((emoji, i) => (
+        <span
+          key={`float-${i}`}
+          aria-hidden="true"
+          style={{
+            position: 'fixed',
+            left: `${8 + i * 12}%`,
             bottom: '-60px',
-            fontSize: p.size,
-            animation: `floatUp ${p.dur} ${p.delay} infinite linear`,
+            fontSize: `${1.3 + Math.random() * 0.6}rem`,
+            animation: `floatUp ${7 + i * 0.5}s ${i * 0.8}s infinite linear`,
             pointerEvents: 'none',
             zIndex: 0,
             userSelect: 'none',
+            opacity: 0.6,
           }}
         >
-          {p.emoji}
+          {emoji}
         </span>
       ))}
 
-      {/* Hero */}
-      <div style={{ textAlign: 'center', marginBottom: 48, position: 'relative', zIndex: 1 }}>
+      {/* ===== HERO SECTION ===== */}
+      <div style={{ textAlign: 'center', marginBottom: 32, position: 'relative', zIndex: 1 }}>
+        {/* Heartbeat glow ring behind logo */}
+        <div style={{
+          position: 'absolute',
+          top: '50%',
+          left: '50%',
+          transform: 'translate(-50%, -55%)',
+          width: 200,
+          height: 200,
+          borderRadius: '50%',
+          background: 'radial-gradient(circle, rgba(232,180,208,0.3) 0%, rgba(155,187,172,0.15) 40%, transparent 70%)',
+          animation: introPhase >= 1 ? 'heartbeat 1.5s ease-in-out infinite' : 'none',
+          opacity: introPhase >= 1 ? 1 : 0,
+          transition: 'opacity 0.5s ease',
+          pointerEvents: 'none',
+        }} />
+
+        {/* Logo */}
         <img
-          src={logoSrc}
+          src="/happy-baby-logo.png"
           alt="happy baby"
           style={{
-            height: 'clamp(90px, 15vw, 150px)',
+            height: 'clamp(100px, 18vw, 170px)',
             objectFit: 'contain',
-            marginBottom: 8,
-            animation: `logoIn 1s ${SPRING} both`,
-            animationDelay: '0.05s',
+            marginBottom: 12,
+            mixBlendMode: 'multiply',
+            opacity: introPhase >= 2 ? 1 : 0,
+            animation: introPhase >= 2 ? `logoBloom 1.2s ${SPRING} both` : 'none',
+            position: 'relative',
+            zIndex: 2,
           }}
         />
-        <p style={{
-          fontSize: 'clamp(1rem, 2.5vw, 1.3rem)',
+
+        {/* Animated tagline with character stagger */}
+        <div style={{
+          fontSize: 'clamp(1.05rem, 2.5vw, 1.35rem)',
           color: 'var(--color-text-muted)',
-          marginTop: 12,
-          fontWeight: 500,
-          animation: `fadeUp 0.7s ease both`,
-          animationDelay: '0.6s',
+          marginTop: 16,
+          fontWeight: 600,
+          letterSpacing: '0.02em',
+          overflow: 'hidden',
+          position: 'relative',
         }}>
-          מלווים אותך בכל שלב של המסע
+          {tagline.split('').map((char, i) => (
+            <span
+              key={i}
+              style={{
+                display: 'inline-block',
+                opacity: introPhase >= 3 ? 1 : 0,
+                animation: introPhase >= 3 ? `textReveal 0.5s ease ${i * 0.03}s both` : 'none',
+                whiteSpace: char === ' ' ? 'pre' : undefined,
+              }}
+            >
+              {char}
+            </span>
+          ))}
+        </div>
+
+        {/* Shimmer subtitle */}
+        <p style={{
+          fontSize: '0.85rem',
+          marginTop: 8,
+          fontWeight: 500,
+          opacity: introPhase >= 4 ? 1 : 0,
+          transition: 'opacity 0.8s ease',
+          background: 'linear-gradient(90deg, var(--color-text-muted), var(--color-sage-dark), var(--color-rose-dark, #c98aa0), var(--color-text-muted))',
+          backgroundSize: '200% auto',
+          WebkitBackgroundClip: 'text',
+          WebkitTextFillColor: 'transparent',
+          animation: introPhase >= 4 ? 'shimmer 4s linear infinite' : 'none',
+        }}>
+          Happy Baby | ליווי הריון ולידה מקצועי
         </p>
       </div>
 
-      {/* Action Cards */}
+      {/* ===== PREGNANCY JOURNEY TIMELINE ===== */}
+      <div
+        ref={journeyRef}
+        style={{
+          width: '100%',
+          maxWidth: 700,
+          margin: '0 auto 40px',
+          position: 'relative',
+          zIndex: 1,
+          padding: '10px 0',
+        }}
+      >
+        <svg
+          viewBox="0 0 700 100"
+          style={{ width: '100%', height: 'auto', overflow: 'visible' }}
+        >
+          {/* Path */}
+          <path
+            d="M 50 50 C 150 10, 250 90, 350 50 C 450 10, 550 90, 650 50"
+            fill="none"
+            stroke="url(#journeyGradient)"
+            strokeWidth="3"
+            strokeLinecap="round"
+            strokeDasharray="900"
+            strokeDashoffset={900 - journeyProgress * 900}
+            style={{ transition: 'stroke-dashoffset 0.05s linear' }}
+          />
+          <defs>
+            <linearGradient id="journeyGradient" x1="0%" y1="0%" x2="100%" y2="0%">
+              <stop offset="0%" stopColor="var(--color-rose)" />
+              <stop offset="50%" stopColor="var(--color-sage)" />
+              <stop offset="100%" stopColor="var(--color-rose)" />
+            </linearGradient>
+          </defs>
+
+          {/* Milestones */}
+          {JOURNEY_MILESTONES.map((m, i) => {
+            const t = m.week / 40;
+            const x = 50 + t * 600;
+            const y = 50 + Math.sin(t * Math.PI * 2) * 30;
+            const visible = journeyProgress >= t;
+            return (
+              <g key={i}>
+                {visible && (
+                  <>
+                    <circle cx={x} cy={y} r="16" fill="white" stroke="var(--color-sage)" strokeWidth="2" opacity="0.9">
+                      <animate attributeName="r" from="0" to="16" dur="0.3s" fill="freeze" />
+                      <animate attributeName="opacity" from="0" to="0.9" dur="0.3s" fill="freeze" />
+                    </circle>
+                    <text
+                      x={x}
+                      y={y + 5}
+                      textAnchor="middle"
+                      fontSize="14"
+                      style={{ animation: 'milestonePop 0.5s ease both' }}
+                    >
+                      {m.emoji}
+                    </text>
+                    <text
+                      x={x}
+                      y={y + 34}
+                      textAnchor="middle"
+                      fontSize="9"
+                      fill="var(--color-text-muted)"
+                      fontWeight="600"
+                      direction="rtl"
+                      opacity={journeyProgress >= t + 0.05 ? 1 : 0}
+                      style={{ transition: 'opacity 0.3s ease' }}
+                    >
+                      {m.label}
+                    </text>
+                    <text
+                      x={x}
+                      y={y - 22}
+                      textAnchor="middle"
+                      fontSize="8"
+                      fill="var(--color-sage-dark)"
+                      fontWeight="700"
+                      opacity={journeyProgress >= t + 0.05 ? 1 : 0}
+                      style={{ transition: 'opacity 0.3s ease' }}
+                    >
+                      {`שבוע ${m.week}`}
+                    </text>
+                  </>
+                )}
+              </g>
+            );
+          })}
+        </svg>
+      </div>
+
+      {/* ===== ACTION CARDS ===== */}
       <div style={{
         display: 'grid',
         gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))',
-        gap: 24,
+        gap: 28,
         width: '100%',
-        maxWidth: 960,
+        maxWidth: 780,
         marginBottom: 48,
         position: 'relative',
         zIndex: 1,
@@ -218,33 +443,37 @@ export default function Landing() {
               alignItems: 'center',
               textAlign: 'center',
               gap: 16,
-              padding: 32,
-              animation: `${CARD_ANIMS[i]} 0.75s ${SPRING} both`,
-              animationDelay: `${0.65 + i * 0.18}s`,
-              transition: 'transform 0.25s, box-shadow 0.25s',
+              padding: '36px 28px',
+              opacity: introPhase >= 4 ? 1 : 0,
+              animation: introPhase >= 4 ? `cardReveal 0.8s ${SPRING} ${i * 0.15}s both` : 'none',
             }}
-            onClick={() => {
-              if (card.role) navigate(`/register?role=${card.role}`);
-              else navigate('/login');
-            }}
+            onClick={() => navigate(`/register?role=${card.role}`)}
           >
-            <div style={{ fontSize: '3.2rem', animation: `logoIn 0.8s ${SPRING} both`, animationDelay: `${0.9 + i * 0.18}s` }}>
+            <div style={{
+              fontSize: '3.5rem',
+              filter: 'drop-shadow(0 4px 12px rgba(0,0,0,0.1))',
+            }}>
               {card.icon}
             </div>
-            <h2 style={{ fontSize: '1.2rem', fontWeight: 800, color: 'var(--color-text)', margin: 0 }}>
+            <h2 style={{ fontSize: '1.25rem', fontWeight: 800, color: 'var(--color-text)', margin: 0 }}>
               {card.title}
             </h2>
-            <p style={{ color: 'var(--color-text-muted)', fontSize: '0.9rem', margin: 0, lineHeight: 1.6 }}>
+            <p style={{ color: 'var(--color-text-muted)', fontSize: '0.92rem', margin: 0, lineHeight: 1.7 }}>
               {card.desc}
             </p>
             <button
               className={card.ctaClass}
               onClick={e => {
                 e.stopPropagation();
-                if (card.role) navigate(`/register?role=${card.role}`);
-                else navigate('/login');
+                navigate(`/register?role=${card.role}`);
               }}
-              style={{ marginTop: 8 }}
+              style={{
+                marginTop: 8,
+                padding: '10px 28px',
+                fontSize: '0.95rem',
+                fontWeight: 700,
+                borderRadius: 12,
+              }}
             >
               {card.cta}
             </button>
@@ -252,7 +481,7 @@ export default function Landing() {
         ))}
       </div>
 
-      {/* Feature Pills */}
+      {/* ===== FEATURE PILLS ===== */}
       <div style={{
         display: 'flex',
         flexWrap: 'wrap',
@@ -269,33 +498,34 @@ export default function Landing() {
               display: 'flex',
               alignItems: 'center',
               gap: 8,
-              background: 'rgba(255,255,255,0.85)',
-              backdropFilter: 'blur(10px)',
-              border: '1px solid var(--color-border)',
-              padding: '8px 18px',
+              background: 'rgba(255,255,255,0.8)',
+              backdropFilter: 'blur(12px)',
+              WebkitBackdropFilter: 'blur(12px)',
+              border: '1px solid rgba(255,255,255,0.4)',
+              padding: '10px 20px',
               borderRadius: '9999px',
               fontSize: '0.9rem',
               fontWeight: 600,
               color: 'var(--color-text)',
-              boxShadow: 'var(--shadow-sm)',
-              animation: `pillPop 0.5s ${SPRING} both`,
-              animationDelay: `${1.25 + i * 0.1}s`,
+              boxShadow: '0 4px 20px rgba(0,0,0,0.06)',
+              opacity: introPhase >= 4 ? 1 : 0,
+              animation: introPhase >= 4 ? `pillPop 0.5s ${SPRING} ${0.3 + i * 0.08}s both` : 'none',
             }}
           >
-            <span>{f.icon}</span>
+            <span style={{ fontSize: '1.1rem' }}>{f.icon}</span>
             <span>{f.label}</span>
           </div>
         ))}
       </div>
 
-      {/* Footer */}
+      {/* ===== FOOTER ===== */}
       <footer style={{
         marginTop: 'auto',
         textAlign: 'center',
         color: 'var(--color-text-muted)',
         fontSize: '0.8rem',
         paddingTop: 24,
-        borderTop: '1px solid var(--color-border)',
+        borderTop: '1px solid rgba(255,255,255,0.3)',
         width: '100%',
         maxWidth: 600,
         position: 'relative',
