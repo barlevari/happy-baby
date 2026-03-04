@@ -3,8 +3,9 @@ import { useLanguage } from '../context/LanguageContext';
 const isPlaceholder = (id) => !id || id.startsWith('VIDEO_');
 
 export default function VideoPlayerModal({ video, onClose, getWeeksLabel }) {
-  const { isRTL } = useLanguage();
+  const { lang, isRTL } = useLanguage();
   const placeholder = isPlaceholder(video.youtubeId);
+  const ccParams = lang === 'en' ? '&cc_load_policy=1&cc_lang_pref=en' : '';
 
   return (
     <div
@@ -70,7 +71,7 @@ export default function VideoPlayerModal({ video, onClose, getWeeksLabel }) {
         ) : (
           <div style={{ position: 'relative', paddingBottom: '56.25%', height: 0, background: '#000' }}>
             <iframe
-              src={`https://www.youtube.com/embed/${video.youtubeId}?autoplay=1&rel=0`}
+              src={`https://www.youtube.com/embed/${video.youtubeId}?autoplay=1&rel=0${ccParams}`}
               title={video.title}
               allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
               allowFullScreen
