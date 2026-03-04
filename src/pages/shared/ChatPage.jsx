@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect } from 'react';
+import { useState, useRef, useEffect, useCallback } from 'react';
 import { useAuth } from '../../context/AuthContext';
 import { useLanguage } from '../../context/LanguageContext';
 
@@ -13,6 +13,8 @@ const SYSTEM_PROMPT = `אתה עוזר AI של Happy Baby – פלטפורמה �
 חשוב: אתה לא מחליף ייעוץ רפואי מקצועי. לכל בעיה רפואית, הפנה לרופא או לאחות.
 היה קצר, ברור וחם. אם שואלים אותך שאלה שאינה קשורה להריון/תינוקות/בריאות, הפנה בנחמדות לנושאים הרלוונטיים.`;
 
+const BUILT_IN_API_KEY = 'REMOVED_API_KEY';
+
 const SUGGESTIONS = [
   'מה מותר לאכול בהריון?',
   'איך מתמודדים עם בחילות בוקר?',
@@ -21,70 +23,190 @@ const SUGGESTIONS = [
   'כמה שינה צריך תינוק?',
 ];
 
+const STORAGE_KEY = 'hb_chat_conversations';
+
+function generateId() {
+  return Date.now().toString(36) + Math.random().toString(36).slice(2, 7);
+}
+
+function loadConversations() {
+  try {
+    const raw = localStorage.getItem(STORAGE_KEY);
+    return raw ? JSON.parse(raw) : [];
+  } catch { return []; }
+}
+
+function saveConversations(convs) {
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(convs));
+}
+
+function getWelcomeMessage(userName) {
+  return {
+    role: 'assistant',
+    content: `שלום ${userName}! 👋 אני העוזר של Happy Baby. אשמח לעזור לך בכל שאלה על הריון, לידה וגידול תינוקות. במה אוכל לסייע?`,
+  };
+}
+
+function autoTitle(messages) {
+  const firstUser = messages.find(m => m.role === 'user');
+  if (!firstUser) return 'שיחה חדשה';
+  const text = firstUser.content;
+  return text.length > 40 ? text.slice(0, 40) + '...' : text;
+}
+
 export default function ChatPage() {
   const { user } = useAuth();
-  const { lang, t } = useLanguage();
-  const [messages, setMessages] = useState([
-    {
-      role: 'assistant',
-      content: `שלום ${user?.name?.split(' ')[0] || ''}! 👋 אני העוזר של Happy Baby. אשמח לעזור לך בכל שאלה על הריון, לידה וגידול תינוקות. במה אוכל לסייע?`,
-    },
-  ]);
+  const { lang } = useLanguage();
+  const isRTL = lang === 'he';
+  const userName = user?.name?.split(' ')[0] || '';
+
+  const [conversations, setConversations] = useState(() => loadConversations());
+  const [activeId, setActiveId] = useState(() => {
+    const convs = loadConversations();
+    return convs.length > 0 ? convs[0].id : null;
+  });
+  const [showSidebar, setShowSidebar] = useState(false);
+  const [editingId, setEditingId] = useState(null);
+  const [editTitle, setEditTitle] = useState('');
   const [input, setInput] = useState('');
   const [loading, setLoading] = useState(false);
-  const [apiKey, setApiKey] = useState(() => localStorage.getItem('hb_ai_key') || '');
-  const [showKeyInput, setShowKeyInput] = useState(false);
   const [error, setError] = useState('');
   const messagesEndRef = useRef(null);
+  const editInputRef = useRef(null);
 
-  const isRTL = lang === 'he';
+  const activeConv = conversations.find(c => c.id === activeId);
+  const messages = activeConv?.messages || [getWelcomeMessage(userName)];
+
+  // Save conversations to localStorage whenever they change
+  useEffect(() => {
+    saveConversations(conversations);
+  }, [conversations]);
 
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [messages, loading]);
 
-  const saveApiKey = (key) => {
-    localStorage.setItem('hb_ai_key', key);
-    setApiKey(key);
-    setShowKeyInput(false);
-  };
+  useEffect(() => {
+    if (editingId && editInputRef.current) {
+      editInputRef.current.focus();
+      editInputRef.current.select();
+    }
+  }, [editingId]);
+
+  const updateConversation = useCallback((id, updater) => {
+    setConversations(prev => prev.map(c => c.id === id ? updater(c) : c));
+  }, []);
+
+  const createNewChat = useCallback(() => {
+    const newConv = {
+      id: generateId(),
+      title: 'שיחה חדשה',
+      messages: [getWelcomeMessage(userName)],
+      createdAt: Date.now(),
+      updatedAt: Date.now(),
+    };
+    setConversations(prev => [newConv, ...prev]);
+    setActiveId(newConv.id);
+    setShowSidebar(false);
+    setInput('');
+    setError('');
+  }, [userName]);
+
+  const deleteConversation = useCallback((id) => {
+    setConversations(prev => {
+      const filtered = prev.filter(c => c.id !== id);
+      if (id === activeId) {
+        setActiveId(filtered.length > 0 ? filtered[0].id : null);
+      }
+      return filtered;
+    });
+  }, [activeId]);
+
+  const startEditing = useCallback((conv) => {
+    setEditingId(conv.id);
+    setEditTitle(conv.title);
+  }, []);
+
+  const finishEditing = useCallback(() => {
+    if (editingId && editTitle.trim()) {
+      updateConversation(editingId, c => ({ ...c, title: editTitle.trim() }));
+    }
+    setEditingId(null);
+    setEditTitle('');
+  }, [editingId, editTitle, updateConversation]);
+
+  const switchConversation = useCallback((id) => {
+    setActiveId(id);
+    setShowSidebar(false);
+    setInput('');
+    setError('');
+  }, []);
 
   const sendMessage = async (text) => {
     const userText = text || input.trim();
-    if (!userText) return;
+    if (!userText || loading) return;
 
     setInput('');
     setError('');
 
-    const newMessages = [...messages, { role: 'user', content: userText }];
-    setMessages(newMessages);
+    // If no active conversation, create one
+    let currentId = activeId;
+    if (!currentId) {
+      const newConv = {
+        id: generateId(),
+        title: 'שיחה חדשה',
+        messages: [getWelcomeMessage(userName)],
+        createdAt: Date.now(),
+        updatedAt: Date.now(),
+      };
+      setConversations(prev => [newConv, ...prev]);
+      currentId = newConv.id;
+      setActiveId(currentId);
+    }
+
+    const currentMessages = conversations.find(c => c.id === currentId)?.messages || [getWelcomeMessage(userName)];
+    const newMessages = [...currentMessages, { role: 'user', content: userText }];
+
+    // Update messages immediately
+    updateConversation(currentId, c => ({
+      ...c,
+      messages: newMessages,
+      title: c.title === 'שיחה חדשה' ? autoTitle(newMessages) : c.title,
+      updatedAt: Date.now(),
+    }));
     setLoading(true);
 
-    if (!apiKey) {
+    if (!BUILT_IN_API_KEY) {
       setTimeout(() => {
-        setMessages(prev => [...prev, {
-          role: 'assistant',
-          content: getAutoResponse(userText),
-        }]);
+        updateConversation(currentId, c => ({
+          ...c,
+          messages: [...c.messages, { role: 'assistant', content: getAutoResponse(userText) }],
+          updatedAt: Date.now(),
+        }));
         setLoading(false);
       }, 800);
       return;
     }
 
     try {
-      const res = await fetch('https://api.anthropic.com/v1/messages', {
+      const apiMessages = newMessages
+        .filter(m => m.role === 'user' || m.role === 'assistant')
+        .slice(1) // skip welcome message
+        .map(m => ({ role: m.role, content: m.content }));
+
+      const res = await fetch('/api/anthropic/v1/messages', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'x-api-key': apiKey,
+          'x-api-key': BUILT_IN_API_KEY,
           'anthropic-version': '2023-06-01',
-          'anthropic-dangerous-client-side-allow-origin': 'true',
+          'anthropic-dangerous-direct-browser-access': 'true',
         },
         body: JSON.stringify({
           model: 'claude-haiku-4-5-20251001',
           max_tokens: 512,
           system: SYSTEM_PROMPT,
-          messages: newMessages.map(m => ({ role: m.role, content: m.content })),
+          messages: apiMessages,
         }),
       });
 
@@ -95,13 +217,18 @@ export default function ChatPage() {
 
       const data = await res.json();
       const reply = data.content?.[0]?.text || '...';
-      setMessages(prev => [...prev, { role: 'assistant', content: reply }]);
+      updateConversation(currentId, c => ({
+        ...c,
+        messages: [...c.messages, { role: 'assistant', content: reply }],
+        updatedAt: Date.now(),
+      }));
     } catch (err) {
       setError(err.message || 'שגיאה בחיבור לAI');
-      setMessages(prev => [...prev, {
-        role: 'assistant',
-        content: '⚠️ אירעה שגיאה. נסי שוב או בדקי את מפתח ה-API.',
-      }]);
+      updateConversation(currentId, c => ({
+        ...c,
+        messages: [...c.messages, { role: 'assistant', content: '⚠️ אירעה שגיאה. נסי שוב מאוחר יותר.' }],
+        updatedAt: Date.now(),
+      }));
     } finally {
       setLoading(false);
     }
@@ -112,53 +239,196 @@ export default function ChatPage() {
     sendMessage();
   };
 
+  const clearAllHistory = () => {
+    setConversations([]);
+    setActiveId(null);
+    setShowSidebar(false);
+  };
+
+  const formatDate = (ts) => {
+    const d = new Date(ts);
+    const now = new Date();
+    const diffDays = Math.floor((now - d) / 86400000);
+    if (diffDays === 0) return 'היום';
+    if (diffDays === 1) return 'אתמול';
+    if (diffDays < 7) return `לפני ${diffDays} ימים`;
+    return d.toLocaleDateString('he-IL', { day: 'numeric', month: 'short' });
+  };
+
   return (
-    <div style={{ direction: isRTL ? 'rtl' : 'ltr', height: 'calc(100vh - 80px)', display: 'flex', flexDirection: 'column' }}>
+    <div style={{ direction: isRTL ? 'rtl' : 'ltr', height: 'calc(100vh - 80px)', display: 'flex', flexDirection: 'column', position: 'relative' }}>
       {/* Header */}
-      <div className="page-header" style={{ marginBottom: 0, flexShrink: 0 }}>
-        <h1>🤖 {isRTL ? 'צ\'אט AI' : 'AI Chat'}</h1>
+      <div className="page-header" style={{ marginBottom: 0, flexShrink: 0, display: 'flex', alignItems: 'center', gap: 8 }}>
+        <button
+          className="btn btn-ghost btn-sm"
+          onClick={() => setShowSidebar(s => !s)}
+          title={isRTL ? 'היסטוריית שיחות' : 'Chat history'}
+          style={{ fontSize: '1.1rem', padding: '4px 8px' }}
+        >
+          {showSidebar ? '✕' : '☰'}
+        </button>
+        <h1 style={{ flex: 1, margin: 0 }}>🤖 {isRTL ? 'צ\'אט AI' : 'AI Chat'}</h1>
         <button
           className="btn btn-secondary btn-sm"
-          onClick={() => setShowKeyInput(s => !s)}
-          title={isRTL ? 'הגדרת מפתח API' : 'Set API Key'}
+          onClick={createNewChat}
+          title={isRTL ? 'שיחה חדשה' : 'New chat'}
         >
-          🔑 {apiKey ? (isRTL ? 'מחובר ✓' : 'Connected ✓') : (isRTL ? 'הוסיפי מפתח API' : 'Add API Key')}
+          ✨ {isRTL ? 'שיחה חדשה' : 'New Chat'}
         </button>
       </div>
 
-      {/* API Key Input */}
-      {showKeyInput && (
-        <div className="card" style={{ margin: '12px 0', flexShrink: 0 }}>
-          <p style={{ fontSize: '0.875rem', color: 'var(--color-text-muted)', marginBottom: 12 }}>
-            {isRTL
-              ? 'הכנסי מפתח Anthropic API לשיחות AI אמיתיות. ללא מפתח – תשובות מוגבלות אוטומטיות.'
-              : 'Enter your Anthropic API key for real AI responses. Without a key, automatic limited responses are used.'}
-          </p>
-          <div style={{ display: 'flex', gap: 8 }}>
-            <input
-              type="password"
-              className="form-input"
-              placeholder="sk-ant-..."
-              defaultValue={apiKey}
-              dir="ltr"
-              id="api-key-input"
-              style={{ flex: 1 }}
-            />
-            <button
-              className="btn btn-primary btn-sm"
-              onClick={() => saveApiKey(document.getElementById('api-key-input').value.trim())}
-            >
-              {isRTL ? 'שמור' : 'Save'}
-            </button>
-            {apiKey && (
+      {/* Sidebar overlay */}
+      {showSidebar && (
+        <div
+          onClick={() => setShowSidebar(false)}
+          style={{
+            position: 'absolute', inset: 0, top: 50,
+            background: 'rgba(0,0,0,0.3)',
+            zIndex: 10,
+            borderRadius: 'var(--radius-lg)',
+          }}
+        />
+      )}
+
+      {/* Sidebar */}
+      {showSidebar && (
+        <div style={{
+          position: 'absolute',
+          top: 50,
+          [isRTL ? 'right' : 'left']: 0,
+          width: 300,
+          maxWidth: '85%',
+          height: 'calc(100% - 50px)',
+          background: 'var(--color-white)',
+          borderLeft: isRTL ? 'none' : '1px solid var(--color-border)',
+          borderRight: isRTL ? '1px solid var(--color-border)' : 'none',
+          boxShadow: 'var(--shadow-xl)',
+          zIndex: 20,
+          display: 'flex',
+          flexDirection: 'column',
+          borderRadius: '0 0 var(--radius-lg) var(--radius-lg)',
+          overflow: 'hidden',
+        }}>
+          {/* Sidebar header */}
+          <div style={{
+            padding: '14px 16px',
+            borderBottom: '1px solid var(--color-border)',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+            background: 'var(--color-sage-ultra)',
+          }}>
+            <span style={{ fontWeight: 700, fontSize: '0.95rem', color: 'var(--color-sage-dark)' }}>
+              📋 {isRTL ? 'היסטוריית שיחות' : 'Chat History'}
+            </span>
+            {conversations.length > 0 && (
               <button
-                className="btn btn-ghost btn-sm"
-                onClick={() => { localStorage.removeItem('hb_ai_key'); setApiKey(''); setShowKeyInput(false); }}
-                style={{ color: 'var(--color-danger)' }}
+                onClick={clearAllHistory}
+                style={{
+                  background: 'none', border: 'none', color: 'var(--color-danger)',
+                  fontSize: '0.75rem', cursor: 'pointer', padding: '2px 6px',
+                }}
+                title={isRTL ? 'מחק הכל' : 'Clear all'}
               >
-                {isRTL ? 'נקה' : 'Clear'}
+                🗑️ {isRTL ? 'מחק הכל' : 'Clear all'}
               </button>
             )}
+          </div>
+
+          {/* Conversation list */}
+          <div style={{ flex: 1, overflowY: 'auto', padding: '8px 0' }}>
+            {conversations.length === 0 ? (
+              <div style={{ textAlign: 'center', padding: 24, color: 'var(--color-text-muted)', fontSize: '0.85rem' }}>
+                {isRTL ? 'אין שיחות עדיין' : 'No conversations yet'}
+              </div>
+            ) : (
+              conversations.map(conv => (
+                <div
+                  key={conv.id}
+                  style={{
+                    padding: '10px 16px',
+                    cursor: 'pointer',
+                    background: conv.id === activeId ? 'var(--color-sage-ultra)' : 'transparent',
+                    borderRight: conv.id === activeId && isRTL ? '3px solid var(--color-sage)' : 'none',
+                    borderLeft: conv.id === activeId && !isRTL ? '3px solid var(--color-sage)' : 'none',
+                    transition: 'background 0.15s',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: 8,
+                  }}
+                  onMouseEnter={e => { if (conv.id !== activeId) e.currentTarget.style.background = 'var(--color-cream)'; }}
+                  onMouseLeave={e => { if (conv.id !== activeId) e.currentTarget.style.background = 'transparent'; }}
+                  onClick={() => editingId !== conv.id && switchConversation(conv.id)}
+                >
+                  <div style={{ flex: 1, minWidth: 0 }}>
+                    {editingId === conv.id ? (
+                      <input
+                        ref={editInputRef}
+                        value={editTitle}
+                        onChange={e => setEditTitle(e.target.value)}
+                        onBlur={finishEditing}
+                        onKeyDown={e => { if (e.key === 'Enter') finishEditing(); if (e.key === 'Escape') setEditingId(null); }}
+                        className="form-input"
+                        style={{ padding: '2px 6px', fontSize: '0.85rem', width: '100%' }}
+                        onClick={e => e.stopPropagation()}
+                      />
+                    ) : (
+                      <>
+                        <div style={{
+                          fontSize: '0.85rem',
+                          fontWeight: conv.id === activeId ? 600 : 400,
+                          color: 'var(--color-text)',
+                          whiteSpace: 'nowrap',
+                          overflow: 'hidden',
+                          textOverflow: 'ellipsis',
+                        }}>
+                          💬 {conv.title}
+                        </div>
+                        <div style={{ fontSize: '0.72rem', color: 'var(--color-text-muted)', marginTop: 2 }}>
+                          {formatDate(conv.updatedAt)} · {conv.messages.filter(m => m.role === 'user').length} {isRTL ? 'הודעות' : 'messages'}
+                        </div>
+                      </>
+                    )}
+                  </div>
+
+                  {editingId !== conv.id && (
+                    <div style={{ display: 'flex', gap: 2, flexShrink: 0 }}>
+                      <button
+                        onClick={e => { e.stopPropagation(); startEditing(conv); }}
+                        style={{
+                          background: 'none', border: 'none', cursor: 'pointer',
+                          padding: '2px 4px', fontSize: '0.75rem', opacity: 0.5,
+                        }}
+                        title={isRTL ? 'שנה שם' : 'Rename'}
+                      >
+                        ✏️
+                      </button>
+                      <button
+                        onClick={e => { e.stopPropagation(); deleteConversation(conv.id); }}
+                        style={{
+                          background: 'none', border: 'none', cursor: 'pointer',
+                          padding: '2px 4px', fontSize: '0.75rem', opacity: 0.5,
+                        }}
+                        title={isRTL ? 'מחק' : 'Delete'}
+                      >
+                        🗑️
+                      </button>
+                    </div>
+                  )}
+                </div>
+              ))
+            )}
+          </div>
+
+          {/* New chat button in sidebar */}
+          <div style={{ padding: 12, borderTop: '1px solid var(--color-border)' }}>
+            <button
+              className="btn btn-primary btn-sm w-full"
+              onClick={createNewChat}
+              style={{ width: '100%' }}
+            >
+              ✨ {isRTL ? 'שיחה חדשה' : 'New Chat'}
+            </button>
           </div>
         </div>
       )}
@@ -248,8 +518,8 @@ export default function ChatPage() {
         <div ref={messagesEndRef} />
       </div>
 
-      {/* Suggestions (only on first message) */}
-      {messages.length === 1 && (
+      {/* Suggestions (only when no active conversation or first message only) */}
+      {messages.length <= 1 && (
         <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8, marginBottom: 12, flexShrink: 0 }}>
           {SUGGESTIONS.map((s, i) => (
             <button
@@ -294,6 +564,12 @@ export default function ChatPage() {
         </button>
       </form>
 
+      {error && (
+        <div style={{ fontSize: '0.78rem', color: 'var(--color-danger)', marginTop: 4, textAlign: 'center' }}>
+          {error}
+        </div>
+      )}
+
       <style>{`
         @keyframes bounce {
           0%, 80%, 100% { transform: translateY(0); }
@@ -322,5 +598,5 @@ function getAutoResponse(text) {
   if (lower.includes('שינה') || lower.includes('תינוק')) {
     return 'תינוק ישן:\n• 0-3 חודשים: 14-17 שעות ביממה\n• 3-6 חודשים: 12-15 שעות\n• 6-12 חודשים: 11-14 שעות\n\nטיפ: שגרת ערב קבועה (אמבטיה → האכלה → שיר → שינה) עוזרת מאוד לתינוקות לישון טוב יותר! 😴';
   }
-  return 'תודה על שאלתך! לתשובות מפורטות ומדויקות יותר, חברי מפתח Anthropic API בהגדרות הצ\'אט (לחצי על כפתור 🔑). בינתיים, אשמח לעזור עם שאלות נוספות על הריון ותינוקות! 💝';
+  return 'תודה על שאלתך! אשמח לעזור עם שאלות נוספות על הריון ותינוקות! 💝';
 }

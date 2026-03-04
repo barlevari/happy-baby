@@ -232,6 +232,7 @@ function MetricModal({ onClose, onSave }) {
             </label>
             <input
               type="number"
+              inputMode="decimal"
               className={`form-input${errors[cfg.field] ? ' error' : ''}`}
               value={form[cfg.field]}
               placeholder={cfg.placeholder}
@@ -240,8 +241,17 @@ function MetricModal({ onClose, onSave }) {
               step={cfg.step}
               dir="ltr"
               style={{ textAlign: 'right' }}
+              onKeyDown={e => {
+                if (!/[0-9.]/.test(e.key) && !['Backspace','Tab','Enter','ArrowLeft','ArrowRight','ArrowUp','ArrowDown','Delete'].includes(e.key)) {
+                  e.preventDefault();
+                }
+                if (e.key === '.' && e.target.value.includes('.')) {
+                  e.preventDefault();
+                }
+              }}
               onChange={e => {
-                setForm(f => ({ ...f, [cfg.field]: e.target.value }));
+                const val = e.target.value.replace(/[^0-9.]/g, '');
+                setForm(f => ({ ...f, [cfg.field]: val }));
                 setErrors(prev => ({ ...prev, [cfg.field]: undefined }));
               }}
             />
@@ -262,19 +272,82 @@ function MetricModal({ onClose, onSave }) {
 }
 
 // ── Add Test Modal ────────────────────────────────────────────
+const PREDEFINED_TESTS = [
+  { name: 'בדיקות דם כלליות', week: 8 },
+  { name: 'שקיפות עורפית + NT', week: 12 },
+  { name: 'סקר גנטי – NIFTY', week: 14 },
+  { name: 'סקירת מערכות מוקדמת', week: 16 },
+  { name: 'סקירת מערכות מאוחרת', week: 22 },
+  { name: 'בדיקת ברזל ופריטין', week: 24 },
+  { name: 'עקומת סוכר – GCT', week: 26 },
+  { name: 'בדיקת שתן ותרבית', week: 28 },
+  { name: 'ספירת דם + בדיקת נוגדנים', week: 30 },
+  { name: 'אולטרסאונד לתפקוד שליה', week: 32 },
+  { name: 'בדיקת סטרפטוקוק – GBS', week: 35 },
+  { name: 'CTG – ניטור עוברי', week: 38 },
+  { name: 'בדיקת TSH – בלוטת התריס', week: 10 },
+  { name: 'בדיקת חלבון בשתן', week: 20 },
+];
+
 function TestModal({ onClose, onSave }) {
   const [form, setForm] = useState({ name: '', recommendedWeek: '', date: new Date().toISOString().split('T')[0] });
+  const [isOther, setIsOther] = useState(false);
+
+  const handleSelectTest = (value) => {
+    if (value === 'other') {
+      setIsOther(true);
+      setForm(f => ({ ...f, name: '', recommendedWeek: '' }));
+    } else {
+      setIsOther(false);
+      const test = PREDEFINED_TESTS.find(t => t.name === value);
+      setForm(f => ({ ...f, name: value, recommendedWeek: test ? String(test.week) : '' }));
+    }
+  };
+
   return (
     <div className="modal-overlay" onClick={onClose}>
       <div className="modal-box" onClick={e => e.stopPropagation()}>
         <h2 style={{ marginBottom: 20, fontSize: '1.2rem', fontWeight: 800 }}>הוספת בדיקה</h2>
         <div className="form-group">
-          <label className="form-label">שם הבדיקה</label>
-          <input type="text" className="form-input" value={form.name} onChange={e => setForm(f => ({ ...f, name: e.target.value }))} />
+          <label className="form-label">בחרי בדיקה</label>
+          <select
+            className="form-input"
+            value={isOther ? 'other' : form.name}
+            onChange={e => handleSelectTest(e.target.value)}
+          >
+            <option value="">-- בחרי בדיקה --</option>
+            {PREDEFINED_TESTS.map(t => (
+              <option key={t.name} value={t.name}>{t.name} (שבוע {t.week})</option>
+            ))}
+            <option value="other">אחר...</option>
+          </select>
         </div>
+        {isOther && (
+          <div className="form-group">
+            <label className="form-label">שם הבדיקה</label>
+            <input type="text" className="form-input" value={form.name} placeholder="הקלידי שם בדיקה..." onChange={e => setForm(f => ({ ...f, name: e.target.value }))} />
+          </div>
+        )}
         <div className="form-group">
           <label className="form-label">שבוע מומלץ</label>
-          <input type="number" className="form-input" value={form.recommendedWeek} onChange={e => setForm(f => ({ ...f, recommendedWeek: e.target.value }))} dir="ltr" />
+          <input
+            type="number"
+            inputMode="numeric"
+            className="form-input"
+            value={form.recommendedWeek}
+            min={1}
+            max={42}
+            dir="ltr"
+            onKeyDown={e => {
+              if (!/[0-9]/.test(e.key) && !['Backspace','Tab','Enter','ArrowLeft','ArrowRight','ArrowUp','ArrowDown','Delete'].includes(e.key)) {
+                e.preventDefault();
+              }
+            }}
+            onChange={e => {
+              const val = e.target.value.replace(/[^0-9]/g, '');
+              setForm(f => ({ ...f, recommendedWeek: val }));
+            }}
+          />
         </div>
         <div className="form-group">
           <label className="form-label">תאריך ביצוע</label>
@@ -282,7 +355,12 @@ function TestModal({ onClose, onSave }) {
         </div>
         <div style={{ display: 'flex', gap: 12 }}>
           <button className="btn btn-ghost" onClick={onClose} style={{ flex: 1 }}>ביטול</button>
-          <button className="btn btn-primary" onClick={() => { onSave({ ...form, status: 'done', id: Date.now() }); onClose(); }} style={{ flex: 2 }}>שמור</button>
+          <button
+            className="btn btn-primary"
+            disabled={!form.name.trim()}
+            onClick={() => { onSave({ ...form, status: 'done', id: Date.now() }); onClose(); }}
+            style={{ flex: 2 }}
+          >שמור</button>
         </div>
       </div>
     </div>
@@ -295,8 +373,7 @@ function loadUserMetrics(userId) {
     const stored = localStorage.getItem(`hb_metrics_${userId}`);
     if (stored) return JSON.parse(stored);
   } catch {}
-  // seed data only for test user id=1
-  return userId === 1 ? MOCK_HEALTH_METRICS : [];
+  return [];
 }
 
 function saveUserMetrics(userId, data) {
@@ -308,7 +385,7 @@ function loadUserTests(userId) {
     const stored = localStorage.getItem(`hb_tests_${userId}`);
     if (stored) return JSON.parse(stored);
   } catch {}
-  return userId === 1 ? MOCK_TESTS : [];
+  return [];
 }
 
 function saveUserTests(userId, data) {
