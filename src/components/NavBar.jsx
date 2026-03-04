@@ -63,22 +63,22 @@ export default function NavBar() {
 
   return (
     <>
-      {/* Desktop Sidebar */}
+      {/* Sidebar / Navigation */}
       <aside className="sidebar" style={{ display: 'flex', flexDirection: 'column' }}>
-        {/* Logo */}
-        <div style={{
+        {/* Logo - Desktop only */}
+        <div className="sidebar-logo" style={{
           padding: '24px 20px 16px',
           borderBottom: '1px solid var(--color-border)',
         }}>
           <img
             src="/happy-baby-logo.png"
             alt="happy baby"
-            style={{ height: 48, objectFit: 'contain', mixBlendMode: 'multiply' }}
+            style={{ height: 48, objectFit: 'contain', opacity: 0.95 }}
           />
         </div>
 
-        {/* User Info */}
-        <div style={{
+        {/* User Info - Desktop only */}
+        <div className="sidebar-user" style={{
           padding: '16px 20px',
           borderBottom: '1px solid var(--color-border)',
           display: 'flex',
@@ -127,7 +127,7 @@ export default function NavBar() {
         </div>
 
         {/* Nav Links */}
-        <nav style={{ flex: 1, padding: '12px 12px', overflowY: 'auto' }}>
+        <nav className="sidebar-nav" style={{ flex: 1, padding: '12px 12px', overflowY: 'auto' }}>
           {links.map(link => (
             <NavLink
               key={link.to}
@@ -147,16 +147,17 @@ export default function NavBar() {
                 background: isActive ? 'var(--color-sage-ultra)' : 'transparent',
                 transition: 'all 0.2s',
               })}
+              title={link.label}
             >
               <span style={{ fontSize: '1.1rem' }}>{link.icon}</span>
-              <span>{link.label}</span>
+              <span className="nav-label">{link.label}</span>
             </NavLink>
           ))}
         </nav>
 
-        {/* Back button */}
+        {/* Back button - Desktop only */}
         {!isRoot && (
-          <div style={{ padding: '0 12px 8px' }}>
+          <div className="sidebar-back" style={{ padding: '0 12px 8px', display: 'none' }}>
             <button
               onClick={() => navigate(-1)}
               style={{
@@ -180,8 +181,8 @@ export default function NavBar() {
           </div>
         )}
 
-        {/* Logout */}
-        <div style={{ padding: '12px', borderTop: '1px solid var(--color-border)' }}>
+        {/* Logout - Desktop only */}
+        <div className="sidebar-logout" style={{ padding: '12px', borderTop: '1px solid var(--color-border)' }}>
           <button
             onClick={handleLogout}
             style={{
@@ -201,42 +202,55 @@ export default function NavBar() {
             }}
             onMouseEnter={e => e.currentTarget.style.background = '#FDEAEA'}
             onMouseLeave={e => e.currentTarget.style.background = 'transparent'}
+            title="יציאה"
           >
             <span>🚪</span>
-            <span>יציאה</span>
+            <span className="nav-label">יציאה</span>
           </button>
         </div>
       </aside>
 
-      {/* Mobile Bottom Nav */}
+      {/* Mobile Navigation Styles */}
       <style>{`
         @media (max-width: 768px) {
-          .sidebar {
-            flex-direction: row !important;
-            align-items: center;
-            justify-content: space-around;
-            padding: 0 8px;
+          .sidebar-logo,
+          .sidebar-user,
+          .sidebar-back {
+            display: none !important;
           }
-          .sidebar-logo { display: none !important; }
-          .sidebar-user { display: none !important; }
+
           .sidebar-nav {
-            display: flex !important;
-            flex-direction: row !important;
-            flex: 1;
-            justify-content: space-around;
+            flex: 1 !important;
             padding: 0 !important;
-            overflow-x: auto;
+            gap: 0 !important;
           }
+
           .sidebar-nav a {
             flex-direction: column !important;
             font-size: 0.65rem !important;
             padding: 8px 4px !important;
             gap: 2px !important;
-            min-width: 48px;
+            flex: 1;
+            min-width: auto !important;
             text-align: center;
             justify-content: center;
+            border-radius: 0 !important;
+            margin-bottom: 0 !important;
+            color: var(--color-text-muted) !important;
           }
-          .sidebar-logout { display: none !important; }
+
+          .sidebar-nav a.active {
+            background: var(--color-sage-ultra) !important;
+            color: var(--color-sage-dark) !important;
+          }
+
+          .sidebar-nav span {
+            font-size: 1.2rem !important;
+          }
+
+          .sidebar-logout {
+            display: none !important;
+          }
         }
       `}</style>
     </>
