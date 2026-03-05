@@ -1,6 +1,8 @@
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useLanguage, usePageText } from '../../context/LanguageContext';
+import { useAuth } from '../../context/AuthContext';
+import { redirectToCheckout, isStripeConfigured } from '../../lib/stripe';
 
 // ── Page-level translations ─────────────────────────────────
 const PAGE_TEXT = {
@@ -12,7 +14,7 @@ const PAGE_TEXT = {
     // Billing toggle
     monthly: 'חודשי',
     yearly: 'שנתי',
-    saveBadge: 'חסכי 47%',
+    saveBadge: 'חסכי 53%',
 
     // Free tier
     freeTitle: 'חינם',
@@ -30,11 +32,11 @@ const PAGE_TEXT = {
     // Premium tier
     premiumTitle: 'פרימיום',
     premiumSubtitle: 'חוויית ליווי מלאה ומקיפה',
-    premiumPriceMonthly: '₪79',
+    premiumPriceMonthly: '₪88',
     premiumPriceYearly: '₪499',
     premiumPeriodMonthly: 'לחודש',
     premiumPeriodYearly: 'לשנה',
-    premiumYearlySaving: 'במקום ₪948 — חסכון של ₪449!',
+    premiumYearlySaving: 'במקום ₪1,056 — חסכון של ₪557!',
     premiumCta: 'שדרגי לפרימיום',
     premiumBadge: 'מומלץ',
     premiumFeatureIntro: 'הכל בחינם, ובנוסף:',
@@ -97,7 +99,7 @@ const PAGE_TEXT = {
     // Billing toggle
     monthly: 'Monthly',
     yearly: 'Yearly',
-    saveBadge: 'Save 47%',
+    saveBadge: 'Save 53%',
 
     // Free tier
     freeTitle: 'Free',
@@ -115,11 +117,11 @@ const PAGE_TEXT = {
     // Premium tier
     premiumTitle: 'Premium',
     premiumSubtitle: 'Complete and comprehensive support experience',
-    premiumPriceMonthly: '₪79',
+    premiumPriceMonthly: '₪88',
     premiumPriceYearly: '₪499',
     premiumPeriodMonthly: '/month',
     premiumPeriodYearly: '/year',
-    premiumYearlySaving: 'Instead of ₪948 — Save ₪449!',
+    premiumYearlySaving: 'Instead of ₪1,056 — Save ₪557!',
     premiumCta: 'Upgrade to Premium',
     premiumBadge: 'Recommended',
     premiumFeatureIntro: 'Everything in Free, plus:',
@@ -179,10 +181,45 @@ const PAGE_TEXT = {
 export default function PricingPage() {
   const { isRTL } = useLanguage();
   const pt = usePageText(PAGE_TEXT);
+  const { user } = useAuth();
   const [billingCycle, setBillingCycle] = useState('monthly');
   const [openFaq, setOpenFaq] = useState(null);
+  const [isLoading, setIsLoading] = useState(false);
+  const [paymentError, setPaymentError] = useState(null);
 
-  const whatsappUrl = `https://wa.me/972547767676?text=${encodeURIComponent(pt('whatsappMessage'))}`;
+  const handlePremiumClick = async () => {
+    setPaymentError(null);
+
+    if (!user) {
+      // Not logged in — redirect to register
+      window.location.href = '/register?role=moms';
+      return;
+    }
+
+    if (isStripeConfigured) {
+      // Stripe is configured — redirect to Stripe Checkout
+      setIsLoading(true);
+      try {
+        const priceId = billingCycle === 'monthly'
+          ? import.meta.env.VITE_STRIPE_PRICE_MONTHLY
+          : import.meta.env.VITE_STRIPE_PRICE_YEARLY;
+        await redirectToCheckout({
+          priceId: priceId || import.meta.env.VITE_STRIPE_PRICE_ID,
+          userId: user.id,
+          userEmail: user.email,
+        });
+      } catch (err) {
+        console.error('Payment error:', err);
+        setPaymentError(isRTL ? 'שגיאה בתהליך התשלום. נסי שוב או צרי קשר.' : 'Payment error. Please try again or contact us.');
+      } finally {
+        setIsLoading(false);
+      }
+    } else {
+      // Stripe not configured — open WhatsApp as fallback
+      const msg = encodeURIComponent(pt('whatsappMessage'));
+      window.open(`https://wa.me/972547767676?text=${msg}`, '_blank');
+    }
+  };
 
   const freeFeatures = [
     pt('freeFeature1'),
@@ -551,10 +588,9 @@ export default function PricingPage() {
             )}
             {billingCycle === 'monthly' && <div style={{ marginBottom: 20 }} />}
 
-            <a
-              href={whatsappUrl}
-              target="_blank"
-              rel="noopener noreferrer"
+            <button
+              onClick={handlePremiumClick}
+              disabled={isLoading}
               className="btn"
               style={{
                 width: '100%',
@@ -562,18 +598,33 @@ export default function PricingPage() {
                 fontSize: 'var(--font-base)',
                 fontWeight: 700,
                 justifyContent: 'center',
-                marginBottom: 28,
+                marginBottom: paymentError ? 8 : 28,
                 textDecoration: 'none',
-                background: 'linear-gradient(135deg, var(--color-sage), var(--color-sage-dark))',
+                background: isLoading
+                  ? 'var(--color-sage-light)'
+                  : 'linear-gradient(135deg, var(--color-sage), var(--color-sage-dark))',
                 color: 'white',
                 border: '2px solid var(--color-sage)',
                 display: 'inline-flex',
                 alignItems: 'center',
                 gap: 8,
+                cursor: isLoading ? 'wait' : 'pointer',
+                opacity: isLoading ? 0.7 : 1,
+                transition: 'all 0.2s ease',
               }}
             >
-              {pt('premiumCta')}
-            </a>
+              {isLoading ? '⏳' : ''} {pt('premiumCta')}
+            </button>
+            {paymentError && (
+              <p style={{
+                fontSize: 'var(--font-xs)',
+                color: 'var(--color-danger)',
+                textAlign: 'center',
+                marginBottom: 20,
+              }}>
+                {paymentError}
+              </p>
+            )}
 
             <p style={{
               fontSize: 'var(--font-xs)',

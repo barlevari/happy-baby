@@ -21,6 +21,26 @@
   </head>
   <body>
     <div id="root"></div>
+    <!-- Force clear old service worker cache on first load after deploy -->
+    <script>
+      if ('serviceWorker' in navigator) {
+        var SW_VERSION = 'v2';
+        if (localStorage.getItem('sw-version') !== SW_VERSION) {
+          navigator.serviceWorker.getRegistrations().then(function(regs) {
+            regs.forEach(function(reg) { reg.unregister(); });
+          });
+          if ('caches' in window) {
+            caches.keys().then(function(names) {
+              names.forEach(function(name) { caches.delete(name); });
+            });
+          }
+          localStorage.setItem('sw-version', SW_VERSION);
+          if (navigator.serviceWorker.controller) {
+            location.reload();
+          }
+        }
+      }
+    </script>
     <script type="module" src="/src/main.jsx"></script>
   </body>
 </html>
