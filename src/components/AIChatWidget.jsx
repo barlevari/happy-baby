@@ -26,6 +26,18 @@ const FAQ_EN = [
   'How to contact support?',
 ];
 
+// Rate limiter: max 10 messages per minute
+const rateLimiter = { count: 0, resetTime: 0 };
+function checkRateLimit() {
+  const now = Date.now();
+  if (now > rateLimiter.resetTime) {
+    rateLimiter.count = 0;
+    rateLimiter.resetTime = now + 60000;
+  }
+  rateLimiter.count++;
+  return rateLimiter.count <= 10;
+}
+
 export default function AIChatWidget() {
   const { user } = useAuth();
   const { lang } = useLanguage();
@@ -52,6 +64,15 @@ export default function AIChatWidget() {
   const sendMessage = async (text) => {
     const userText = text || input.trim();
     if (!userText || loading) return;
+
+    if (!checkRateLimit()) {
+      setMessages(prev => [...prev,
+        { role: 'user', content: userText },
+        { role: 'assistant', content: isRTL ? '⚠️ יותר מדי הודעות. נסי שוב בעוד דקה.' : '⚠️ Too many messages. Please wait a minute.' },
+      ]);
+      return;
+    }
+
     setInput('');
 
     const newMessages = [...messages, { role: 'user', content: userText }];

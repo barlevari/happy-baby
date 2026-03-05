@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useNavigate, useSearchParams, Link } from 'react-router-dom';
-import { useAuth, ADMIN_SECRET } from '../../context/AuthContext';
+import { useAuth } from '../../context/AuthContext';
 import { useLanguage, usePageText } from '../../context/LanguageContext';
 
 // ── Page-level translations ─────────────────────────────────
@@ -22,7 +22,7 @@ const PAGE_TEXT = {
     lmpLabel: 'תאריך הווסת האחרון (LMP)',
     lmpHint: 'שדה זה משמש לחישוב שבוע ההריון ותאריך הלידה המשוער',
     adminCodeLabel: '🔑 קוד מנהל',
-    adminCodePlaceholder: 'HAPPYBABY2025',
+    adminCodePlaceholder: 'הזיני את הקוד שקיבלת',
     adminCodeHint: 'הקוד מתקבל מהמנהלת הראשית בלבד',
     backStepBtn: 'חזרה',
     loading: 'נרשמ/ת...',
@@ -70,7 +70,7 @@ const PAGE_TEXT = {
     lmpLabel: 'Last Menstrual Period (LMP)',
     lmpHint: 'This field is used to calculate your pregnancy week and estimated due date',
     adminCodeLabel: '🔑 Admin Code',
-    adminCodePlaceholder: 'HAPPYBABY2025',
+    adminCodePlaceholder: 'Enter the code you received',
     adminCodeHint: 'The code is provided by the head admin only',
     backStepBtn: 'Back',
     loading: 'Registering...',

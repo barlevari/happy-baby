@@ -3,17 +3,33 @@ import { supabase, isSupabaseConfigured } from '../lib/supabase';
 
 const AuthContext = createContext(null);
 
-export const ADMIN_SECRET = 'HAPPYBABY2025';
+// Admin secret loaded from env var — never hardcode in client code
+const ADMIN_SECRET = import.meta.env.VITE_ADMIN_SECRET || '';
 
 // ── Mock mode helpers (used when Supabase is not configured) ──
 
+// Simple hash for mock passwords — NOT cryptographically secure, just avoids plaintext in bundle
+async function hashPassword(pw) {
+  const encoded = new TextEncoder().encode(pw);
+  const buf = await crypto.subtle.digest('SHA-256', encoded);
+  return Array.from(new Uint8Array(buf)).map(b => b.toString(16).padStart(2, '0')).join('');
+}
+
+async function checkPassword(pw, hash) {
+  return (await hashPassword(pw)) === hash;
+}
+
+// Pre-hashed passwords (SHA-256): test1234 and admin1234
+const H_TEST = '937e8d5fbb48bd4949536cd65b8d35c426b80d2f830c5c308e2cdec422ae2244'; // test1234
+const H_ADMIN = 'ac9689e2272427085e35b9d3e3e8bed88cb3434828b43b86fc0596cad4c6e270'; // admin1234
+
 const SEED_USERS = [
-  { id: 1, name: 'שרה לוי', email: 'sarah@test.com', password: 'test1234', role: 'moms', lmpDate: '2024-09-01', idNumber: '031234567', status: 'approved', joined: '2026-01-05' },
-  { id: 2, name: 'מיכל כהן', email: 'michal@test.com', password: 'test1234', role: 'student', idNumber: '012345678', status: 'approved', joined: '2026-01-08' },
-  { id: 3, name: 'מנהלת', email: 'admin@happybaby.com', password: 'admin1234', role: 'admin', idNumber: '000000018', status: 'approved', joined: '2026-01-01' },
-  { id: 4, name: 'רחל אברהם', email: 'rachel@test.com', password: 'test1234', role: 'moms', idNumber: '025874561', status: 'pending', joined: '2026-02-20' },
-  { id: 5, name: 'דנה ישראלי', email: 'dana@test.com', password: 'test1234', role: 'student', idNumber: '074125836', status: 'pending', joined: '2026-02-22' },
-  { id: 6, name: 'נועה שמש', email: 'noa@test.com', password: 'test1234', role: 'moms', idNumber: '036985214', status: 'blocked', joined: '2026-01-18' },
+  { id: 1, name: 'שרה לוי', email: 'sarah@test.com', passwordHash: H_TEST, role: 'moms', lmpDate: '2024-09-01', idNumber: '031234567', status: 'approved', joined: '2026-01-05' },
+  { id: 2, name: 'מיכל כהן', email: 'michal@test.com', passwordHash: H_TEST, role: 'student', idNumber: '012345678', status: 'approved', joined: '2026-01-08' },
+  { id: 3, name: 'מנהלת', email: 'admin@happybaby.com', passwordHash: H_ADMIN, role: 'admin', idNumber: '000000018', status: 'approved', joined: '2026-01-01' },
+  { id: 4, name: 'רחל אברהם', email: 'rachel@test.com', passwordHash: H_TEST, role: 'moms', idNumber: '025874561', status: 'pending', joined: '2026-02-20' },
+  { id: 5, name: 'דנה ישראלי', email: 'dana@test.com', passwordHash: H_TEST, role: 'student', idNumber: '074125836', status: 'pending', joined: '2026-02-22' },
+  { id: 6, name: 'נועה שמש', email: 'noa@test.com', passwordHash: H_TEST, role: 'moms', idNumber: '036985214', status: 'blocked', joined: '2026-01-18' },
 ];
 
 function loadUsers() {
@@ -150,13 +166,15 @@ export function AuthProvider({ children }) {
       return { ok: true, user: profile };
     }
 
-    // Mock mode
+    // Mock mode — compare hashed password
     const allUsers = loadUsers();
-    const found = allUsers.find(u => u.email === email && u.password === password);
+    const found = allUsers.find(u => u.email === email);
     if (!found) return { ok: false, error: 'אימייל או סיסמה שגויים' };
+    const pwMatch = await checkPassword(password, found.passwordHash);
+    if (!pwMatch) return { ok: false, error: 'אימייל או סיסמה שגויים' };
     if (found.status === 'pending') return { ok: false, pending: true, error: 'בקשתך ממתינה לאישור מנהל' };
     if (found.status === 'blocked') return { ok: false, error: 'חשבונך חסום. פני למנהל האתר' };
-    const { password: _, ...safe } = found;
+    const { passwordHash: _, ...safe } = found;
     setUser(safe);
     localStorage.setItem('hb_user', JSON.stringify(safe));
     return { ok: true, user: safe };
@@ -204,14 +222,16 @@ export function AuthProvider({ children }) {
       return { ok: true, pending: true };
     }
 
-    // Mock mode
+    // Mock mode — hash the password before storing
     const allUsers = loadUsers();
     if (allUsers.find(u => u.email === email)) return { ok: false, error: 'כתובת האימייל כבר רשומה במערכת' };
 
     const status = role === 'admin' ? 'approved' : 'pending';
     const newUser = {
       id: Date.now(),
-      name, email, password, role,
+      name, email,
+      passwordHash: await hashPassword(password),
+      role,
       lmpDate: lmpDate || null,
       idNumber, status,
       joined: new Date().toISOString().split('T')[0],
@@ -222,7 +242,7 @@ export function AuthProvider({ children }) {
     setUsers(updated);
 
     if (role === 'admin') {
-      const { password: _, ...safe } = newUser;
+      const { passwordHash: _, ...safe } = newUser;
       setUser(safe);
       localStorage.setItem('hb_user', JSON.stringify(safe));
       return { ok: true, user: safe };

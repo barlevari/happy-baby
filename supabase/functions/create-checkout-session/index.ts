@@ -12,8 +12,11 @@ const stripe = new Stripe(Deno.env.get('STRIPE_SECRET_KEY')!, {
   apiVersion: '2023-10-16',
 });
 
+// IMPORTANT: Replace with your actual domain before deploying
+const ALLOWED_ORIGIN = Deno.env.get('ALLOWED_ORIGIN') || 'https://happy-baby-web.vercel.app';
+
 const corsHeaders = {
-  'Access-Control-Allow-Origin': '*',
+  'Access-Control-Allow-Origin': ALLOWED_ORIGIN,
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 };
 
