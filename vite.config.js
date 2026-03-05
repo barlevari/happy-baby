@@ -12,7 +12,23 @@ export default defineConfig(({ mode }) => {
         registerType: 'autoUpdate',
         workbox: {
           globPatterns: ['**/*.{js,css,html,png,jpg,jpeg,svg,ico,woff2}'],
+          // Force the new service worker to activate immediately
+          skipWaiting: true,
+          clientsClaim: true,
+          // SPA: always serve index.html for navigation requests
+          navigateFallback: '/index.html',
+          navigateFallbackDenylist: [/^\/api\//],
           runtimeCaching: [
+            {
+              // App shell & assets: network-first so updates show immediately
+              urlPattern: /^https:\/\/happy-baby-web\.vercel\.app\/.*/i,
+              handler: 'NetworkFirst',
+              options: {
+                cacheName: 'app-shell',
+                expiration: { maxEntries: 100, maxAgeSeconds: 60 * 60 * 24 },
+                networkTimeoutSeconds: 3,
+              },
+            },
             {
               urlPattern: /^https:\/\/img\.youtube\.com\/.*/i,
               handler: 'CacheFirst',

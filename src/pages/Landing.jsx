@@ -176,28 +176,41 @@ export default function Landing() {
       overflow: 'hidden',
       position: 'relative',
     }}>
-      {/* === Background Video === */}
-      <video
-        autoPlay
-        loop
-        muted
-        playsInline
+      {/* === Background Video (YouTube) === */}
+      <div
         aria-hidden="true"
         style={{
           position: 'fixed',
-          top: 0,
-          left: 0,
-          width: '100%',
-          height: '100%',
-          objectFit: 'cover',
-          opacity: 0.3,
+          top: '-10%',
+          left: '-10%',
+          width: '120%',
+          height: '120%',
+          overflow: 'hidden',
           zIndex: 0,
           pointerEvents: 'none',
+          opacity: 0.3,
           filter: 'blur(1px) saturate(0.8)',
         }}
       >
-        <source src="/bg-video.mp4" type="video/mp4" />
-      </video>
+        <iframe
+          src="https://www.youtube.com/embed/-3snf7nVLuc?autoplay=1&mute=1&loop=1&playlist=-3snf7nVLuc&controls=0&showinfo=0&modestbranding=1&rel=0&playsinline=1&disablekb=1&iv_load_policy=3&cc_load_policy=0&start=5"
+          title="Background video"
+          allow="autoplay; encrypted-media"
+          frameBorder="0"
+          style={{
+            position: 'absolute',
+            top: '50%',
+            left: '50%',
+            width: '100vw',
+            height: '56.25vw', /* 16:9 aspect ratio */
+            minHeight: '100vh',
+            minWidth: '177.78vh', /* 16:9 aspect ratio */
+            transform: 'translate(-50%, -50%)',
+            border: 'none',
+            pointerEvents: 'none',
+          }}
+        />
+      </div>
       {/* Gradient overlay on top of video */}
       <div
         aria-hidden="true"
