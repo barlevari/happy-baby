@@ -181,15 +181,15 @@ export default function Landing() {
         aria-hidden="true"
         style={{
           position: 'fixed',
-          top: '-10%',
-          left: '-10%',
-          width: '120%',
-          height: '120%',
+          top: '-20%',
+          left: '-20%',
+          width: '140%',
+          height: '140%',
           overflow: 'hidden',
           zIndex: 0,
           pointerEvents: 'none',
-          opacity: 0.3,
-          filter: 'blur(1px) saturate(0.8)',
+          opacity: 0.28,
+          filter: 'blur(4px) saturate(0.7)',
         }}
       >
         <iframe
@@ -201,10 +201,10 @@ export default function Landing() {
             position: 'absolute',
             top: '50%',
             left: '50%',
-            width: '100vw',
-            height: '56.25vw', /* 16:9 aspect ratio */
-            minHeight: '100vh',
-            minWidth: '177.78vh', /* 16:9 aspect ratio */
+            width: '180vw',
+            height: '101.25vw', /* 16:9 scaled up */
+            minHeight: '180vh',
+            minWidth: '320vh', /* zoomed in to crop text areas */
             transform: 'translate(-50%, -50%)',
             border: 'none',
             pointerEvents: 'none',
@@ -220,7 +220,7 @@ export default function Landing() {
           left: 0,
           width: '100%',
           height: '100%',
-          background: 'linear-gradient(160deg, rgba(var(--color-cream-rgb, 255,250,240), 0.35) 0%, rgba(var(--color-sage-ultra-rgb, 230,240,235), 0.3) 50%, rgba(var(--color-rose-light-rgb, 252,235,240), 0.35) 100%)',
+          background: 'linear-gradient(160deg, rgba(var(--color-cream-rgb, 255,250,240), 0.45) 0%, rgba(var(--color-sage-ultra-rgb, 230,240,235), 0.4) 50%, rgba(var(--color-rose-light-rgb, 252,235,240), 0.45) 100%)',
           zIndex: 0,
           pointerEvents: 'none',
         }}
@@ -383,10 +383,10 @@ export default function Landing() {
           src="/happy-baby-logo.png"
           alt="hapby baby"
           style={{
-            height: 'clamp(100px, 18vw, 170px)',
+            height: 'clamp(110px, 20vw, 190px)',
             objectFit: 'contain',
             marginBottom: 12,
-            mixBlendMode: 'multiply',
+            filter: 'drop-shadow(0 2px 8px rgba(0,0,0,0.15))',
             opacity: introPhase >= 2 ? 1 : 0,
             animation: introPhase >= 2 ? `logoBloom 1.2s ${SPRING} both` : 'none',
             position: 'relative',
@@ -396,13 +396,14 @@ export default function Landing() {
 
         {/* Animated tagline with character stagger */}
         <div style={{
-          fontSize: 'clamp(1.05rem, 2.5vw, 1.35rem)',
-          color: 'var(--color-text-muted)',
+          fontSize: 'clamp(1.15rem, 3vw, 1.5rem)',
+          color: 'var(--color-sage-dark)',
           marginTop: 16,
-          fontWeight: 600,
+          fontWeight: 800,
           letterSpacing: '0.02em',
           overflow: 'hidden',
           position: 'relative',
+          textShadow: '0 1px 8px rgba(255,255,255,0.8), 0 0 20px rgba(255,255,255,0.5)',
         }}>
           {tagline.split('').map((char, i) => (
             <span
@@ -421,9 +422,9 @@ export default function Landing() {
 
         {/* Shimmer subtitle */}
         <p style={{
-          fontSize: '0.85rem',
+          fontSize: '0.95rem',
           marginTop: 8,
-          fontWeight: 500,
+          fontWeight: 700,
           opacity: introPhase >= 4 ? 1 : 0,
           transition: 'opacity 0.8s ease',
           background: 'linear-gradient(90deg, var(--color-text-muted), var(--color-sage-dark), var(--color-rose-dark, #c98aa0), var(--color-text-muted))',
