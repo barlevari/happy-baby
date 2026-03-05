@@ -10,12 +10,12 @@ const PAGE_TEXT = {
 
     // 1. Introduction
     introTitle: '1. מבוא',
-    introP1: 'ברוכים הבאים ל-Happy Baby (להלן: "השירות", "הפלטפורמה" או "האפליקציה"), בבעלות והפעלת רויטל לב ארי (להלן: "אנחנו", "שלנו" או "החברה").',
+    introP1: 'ברוכים הבאים ל-Hapby Baby (להלן: "השירות", "הפלטפורמה" או "האפליקציה"), בבעלות והפעלת רויטל לב ארי (להלן: "אנחנו", "שלנו" או "החברה").',
     introP2: 'השימוש בפלטפורמה מהווה הסכמה לתנאי שימוש אלה. אם אינך מסכימה לתנאים, אנא הימנעי משימוש בשירות. המשך השימוש בפלטפורמה לאחר עדכון תנאי השימוש מהווה הסכמה לתנאים המעודכנים.',
 
     // 2. Service Description
     serviceTitle: '2. תיאור השירות',
-    serviceP1: 'Happy Baby היא פלטפורמה דיגיטלית המספקת:',
+    serviceP1: 'Hapby Baby היא פלטפורמה דיגיטלית המספקת:',
     serviceItem1: 'מעקב הריון שבועי ומידע על התפתחות העובר',
     serviceItem2: 'תוכן חינוכי בנושאי הריון, לידה, תזונה והכנה מנטלית',
     serviceItem3: 'צ\'אט AI חכם למענה על שאלות בנושאי הריון ולידה',
@@ -35,14 +35,14 @@ const PAGE_TEXT = {
 
     // 4. Content & IP
     contentTitle: '4. תוכן וקניין רוחני',
-    contentP1: 'כל התכנים בפלטפורמה, לרבות טקסטים, תמונות, סרטונים, עיצובים, לוגואים, וחומרי לימוד, הם קניינה הרוחני של Happy Baby ורויטל לב ארי, ומוגנים על ידי חוקי זכויות יוצרים.',
+    contentP1: 'כל התכנים בפלטפורמה, לרבות טקסטים, תמונות, סרטונים, עיצובים, לוגואים, וחומרי לימוד, הם קניינה הרוחני של Hapby Baby ורויטל לב ארי, ומוגנים על ידי חוקי זכויות יוצרים.',
     contentP2: 'השימוש בתכנים מותר למטרות אישיות ולא מסחריות בלבד. אין להעתיק, לשכפל, להפיץ, לשדר, להציג בפומבי, לערוך, להתאים, או ליצור יצירות נגזרות מתכני הפלטפורמה ללא הסכמה מראש ובכתב.',
     contentP3: 'שיתוף חומרים מהפלטפורמה עם צדדים שלישיים, לרבות צילומי מסך או העתקת תכנים, אסור בהחלט.',
 
     // 5. Medical Disclaimer
     medicalTitle: '5. הצהרה רפואית',
     medicalP1: 'השירות אינו מספק ייעוץ רפואי. כל המידע והתוכן בפלטפורמה נועדו למטרות חינוכיות ומידע כללי בלבד.',
-    medicalP2: 'Happy Baby אינו תחליף לייעוץ, אבחון או טיפול רפואי מקצועי. תמיד יש לפנות לרופא/ה, מיילדת או איש/ת מקצוע רפואי מוסמך/ת לקבלת ייעוץ בנוגע למצבך הרפואי.',
+    medicalP2: 'Hapby Baby אינו תחליף לייעוץ, אבחון או טיפול רפואי מקצועי. תמיד יש לפנות לרופא/ה, מיילדת או איש/ת מקצוע רפואי מוסמך/ת לקבלת ייעוץ בנוגע למצבך הרפואי.',
     medicalP3: 'צ\'אט ה-AI מספק מידע כללי בלבד ואינו מהווה תחליף לייעוץ רפואי. אין לקבל החלטות רפואיות על סמך מידע שהתקבל מהצ\'אט.',
     medicalP4: 'במקרה חירום רפואי, יש לפנות מיידית לשירותי החירום או לבית החולים הקרוב.',
 
@@ -68,7 +68,7 @@ const PAGE_TEXT = {
     // 9. Limitation of Liability
     liabilityTitle: '9. הגבלת אחריות',
     liabilityP1: 'השירות ניתן "כפי שהוא" (AS IS) ו-"כפי שזמין" (AS AVAILABLE). אנו אינם מתחייבים שהשירות יהיה רציף, מאובטח, או נקי משגיאות.',
-    liabilityP2: 'במידה המרבית המותרת על פי חוק, Happy Baby, רויטל לב ארי, ועובדיהן לא יישאו באחריות לכל נזק ישיר, עקיף, מקרי, מיוחד או תוצאתי הנובע מהשימוש בשירות או מאי היכולת להשתמש בו.',
+    liabilityP2: 'במידה המרבית המותרת על פי חוק, Hapby Baby, רויטל לב ארי, ועובדיהן לא יישאו באחריות לכל נזק ישיר, עקיף, מקרי, מיוחד או תוצאתי הנובע מהשימוש בשירות או מאי היכולת להשתמש בו.',
     liabilityP3: 'הגבלת אחריות זו חלה במידה המרבית המותרת על פי הדין הישראלי.',
 
     // 10. Contact
@@ -84,12 +84,12 @@ const PAGE_TEXT = {
 
     // 1. Introduction
     introTitle: '1. Introduction',
-    introP1: 'Welcome to Happy Baby (hereinafter: "the Service", "the Platform", or "the App"), owned and operated by Revital Lev Ari (hereinafter: "we", "our", or "the Company").',
+    introP1: 'Welcome to Hapby Baby (hereinafter: "the Service", "the Platform", or "the App"), owned and operated by Revital Lev Ari (hereinafter: "we", "our", or "the Company").',
     introP2: 'By using the Platform, you agree to these Terms of Use. If you do not agree to these terms, please refrain from using the Service. Continued use of the Platform after updates to the Terms of Use constitutes acceptance of the updated terms.',
 
     // 2. Service Description
     serviceTitle: '2. Service Description',
-    serviceP1: 'Happy Baby is a digital platform that provides:',
+    serviceP1: 'Hapby Baby is a digital platform that provides:',
     serviceItem1: 'Weekly pregnancy tracking and fetal development information',
     serviceItem2: 'Educational content on pregnancy, birth, nutrition, and mental preparation',
     serviceItem3: 'A smart AI chat for answering pregnancy and birth-related questions',
@@ -109,14 +109,14 @@ const PAGE_TEXT = {
 
     // 4. Content & IP
     contentTitle: '4. Content and Intellectual Property',
-    contentP1: 'All content on the Platform, including texts, images, videos, designs, logos, and educational materials, is the intellectual property of Happy Baby and Revital Lev Ari, and is protected by copyright laws.',
+    contentP1: 'All content on the Platform, including texts, images, videos, designs, logos, and educational materials, is the intellectual property of Hapby Baby and Revital Lev Ari, and is protected by copyright laws.',
     contentP2: 'Use of the content is permitted for personal, non-commercial purposes only. You may not copy, reproduce, distribute, transmit, publicly display, edit, adapt, or create derivative works from the Platform\'s content without prior written consent.',
     contentP3: 'Sharing materials from the Platform with third parties, including screenshots or copying of content, is strictly prohibited.',
 
     // 5. Medical Disclaimer
     medicalTitle: '5. Medical Disclaimer',
     medicalP1: 'The Service does not provide medical advice. All information and content on the Platform is intended for educational and general informational purposes only.',
-    medicalP2: 'Happy Baby is NOT a substitute for professional medical advice, diagnosis, or treatment. Always consult your doctor, midwife, or qualified healthcare professional for advice regarding your medical condition.',
+    medicalP2: 'Hapby Baby is NOT a substitute for professional medical advice, diagnosis, or treatment. Always consult your doctor, midwife, or qualified healthcare professional for advice regarding your medical condition.',
     medicalP3: 'The AI chat provides general information only and does not constitute a substitute for medical advice. Do not make medical decisions based on information received from the chat.',
     medicalP4: 'In case of a medical emergency, contact emergency services or go to the nearest hospital immediately.',
 
@@ -142,7 +142,7 @@ const PAGE_TEXT = {
     // 9. Limitation of Liability
     liabilityTitle: '9. Limitation of Liability',
     liabilityP1: 'The Service is provided "AS IS" and "AS AVAILABLE". We do not guarantee that the Service will be continuous, secure, or error-free.',
-    liabilityP2: 'To the maximum extent permitted by law, Happy Baby, Revital Lev Ari, and their employees shall not be liable for any direct, indirect, incidental, special, or consequential damages arising from the use of, or inability to use, the Service.',
+    liabilityP2: 'To the maximum extent permitted by law, Hapby Baby, Revital Lev Ari, and their employees shall not be liable for any direct, indirect, incidental, special, or consequential damages arising from the use of, or inability to use, the Service.',
     liabilityP3: 'This limitation of liability applies to the maximum extent permitted under Israeli law.',
 
     // 10. Contact

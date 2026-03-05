@@ -47,7 +47,7 @@ const PAGE_TEXT = {
     premiumFeature7: 'תכנים חדשים כל שבוע',
 
     // WhatsApp message
-    whatsappMessage: 'היי רויטל! אשמח לשדרג למנוי פרימיום של Happy Baby 🌿',
+    whatsappMessage: 'היי רויטל! אשמח לשדרג למנוי פרימיום של Hapby Baby 🌿',
 
     // Comparison section
     comparisonTitle: 'השוואת מסלולים',
@@ -132,7 +132,7 @@ const PAGE_TEXT = {
     premiumFeature7: 'New content every week',
 
     // WhatsApp message
-    whatsappMessage: 'Hi Revital! I\'d like to upgrade to a Happy Baby Premium subscription 🌿',
+    whatsappMessage: 'Hi Revital! I\'d like to upgrade to a Hapby Baby Premium subscription 🌿',
 
     // Comparison section
     comparisonTitle: 'Plan Comparison',

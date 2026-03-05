@@ -7,7 +7,7 @@ import VideoPlayerModal from '../../components/VideoPlayerModal';
 // ── Page-level translations ─────────────────────────────────
 const PAGE_TEXT = {
   he: {
-    pageTitle: '🎥 סרטוני שיטת Happy Baby',
+    pageTitle: '🎥 סרטוני שיטת Hapby Baby',
     videosCount: 'סרטונים',
     allWeeks: 'כל השבועות',
     weeksRange: 'שבועות',
@@ -17,7 +17,7 @@ const PAGE_TEXT = {
     noVideosFound: 'לא נמצאו סרטונים לשבוע זה',
   },
   en: {
-    pageTitle: '🎥 Happy Baby Method Videos',
+    pageTitle: '🎥 Hapby Baby Method Videos',
     videosCount: 'videos',
     allWeeks: 'All weeks',
     weeksRange: 'Weeks',

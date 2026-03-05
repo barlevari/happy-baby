@@ -2,13 +2,13 @@ import { useState, useRef, useEffect, useCallback } from 'react';
 import { useAuth } from '../../context/AuthContext';
 import { useLanguage, usePageText } from '../../context/LanguageContext';
 
-const SYSTEM_PROMPT = `אתה עוזר AI של Happy Baby – פלטפורמה ישראלית לליווי הריון, לידה וגידול תינוקות.
+const SYSTEM_PROMPT = `אתה עוזר AI של Hapby Baby – פלטפורמה ישראלית לליווי הריון, לידה וגידול תינוקות.
 אתה מדבר עברית בצורה חמה, תומכת ומקצועית.
 אתה יכול לענות על שאלות בנושאי:
 - הריון ולידה (שבועות, סימפטומים, תזונה, בדיקות)
 - גידול תינוקות (הנקה, שינה, התפתחות)
 - בריאות האם (גופנית ונפשית)
-- שאלות כלליות על שיטת Happy Baby
+- שאלות כלליות על שיטת Hapby Baby
 
 חשוב: אתה לא מחליף ייעוץ רפואי מקצועי. לכל בעיה רפואית, הפנה לרופא או לאחות.
 היה קצר, ברור וחם. אם שואלים אותך שאלה שאינה קשורה להריון/תינוקות/בריאות, הפנה בנחמדות לנושאים הרלוונטיים.`;
@@ -45,7 +45,7 @@ const PAGE_TEXT = {
     daysAgoPrefix: 'לפני',
 
     // Welcome & errors
-    welcomeMessage: (name) => `שלום ${name}! 👋 אני העוזר של Happy Baby. אשמח לעזור לך בכל שאלה על הריון, לידה וגידול תינוקות. במה אוכל לסייע?`,
+    welcomeMessage: (name) => `שלום ${name}! 👋 אני העוזר של Hapby Baby. אשמח לעזור לך בכל שאלה על הריון, לידה וגידול תינוקות. במה אוכל לסייע?`,
     errorPrefix: 'שגיאה',
     connectionError: 'שגיאה בחיבור לAI',
     retryError: '⚠️ אירעה שגיאה. נסי שוב מאוחר יותר.',
@@ -54,7 +54,7 @@ const PAGE_TEXT = {
     autoNausea: 'בחילות בוקר נפוצות בטרימסטר הראשון. טיפים שעוזרים: אכלי ביסקוויטים לפני שקמי מהמיטה, שתי מים קרים, הימני ממאכלים חריפים. אם הבחילה חמורה – דברי עם הרופאה שלך. 💚',
     autoFood: 'בהריון חשוב לאכול:\n✅ פירות וירקות טריים\n✅ חלבונים (ביצים, עוף, דגים)\n✅ פחמימות מורכבות\n✅ מוצרי חלב (סידן)\n\n❌ להימנע: אלכוהול, דגים גדולים (כספית), גבינות רכות לא מפוסטרות.',
     autoSize: 'גודל התינוק משתנה מדי שבוע! 🍓 שבוע 8 – פטל, שבוע 12 – ליים, שבוע 20 – בננה, שבוע 28 – חציל, שבוע 36 – פפאיה, שבוע 40 – אבטיח! 🍉\n\nכנסי לדשבורד שלך לראות את השבוע המדויק שלך.',
-    autoBirth: 'לקראת הלידה כדאי:\n• להכין תיק לבית חולים\n• ללמוד טכניקות נשימה\n• לתאם הסעה לבית החולים\n• לכתוב תכנית לידה\n• לישון טוב ולנוח\n\nAcademy של Happy Baby מכיל קורס מלא על הכנה ללידה! 🌸',
+    autoBirth: 'לקראת הלידה כדאי:\n• להכין תיק לבית חולים\n• ללמוד טכניקות נשימה\n• לתאם הסעה לבית החולים\n• לכתוב תכנית לידה\n• לישון טוב ולנוח\n\nAcademy של Hapby Baby מכיל קורס מלא על הכנה ללידה! 🌸',
     autoSleep: 'תינוק ישן:\n• 0-3 חודשים: 14-17 שעות ביממה\n• 3-6 חודשים: 12-15 שעות\n• 6-12 חודשים: 11-14 שעות\n\nטיפ: שגרת ערב קבועה (אמבטיה → האכלה → שיר → שינה) עוזרת מאוד לתינוקות לישון טוב יותר! 😴',
     autoDefault: 'תודה על שאלתך! אשמח לעזור עם שאלות נוספות על הריון ותינוקות! 💝',
   },
@@ -84,7 +84,7 @@ const PAGE_TEXT = {
     daysAgoPrefix: '',
 
     // Welcome & errors
-    welcomeMessage: (name) => `Hi ${name}! 👋 I'm the Happy Baby assistant. I'd love to help you with any questions about pregnancy, birth, and baby care. How can I help?`,
+    welcomeMessage: (name) => `Hi ${name}! 👋 I'm the Hapby Baby assistant. I'd love to help you with any questions about pregnancy, birth, and baby care. How can I help?`,
     errorPrefix: 'Error',
     connectionError: 'Error connecting to AI',
     retryError: '⚠️ An error occurred. Please try again later.',
@@ -93,7 +93,7 @@ const PAGE_TEXT = {
     autoNausea: 'Morning sickness is common in the first trimester. Helpful tips: eat crackers before getting out of bed, drink cold water, avoid spicy foods. If nausea is severe, talk to your doctor. 💚',
     autoFood: 'During pregnancy, it\'s important to eat:\n✅ Fresh fruits and vegetables\n✅ Proteins (eggs, chicken, fish)\n✅ Complex carbohydrates\n✅ Dairy products (calcium)\n\n❌ Avoid: alcohol, large fish (mercury), unpasteurized soft cheeses.',
     autoSize: 'Your baby\'s size changes every week! 🍓 Week 8 – raspberry, Week 12 – lime, Week 20 – banana, Week 28 – eggplant, Week 36 – papaya, Week 40 – watermelon! 🍉\n\nCheck your dashboard to see your exact week.',
-    autoBirth: 'Before birth, it\'s good to:\n• Pack a hospital bag\n• Learn breathing techniques\n• Arrange transportation to the hospital\n• Write a birth plan\n• Get plenty of sleep and rest\n\nThe Happy Baby Academy has a full course on birth preparation! 🌸',
+    autoBirth: 'Before birth, it\'s good to:\n• Pack a hospital bag\n• Learn breathing techniques\n• Arrange transportation to the hospital\n• Write a birth plan\n• Get plenty of sleep and rest\n\nThe Hapby Baby Academy has a full course on birth preparation! 🌸',
     autoSleep: 'Baby sleep:\n• 0-3 months: 14-17 hours per day\n• 3-6 months: 12-15 hours\n• 6-12 months: 11-14 hours\n\nTip: A consistent evening routine (bath → feeding → song → sleep) really helps babies sleep better! 😴',
     autoDefault: 'Thank you for your question! I\'d love to help with more questions about pregnancy and babies! 💝',
   },

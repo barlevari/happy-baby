@@ -2,9 +2,9 @@ import { useState, useRef, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { useLanguage } from '../context/LanguageContext';
 
-const WIDGET_SYSTEM_PROMPT = `You are the Happy Baby assistant – a warm, professional AI helper for an Israeli pregnancy and baby care platform.
+const WIDGET_SYSTEM_PROMPT = `You are the Hapby Baby assistant – a warm, professional AI helper for an Israeli pregnancy and baby care platform.
 You help users with common questions about:
-- The Happy Baby platform (features, navigation, subscription)
+- The Hapby Baby platform (features, navigation, subscription)
 - Pregnancy tracking, nutrition, and mental preparation
 - Academy courses and content
 - General pregnancy and baby FAQ
@@ -166,7 +166,7 @@ export default function AIChatWidget() {
             }}>🤰</div>
             <div style={{ flex: 1 }}>
               <div style={{ fontWeight: 700, fontSize: '0.95rem' }}>
-                {isRTL ? 'עוזרת Happy Baby' : 'Happy Baby Assistant'}
+                {isRTL ? 'עוזרת Hapby Baby' : 'Hapby Baby Assistant'}
               </div>
               <div style={{ fontSize: '0.72rem', opacity: 0.85 }}>
                 {isRTL ? 'כאן לעזור בכל שאלה' : 'Here to help with any question'}

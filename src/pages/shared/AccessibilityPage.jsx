@@ -10,7 +10,7 @@ const PAGE_TEXT = {
 
     // 1. Commitment
     commitmentTitle: '1. המחויבות שלנו לנגישות',
-    commitmentP1: 'Happy Baby מחויבת להנגשת הפלטפורמה לכלל המשתמשות, כולל אנשים עם מוגבלויות. אנו שואפים לעמוד בתקן WCAG 2.1 ברמה AA (Web Content Accessibility Guidelines), ופועלים באופן שוטף לשיפור הנגישות של הפלטפורמה.',
+    commitmentP1: 'Hapby Baby מחויבת להנגשת הפלטפורמה לכלל המשתמשות, כולל אנשים עם מוגבלויות. אנו שואפים לעמוד בתקן WCAG 2.1 ברמה AA (Web Content Accessibility Guidelines), ופועלים באופן שוטף לשיפור הנגישות של הפלטפורמה.',
     commitmentP2: 'אנו מאמינים שכל אישה בהריון ראויה לגישה שווה למידע, לכלים ולתמיכה שהפלטפורמה מציעה, ללא קשר ליכולותיה הפיזיות או הקוגניטיביות.',
 
     // 2. Current Features
@@ -78,7 +78,7 @@ const PAGE_TEXT = {
 
     // 1. Commitment
     commitmentTitle: '1. Our Commitment to Accessibility',
-    commitmentP1: 'Happy Baby is committed to making our Platform accessible to all users, including people with disabilities. We strive to conform to WCAG 2.1 Level AA (Web Content Accessibility Guidelines), and continuously work to improve the accessibility of our Platform.',
+    commitmentP1: 'Hapby Baby is committed to making our Platform accessible to all users, including people with disabilities. We strive to conform to WCAG 2.1 Level AA (Web Content Accessibility Guidelines), and continuously work to improve the accessibility of our Platform.',
     commitmentP2: 'We believe every pregnant woman deserves equal access to the information, tools, and support that our Platform offers, regardless of physical or cognitive abilities.',
 
     // 2. Current Features

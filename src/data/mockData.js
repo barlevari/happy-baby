@@ -1,5 +1,5 @@
 // ============================================================
-// Happy Baby – Mock Data
+// Hapby Baby – Mock Data
 // ============================================================
 
 export const MOCK_VIDEOS = [
@@ -45,14 +45,14 @@ export const MOCK_EVENTS = [
 ];
 
 export const MOCK_LESSONS = [
-  { id: 1, title: 'מבוא לשיטת Happy Baby', estimatedMinutes: 45, status: 'completed', videoUrl: '#', readingUrl: '#' },
+  { id: 1, title: 'מבוא לשיטת Hapby Baby', estimatedMinutes: 45, status: 'completed', videoUrl: '#', readingUrl: '#' },
   { id: 2, title: 'פיזיולוגיה של שינת תינוקות', estimatedMinutes: 60, status: 'unlocked', videoUrl: '#', readingUrl: '#' },
   { id: 3, title: 'מחזורי שינה – הבנה מעמיקה', estimatedMinutes: 55, status: 'locked', videoUrl: '#', readingUrl: '#' },
   { id: 4, title: 'גיבוש שגרת שינה בריאה', estimatedMinutes: 70, status: 'locked', videoUrl: '#', readingUrl: '#' },
   { id: 5, title: 'הרגעת תינוק בוכה – טכניקות מתקדמות', estimatedMinutes: 50, status: 'locked', videoUrl: '#', readingUrl: '#' },
   { id: 6, title: 'ליווי הורים – כלים פרקטיים', estimatedMinutes: 65, status: 'locked', videoUrl: '#', readingUrl: '#' },
   { id: 7, title: 'מקרי אירוע וסימולציות', estimatedMinutes: 80, status: 'locked', videoUrl: '#', readingUrl: '#' },
-  { id: 8, title: 'סיכום והסמכה – שיטת Happy Baby', estimatedMinutes: 40, status: 'locked', videoUrl: '#', readingUrl: '#' },
+  { id: 8, title: 'סיכום והסמכה – שיטת Hapby Baby', estimatedMinutes: 40, status: 'locked', videoUrl: '#', readingUrl: '#' },
 ];
 
 export const MOCK_TESTS = [

@@ -12,7 +12,7 @@ const FOOTER_TEXT = {
     videoLibrary: 'ספריית סרטונים',
     aiChat: 'צ\'אט AI חכם',
     academy: 'אקדמיה',
-    academyTitle: 'אקדמיית Happy Baby',
+    academyTitle: 'אקדמיית Hapby Baby',
     professionalCourse: 'קורס מקצועי',
     practiceTools: 'כלי תרגול',
     eventsCommunity: 'אירועים וקהילה',
@@ -29,7 +29,10 @@ const FOOTER_TEXT = {
     email: 'revital@happybaby.co.il',
     whatsapp: 'WhatsApp',
     instagram: 'Instagram',
-    copyright: `© ${new Date().getFullYear()} Happy Baby. כל הזכויות שמורות.`,
+    contactWriteMessage: 'כתבי לנו באתר',
+    contactWhatsApp: 'שלחי הודעה בוואטסאפ',
+    contactEmail: 'שלחי מייל',
+    copyright: `\u00A9 ${new Date().getFullYear()} Hapby Baby. כל הזכויות שמורות.`,
     madeWith: 'נבנה באהבה עבור אמהות וילדים',
   },
   en: {
@@ -41,7 +44,7 @@ const FOOTER_TEXT = {
     videoLibrary: 'Video Library',
     aiChat: 'Smart AI Chat',
     academy: 'Academy',
-    academyTitle: 'Happy Baby Academy',
+    academyTitle: 'Hapby Baby Academy',
     professionalCourse: 'Professional Course',
     practiceTools: 'Practice Tools',
     eventsCommunity: 'Events & Community',
@@ -58,9 +61,43 @@ const FOOTER_TEXT = {
     email: 'revital@happybaby.co.il',
     whatsapp: 'WhatsApp',
     instagram: 'Instagram',
-    copyright: `© ${new Date().getFullYear()} Happy Baby. All rights reserved.`,
+    contactWriteMessage: 'Write us on the site',
+    contactWhatsApp: 'Message us on WhatsApp',
+    contactEmail: 'Send us an email',
+    copyright: `\u00A9 ${new Date().getFullYear()} Hapby Baby. All rights reserved.`,
     madeWith: 'Built with love for mothers and children',
   },
+};
+
+const footerHeadingStyle = {
+  fontSize: '1rem',
+  fontWeight: 800,
+  color: 'white',
+  marginBottom: 18,
+  letterSpacing: '0.1em',
+  paddingBottom: 10,
+  borderBottom: '2px solid rgba(255,255,255,0.25)',
+  display: 'inline-block',
+};
+
+const footerLinkStyle = {
+  color: 'rgba(255,255,255,0.7)',
+  textDecoration: 'none',
+  fontSize: '0.85rem',
+  transition: 'color 0.2s',
+};
+
+const contactItemStyle = {
+  display: 'flex',
+  alignItems: 'center',
+  gap: 8,
+  color: 'rgba(255,255,255,0.85)',
+  textDecoration: 'none',
+  fontSize: '0.85rem',
+  transition: 'color 0.2s, background 0.2s',
+  padding: '6px 10px',
+  borderRadius: 8,
+  background: 'rgba(255,255,255,0.06)',
 };
 
 export default function Footer() {
@@ -90,11 +127,15 @@ export default function Footer() {
       }}>
         {/* Brand Column */}
         <div style={{ maxWidth: 280 }}>
-          <img
-            src="/happy-baby-logo.png"
-            alt="Happy Baby"
-            style={{ height: 50, objectFit: 'contain', marginBottom: 16, filter: 'brightness(10)' }}
-          />
+          <div style={{
+            fontSize: '1.5rem',
+            fontWeight: 800,
+            color: 'white',
+            marginBottom: 16,
+            lineHeight: 1.2,
+          }}>
+            hapby baby
+          </div>
           <p style={{ fontSize: '0.85rem', lineHeight: 1.7, color: 'rgba(255,255,255,0.7)', margin: 0 }}>
             {t.brandDesc}
           </p>
@@ -154,11 +195,8 @@ export default function Footer() {
 
         {/* Services Column */}
         <div>
-          <h4 style={{
-            fontSize: '0.9rem', fontWeight: 800, color: 'white',
-            marginBottom: 16, textTransform: 'uppercase', letterSpacing: '0.05em',
-          }}>
-            {t.servicesTitle}
+          <h4 style={footerHeadingStyle}>
+            ✨ {t.servicesTitle}
           </h4>
           <ul style={{ listStyle: 'none', padding: 0, margin: 0, display: 'flex', flexDirection: 'column', gap: 10 }}>
             {[
@@ -169,10 +207,7 @@ export default function Footer() {
               { label: t.aiChat, to: user ? '/chat' : '/login' },
             ].map((item, i) => (
               <li key={i}>
-                <Link to={item.to} style={{
-                  color: 'rgba(255,255,255,0.7)', textDecoration: 'none',
-                  fontSize: '0.85rem', transition: 'color 0.2s',
-                }}
+                <Link to={item.to} style={footerLinkStyle}
                 onMouseEnter={e => e.currentTarget.style.color = 'white'}
                 onMouseLeave={e => e.currentTarget.style.color = 'rgba(255,255,255,0.7)'}
                 >
@@ -185,11 +220,8 @@ export default function Footer() {
 
         {/* Academy Column */}
         <div>
-          <h4 style={{
-            fontSize: '0.9rem', fontWeight: 800, color: 'white',
-            marginBottom: 16, textTransform: 'uppercase', letterSpacing: '0.05em',
-          }}>
-            {t.academyTitle}
+          <h4 style={footerHeadingStyle}>
+            🎓 {t.academyTitle}
           </h4>
           <ul style={{ listStyle: 'none', padding: 0, margin: 0, display: 'flex', flexDirection: 'column', gap: 10 }}>
             {[
@@ -199,10 +231,7 @@ export default function Footer() {
               { label: t.digitalLibrary, to: user?.role === 'student' ? '/academy/library' : academyBase },
             ].map((item, i) => (
               <li key={i}>
-                <Link to={item.to} style={{
-                  color: 'rgba(255,255,255,0.7)', textDecoration: 'none',
-                  fontSize: '0.85rem', transition: 'color 0.2s',
-                }}
+                <Link to={item.to} style={footerLinkStyle}
                 onMouseEnter={e => e.currentTarget.style.color = 'white'}
                 onMouseLeave={e => e.currentTarget.style.color = 'rgba(255,255,255,0.7)'}
                 >
@@ -215,18 +244,12 @@ export default function Footer() {
 
         {/* Support & Contact Column */}
         <div>
-          <h4 style={{
-            fontSize: '0.9rem', fontWeight: 800, color: 'white',
-            marginBottom: 16, textTransform: 'uppercase', letterSpacing: '0.05em',
-          }}>
-            {t.supportTitle}
+          <h4 style={footerHeadingStyle}>
+            💛 {t.supportTitle}
           </h4>
           <ul style={{ listStyle: 'none', padding: 0, margin: 0, display: 'flex', flexDirection: 'column', gap: 10 }}>
             <li>
-              <Link to="/about" style={{
-                color: 'rgba(255,255,255,0.7)', textDecoration: 'none',
-                fontSize: '0.85rem', transition: 'color 0.2s',
-              }}
+              <Link to="/about" style={footerLinkStyle}
               onMouseEnter={e => e.currentTarget.style.color = 'white'}
               onMouseLeave={e => e.currentTarget.style.color = 'rgba(255,255,255,0.7)'}
               >
@@ -234,25 +257,7 @@ export default function Footer() {
               </Link>
             </li>
             <li>
-              <a
-                href="https://wa.me/972547767676"
-                target="_blank"
-                rel="noopener noreferrer"
-                style={{
-                  color: 'rgba(255,255,255,0.7)', textDecoration: 'none',
-                  fontSize: '0.85rem', transition: 'color 0.2s',
-                }}
-                onMouseEnter={e => e.currentTarget.style.color = 'white'}
-                onMouseLeave={e => e.currentTarget.style.color = 'rgba(255,255,255,0.7)'}
-              >
-                {t.contactUs}
-              </a>
-            </li>
-            <li>
-              <Link to="/faq" style={{
-                color: 'rgba(255,255,255,0.7)', textDecoration: 'none',
-                fontSize: '0.85rem', transition: 'color 0.2s',
-              }}
+              <Link to="/faq" style={footerLinkStyle}
               onMouseEnter={e => e.currentTarget.style.color = 'white'}
               onMouseLeave={e => e.currentTarget.style.color = 'rgba(255,255,255,0.7)'}
               >
@@ -260,10 +265,7 @@ export default function Footer() {
               </Link>
             </li>
             <li>
-              <Link to="/terms" style={{
-                color: 'rgba(255,255,255,0.7)', textDecoration: 'none',
-                fontSize: '0.85rem', transition: 'color 0.2s',
-              }}
+              <Link to="/terms" style={footerLinkStyle}
               onMouseEnter={e => e.currentTarget.style.color = 'white'}
               onMouseLeave={e => e.currentTarget.style.color = 'rgba(255,255,255,0.7)'}
               >
@@ -271,10 +273,7 @@ export default function Footer() {
               </Link>
             </li>
             <li>
-              <Link to="/privacy" style={{
-                color: 'rgba(255,255,255,0.7)', textDecoration: 'none',
-                fontSize: '0.85rem', transition: 'color 0.2s',
-              }}
+              <Link to="/privacy" style={footerLinkStyle}
               onMouseEnter={e => e.currentTarget.style.color = 'white'}
               onMouseLeave={e => e.currentTarget.style.color = 'rgba(255,255,255,0.7)'}
               >
@@ -282,10 +281,7 @@ export default function Footer() {
               </Link>
             </li>
             <li>
-              <Link to="/accessibility" style={{
-                color: 'rgba(255,255,255,0.7)', textDecoration: 'none',
-                fontSize: '0.85rem', transition: 'color 0.2s',
-              }}
+              <Link to="/accessibility" style={footerLinkStyle}
               onMouseEnter={e => e.currentTarget.style.color = 'white'}
               onMouseLeave={e => e.currentTarget.style.color = 'rgba(255,255,255,0.7)'}
               >
@@ -294,13 +290,50 @@ export default function Footer() {
             </li>
           </ul>
 
-          {/* Contact info */}
-          <div style={{ marginTop: 20, display: 'flex', flexDirection: 'column', gap: 8 }}>
-            <a href="tel:+972547767676" style={{ color: 'rgba(255,255,255,0.7)', textDecoration: 'none', fontSize: '0.85rem' }}>
-              📞 {t.phone}
+          {/* Contact Us - multiple options */}
+          <div style={{
+            marginTop: 20,
+            display: 'flex',
+            flexDirection: 'column',
+            gap: 8,
+          }}>
+            <div style={{
+              fontSize: '0.8rem',
+              fontWeight: 700,
+              color: 'rgba(255,255,255,0.9)',
+              marginBottom: 4,
+              letterSpacing: '0.05em',
+            }}>
+              {t.contactTitle}
+            </div>
+            <Link
+              to="/contact"
+              style={contactItemStyle}
+              onMouseEnter={e => { e.currentTarget.style.background = 'rgba(255,255,255,0.12)'; e.currentTarget.style.color = 'white'; }}
+              onMouseLeave={e => { e.currentTarget.style.background = 'rgba(255,255,255,0.06)'; e.currentTarget.style.color = 'rgba(255,255,255,0.85)'; }}
+            >
+              <span style={{ fontSize: '1rem' }}>💬</span>
+              {t.contactWriteMessage}
+            </Link>
+            <a
+              href="https://wa.me/972547767676"
+              target="_blank"
+              rel="noopener noreferrer"
+              style={contactItemStyle}
+              onMouseEnter={e => { e.currentTarget.style.background = 'rgba(37,211,102,0.2)'; e.currentTarget.style.color = 'white'; }}
+              onMouseLeave={e => { e.currentTarget.style.background = 'rgba(255,255,255,0.06)'; e.currentTarget.style.color = 'rgba(255,255,255,0.85)'; }}
+            >
+              <span style={{ fontSize: '1rem' }}>📱</span>
+              {t.contactWhatsApp}
             </a>
-            <a href="mailto:revital@happybaby.co.il" style={{ color: 'rgba(255,255,255,0.7)', textDecoration: 'none', fontSize: '0.85rem' }}>
-              ✉️ {t.email}
+            <a
+              href="mailto:revital@happybaby.co.il"
+              style={contactItemStyle}
+              onMouseEnter={e => { e.currentTarget.style.background = 'rgba(255,255,255,0.12)'; e.currentTarget.style.color = 'white'; }}
+              onMouseLeave={e => { e.currentTarget.style.background = 'rgba(255,255,255,0.06)'; e.currentTarget.style.color = 'rgba(255,255,255,0.85)'; }}
+            >
+              <span style={{ fontSize: '1rem' }}>✉️</span>
+              {t.contactEmail}
             </a>
           </div>
         </div>
@@ -321,7 +354,7 @@ export default function Footer() {
         <span style={{ fontSize: '0.8rem', color: 'rgba(255,255,255,0.5)' }}>
           {t.copyright}
         </span>
-        <span style={{ fontSize: '0.8rem', color: 'rgba(255,255,255,0.5)' }}>
+        <span style={{ fontSize: '0.85rem', color: 'rgba(255,255,255,0.65)', fontWeight: 500 }}>
           💜 {t.madeWith}
         </span>
       </div>

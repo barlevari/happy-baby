@@ -7,7 +7,7 @@ import Footer from '../components/Footer';
 const PAGE_TEXT = {
   he: {
     tagline: 'מלווים אותך בכל שלב של המסע',
-    subtitle: 'Happy Baby | ליווי הריון ולידה מקצועי',
+    subtitle: 'Hapby Baby | ליווי הריון ולידה מקצועי',
     // Milestones
     milestone4: 'פעימת לב ראשונה',
     milestone12: 'סוף טרימסטר ראשון',
@@ -20,7 +20,7 @@ const PAGE_TEXT = {
     momsTitle: 'אני בהריון / יולדת',
     momsDesc: 'מעקב אישי, טיפים שבועיים ותמיכה לאורך כל הדרך',
     momsCta: 'בואי נתחיל',
-    academyTitle: 'אני רוצה ללמוד Happy Baby',
+    academyTitle: 'אני רוצה ללמוד Hapby Baby',
     academyDesc: 'קורס מקצועי לרכישת השיטה ולווי אמהות',
     academyCta: 'לפרטים נוספים',
     // Features
@@ -30,11 +30,11 @@ const PAGE_TEXT = {
     supportLabel: 'תמיכה',
     eventsLabel: 'אירועים',
     // Footer
-    footer: 'happy baby \u00A9 2025 | כל הזכויות שמורות',
+    footer: 'hapby baby \u00A9 2025 | כל הזכויות שמורות',
   },
   en: {
     tagline: 'With you at every step of the journey',
-    subtitle: 'Happy Baby | Professional Pregnancy & Birth Support',
+    subtitle: 'Hapby Baby | Professional Pregnancy & Birth Support',
     milestone4: 'First heartbeat',
     milestone12: 'End of first trimester',
     milestone20: 'First kicks',
@@ -45,7 +45,7 @@ const PAGE_TEXT = {
     momsTitle: 'I\'m pregnant / a new mom',
     momsDesc: 'Personal tracking, weekly tips and support all the way',
     momsCta: 'Let\'s get started',
-    academyTitle: 'I want to learn Happy Baby',
+    academyTitle: 'I want to learn Hapby Baby',
     academyDesc: 'Professional course for learning the method and supporting mothers',
     academyCta: 'Learn more',
     weeklyTracking: 'Weekly Tracking',
@@ -53,7 +53,7 @@ const PAGE_TEXT = {
     videosLabel: 'Videos',
     supportLabel: 'Support',
     eventsLabel: 'Events',
-    footer: 'happy baby \u00A9 2025 | All rights reserved',
+    footer: 'hapby baby \u00A9 2025 | All rights reserved',
   },
 };
 
@@ -368,7 +368,7 @@ export default function Landing() {
         {/* Logo */}
         <img
           src="/happy-baby-logo.png"
-          alt="happy baby"
+          alt="hapby baby"
           style={{
             height: 'clamp(100px, 18vw, 170px)',
             objectFit: 'contain',

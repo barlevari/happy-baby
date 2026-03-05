@@ -34,8 +34,8 @@ const PAGE_TEXT = {
     // Role cards
     roleMomsTitle: 'אני בהריון / יולדת',
     roleMomsDesc: 'מעקב הריון אישי, טיפים שבועיים, ניהול בדיקות ותמיכה',
-    roleStudentTitle: 'אני רוצה ללמוד Happy Baby',
-    roleStudentDesc: 'קורס מקצועי לרכישת שיטת Happy Baby ולווי אמהות',
+    roleStudentTitle: 'אני רוצה ללמוד Hapby Baby',
+    roleStudentDesc: 'קורס מקצועי לרכישת שיטת Hapby Baby ולווי אמהות',
     roleAdminTitle: 'מנהל / מנהלת האתר',
     roleAdminDesc: 'גישה מלאה לניהול משתמשים, תוכן ואבטחה (נדרש קוד מנהל)',
 
@@ -82,8 +82,8 @@ const PAGE_TEXT = {
     // Role cards
     roleMomsTitle: "I'm pregnant / a new mom",
     roleMomsDesc: 'Personal pregnancy tracking, weekly tips, test management, and support',
-    roleStudentTitle: 'I want to learn Happy Baby',
-    roleStudentDesc: 'Professional course to learn the Happy Baby method and support mothers',
+    roleStudentTitle: 'I want to learn Hapby Baby',
+    roleStudentDesc: 'Professional course to learn the Hapby Baby method and support mothers',
     roleAdminTitle: 'Site Administrator',
     roleAdminDesc: 'Full access to manage users, content, and security (admin code required)',
 
@@ -283,7 +283,7 @@ export default function Register() {
       }}>
         {/* Logo */}
         <div style={{ display: 'flex', justifyContent: 'center', marginBottom: 20 }}>
-          <img src="/happy-baby-logo.png" alt="happy baby" style={{ height: 72, objectFit: 'contain' }} />
+          <img src="/happy-baby-logo.png" alt="hapby baby" style={{ height: 72, objectFit: 'contain' }} />
         </div>
 
         {/* Progress */}

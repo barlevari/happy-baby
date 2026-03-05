@@ -10,7 +10,7 @@ const PAGE_TEXT = {
 
     // 1. Introduction
     introTitle: '1. מבוא',
-    introP1: 'Happy Baby (להלן: "אנחנו", "שלנו" או "הפלטפורמה"), בבעלות רויטל לב ארי, מחויבת להגנה על פרטיותך. מדיניות פרטיות זו מסבירה כיצד אנו אוספים, משתמשים, מאחסנים ומגנים על המידע האישי שלך בעת השימוש בפלטפורמה.',
+    introP1: 'Hapby Baby (להלן: "אנחנו", "שלנו" או "הפלטפורמה"), בבעלות רויטל לב ארי, מחויבת להגנה על פרטיותך. מדיניות פרטיות זו מסבירה כיצד אנו אוספים, משתמשים, מאחסנים ומגנים על המידע האישי שלך בעת השימוש בפלטפורמה.',
     introP2: 'השימוש בשירות מהווה הסכמה לאיסוף ולשימוש במידע כמתואר במדיניות זו.',
 
     // 2. Information Collected
@@ -104,7 +104,7 @@ const PAGE_TEXT = {
 
     // 1. Introduction
     introTitle: '1. Introduction',
-    introP1: 'Happy Baby (hereinafter: "we", "our", or "the Platform"), owned by Revital Lev Ari, is committed to protecting your privacy. This Privacy Policy explains how we collect, use, store, and protect your personal information when using the Platform.',
+    introP1: 'Hapby Baby (hereinafter: "we", "our", or "the Platform"), owned by Revital Lev Ari, is committed to protecting your privacy. This Privacy Policy explains how we collect, use, store, and protect your personal information when using the Platform.',
     introP2: 'By using the Service, you consent to the collection and use of information as described in this policy.',
 
     // 2. Information Collected

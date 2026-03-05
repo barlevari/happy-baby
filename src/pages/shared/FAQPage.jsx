@@ -6,7 +6,7 @@ import { useLanguage, usePageText } from '../../context/LanguageContext';
 const PAGE_TEXT = {
   he: {
     pageTitle: 'שאלות נפוצות',
-    pageSubtitle: 'מצאי תשובות לשאלות הנפוצות ביותר על Happy Baby',
+    pageSubtitle: 'מצאי תשובות לשאלות הנפוצות ביותר על Hapby Baby',
     searchPlaceholder: 'חיפוש שאלה...',
     noResults: 'לא נמצאו תוצאות. נסי לחפש במילים אחרות או פני אלינו ישירות.',
     contactPrompt: 'לא מצאת תשובה?',
@@ -22,11 +22,11 @@ const PAGE_TEXT = {
     catBilling: 'תשלומים ומנויים',
 
     // General
-    q1: 'מה זה Happy Baby?',
-    a1: 'Happy Baby היא פלטפורמה דיגיטלית מקיפה לליווי נשים במהלך ההריון, הלידה ותקופת ההתאוששות. הפלטפורמה שלנו מבוססת על למעלה מ-35 שנות ניסיון קליני ברפואה סינית, ומשלבת ידע מסורתי עם כלים טכנולוגיים מתקדמים. תוכלי למצוא אצלנו סרטונים, מאמרים, מעקב הריון מותאם אישית ועוד.',
+    q1: 'מה זה Hapby Baby?',
+    a1: 'Hapby Baby היא פלטפורמה דיגיטלית מקיפה לליווי נשים במהלך ההריון, הלידה ותקופת ההתאוששות. הפלטפורמה שלנו מבוססת על למעלה מ-35 שנות ניסיון קליני ברפואה סינית, ומשלבת ידע מסורתי עם כלים טכנולוגיים מתקדמים. תוכלי למצוא אצלנו סרטונים, מאמרים, מעקב הריון מותאם אישית ועוד.',
 
-    q2: 'למי מיועדת Happy Baby?',
-    a2: 'Happy Baby מיועדת לנשים בהריון, אמהות טריות ובני זוגן, וכן לסטודנטיות ומטפלות ברפואה משלימה שרוצות להעמיק את הידע שלהן. המסלולים שלנו מותאמים בנפרד לכל קהל יעד, כך שכל משתמשת מקבלת את התוכן הרלוונטי ביותר עבורה.',
+    q2: 'למי מיועדת Hapby Baby?',
+    a2: 'Hapby Baby מיועדת לנשים בהריון, אמהות טריות ובני זוגן, וכן לסטודנטיות ומטפלות ברפואה משלימה שרוצות להעמיק את הידע שלהן. המסלולים שלנו מותאמים בנפרד לכל קהל יעד, כך שכל משתמשת מקבלת את התוכן הרלוונטי ביותר עבורה.',
 
     q3: 'איך נרשמים לפלטפורמה?',
     a3: 'ההרשמה פשוטה ומהירה. לחצי על כפתור "הרשמה" בדף הבית, הזיני שם, אימייל וסיסמה, ובחרי את המסלול המתאים לך (מטופלות או סטודנטיות). לאחר אימות האימייל, תוכלי להתחיל לגלוש בתכנים מיד.',
@@ -52,7 +52,7 @@ const PAGE_TEXT = {
     a9: 'כרגע הסרטונים זמינים לצפייה בסטרימינג באתר בלבד. אנחנו עובדים על פיתוח אפשרות לצפייה אופליין באפליקציה העתידית. בינתיים, ניתן לצפות בסרטונים מכל מכשיר עם חיבור לאינטרנט.',
 
     // Academy
-    q10: 'מהי האקדמיה של Happy Baby?',
+    q10: 'מהי האקדמיה של Hapby Baby?',
     a10: 'האקדמיה היא מסלול לימודי מעמיק המיועד לסטודנטיות ומטפלות ברפואה משלימה. המסלול כולל סילבוס מקצועי, ספריית לימוד, תרגולים מעשיים ומפגשים חיים. זהו המסלול המתקדם ביותר שלנו, שנועד להכשיר דור חדש של מטפלות.',
 
     q11: 'מי יכולה להצטרף לאקדמיה?',
@@ -83,7 +83,7 @@ const PAGE_TEXT = {
   },
   en: {
     pageTitle: 'Frequently Asked Questions',
-    pageSubtitle: 'Find answers to the most common questions about Happy Baby',
+    pageSubtitle: 'Find answers to the most common questions about Hapby Baby',
     searchPlaceholder: 'Search questions...',
     noResults: 'No results found. Try different keywords or contact us directly.',
     contactPrompt: 'Didn\'t find your answer?',
@@ -99,11 +99,11 @@ const PAGE_TEXT = {
     catBilling: 'Billing & Subscriptions',
 
     // General
-    q1: 'What is Happy Baby?',
-    a1: 'Happy Baby is a comprehensive digital platform for supporting women throughout pregnancy, birth, and recovery. Our platform is based on over 35 years of clinical experience in Chinese medicine, combining traditional knowledge with advanced technological tools. You\'ll find videos, articles, personalized pregnancy tracking, and more.',
+    q1: 'What is Hapby Baby?',
+    a1: 'Hapby Baby is a comprehensive digital platform for supporting women throughout pregnancy, birth, and recovery. Our platform is based on over 35 years of clinical experience in Chinese medicine, combining traditional knowledge with advanced technological tools. You\'ll find videos, articles, personalized pregnancy tracking, and more.',
 
-    q2: 'Who is Happy Baby for?',
-    a2: 'Happy Baby is designed for pregnant women, new mothers and their partners, as well as students and practitioners in complementary medicine who want to deepen their knowledge. Our tracks are separately tailored for each audience, so every user receives the most relevant content for them.',
+    q2: 'Who is Hapby Baby for?',
+    a2: 'Hapby Baby is designed for pregnant women, new mothers and their partners, as well as students and practitioners in complementary medicine who want to deepen their knowledge. Our tracks are separately tailored for each audience, so every user receives the most relevant content for them.',
 
     q3: 'How do I register?',
     a3: 'Registration is quick and easy. Click the "Sign Up" button on the homepage, enter your name, email, and password, then choose the track that suits you (patients or students). After verifying your email, you can start browsing content right away.',
@@ -129,7 +129,7 @@ const PAGE_TEXT = {
     a9: 'Currently, videos are available for streaming on the website only. We are working on developing offline viewing capability in the upcoming mobile app. In the meantime, you can watch videos from any device with an internet connection.',
 
     // Academy
-    q10: 'What is the Happy Baby Academy?',
+    q10: 'What is the Hapby Baby Academy?',
     a10: 'The Academy is an in-depth learning track designed for students and practitioners in complementary medicine. The track includes a professional syllabus, study library, practical exercises, and live sessions. This is our most advanced track, designed to train a new generation of practitioners.',
 
     q11: 'Who can join the Academy?',

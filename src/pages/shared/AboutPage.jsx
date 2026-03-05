@@ -10,7 +10,7 @@ const PAGE_TEXT = {
     cred2Title: '35+ שנות ניסיון קליני',
     cred2Desc: 'ניסיון קליני עשיר של למעלה מ-35 שנה בליווי נשים, תינוקות ומשפחות.',
     cred3Title: 'גישה הוליסטית ומחברת',
-    cred3Desc: 'שיטת Happy Baby מאחדת רפואה סינית, מדע מודרני ואינטואיציה הורית ליצירת שגרה בריאה.',
+    cred3Desc: 'שיטת Hapby Baby מאחדת רפואה סינית, מדע מודרני ואינטואיציה הורית ליצירת שגרה בריאה.',
 
     // Specialties
     spec1: 'רפואה סינית לתינוקות וילדים',
@@ -23,14 +23,14 @@ const PAGE_TEXT = {
     // Hero
     imgAlt: 'רויטל לב ארי',
     heroName: 'רויטל לב ארי',
-    heroTitle: 'מייסדת Happy Baby | מומחית ברפואה סינית לתינוקות, ילדים, הריון ולידה',
+    heroTitle: 'מייסדת Hapby Baby | מומחית ברפואה סינית לתינוקות, ילדים, הריון ולידה',
     heroIntro: 'נעים מאוד! אני רויטל לב ארי, נשואה לשחר ואמא לבר ואביב. מקדישה חיים ללימודי רפואה סינית ולממשק הייחודי של רפואה סינית לתינוקות, ילדים, הריון ולידה — תחום ייחודי ונדיר שאני גאה להיות בין המובילות בו בארץ.',
 
     // Story section
     storyTitle: '🌱 הסיפור שלי',
     storyP1: 'הדרך שלי לרפואה סינית התחילה מתוך סקרנות ואהבה עמוקה לרפואה הוליסטית. לאחר שנים של לימוד ופרקטיקה, התמחיתי בתחום שגיליתי שהוא הלב שלי — ליווי אמהות בהריון, לידה, ותקופת הגדילה של התינוקות.',
-    storyP2: 'ניסיון קליני של למעלה מ-35 שנה לימד אותי שכל אמא, כל תינוק וכל משפחה הם עולם ומלואו. שיטת Happy Baby נולדה מתוך הרצון לתת לכל אמא — ולכל מי שמלווה אמהות — את הכלים, הידע והביטחון שהם צריכים.',
-    storyP3: 'Happy Baby היא לא רק שיטה — זו פילוסופיה של ליווי חם, מקצועי ומבוסס ניסיון שמאמינה בכל אמא ובכל תינוק.',
+    storyP2: 'ניסיון קליני של למעלה מ-35 שנה לימד אותי שכל אמא, כל תינוק וכל משפחה הם עולם ומלואו. שיטת Hapby Baby נולדה מתוך הרצון לתת לכל אמא — ולכל מי שמלווה אמהות — את הכלים, הידע והביטחון שהם צריכים.',
+    storyP3: 'Hapby Baby היא לא רק שיטה — זו פילוסופיה של ליווי חם, מקצועי ומבוסס ניסיון שמאמינה בכל אמא ובכל תינוק.',
 
     // Specialties section
     specialtiesTitle: '✨ תחומי התמחות',
@@ -49,7 +49,7 @@ const PAGE_TEXT = {
     cred2Title: '35+ Years of Clinical Experience',
     cred2Desc: 'Over 35 years of rich clinical experience supporting women, infants, and families.',
     cred3Title: 'Holistic & Integrative Approach',
-    cred3Desc: 'The Happy Baby method unites Chinese medicine, modern science, and parental intuition to create a healthy routine.',
+    cred3Desc: 'The Hapby Baby method unites Chinese medicine, modern science, and parental intuition to create a healthy routine.',
 
     // Specialties
     spec1: 'Chinese medicine for infants and children',
@@ -62,14 +62,14 @@ const PAGE_TEXT = {
     // Hero
     imgAlt: 'Roital Lev Ari',
     heroName: 'Roital Lev Ari',
-    heroTitle: 'Founder of Happy Baby | Chinese Medicine Specialist for Infants, Children, Pregnancy & Birth',
+    heroTitle: 'Founder of Hapby Baby | Chinese Medicine Specialist for Infants, Children, Pregnancy & Birth',
     heroIntro: 'Nice to meet you! I\'m Roital Lev Ari, married to Shachar and mother to Bar and Aviv. I\'ve dedicated my life to studying Chinese medicine and the unique intersection of Chinese medicine for infants, children, pregnancy, and birth — a unique and rare field that I\'m proud to be among the leaders of in Israel.',
 
     // Story section
     storyTitle: '🌱 My Story',
     storyP1: 'My journey to Chinese medicine began with curiosity and a deep love for holistic medicine. After years of study and practice, I specialized in the field I discovered was my heart\'s calling — supporting mothers through pregnancy, birth, and their babies\' growth.',
-    storyP2: 'Over 35 years of clinical experience taught me that every mother, every baby, and every family is a world of their own. The Happy Baby method was born from the desire to give every mother — and everyone who supports mothers — the tools, knowledge, and confidence they need.',
-    storyP3: 'Happy Baby is not just a method — it\'s a philosophy of warm, professional, experience-based care that believes in every mother and every baby.',
+    storyP2: 'Over 35 years of clinical experience taught me that every mother, every baby, and every family is a world of their own. The Hapby Baby method was born from the desire to give every mother — and everyone who supports mothers — the tools, knowledge, and confidence they need.',
+    storyP3: 'Hapby Baby is not just a method — it\'s a philosophy of warm, professional, experience-based care that believes in every mother and every baby.',
 
     // Specialties section
     specialtiesTitle: '✨ Areas of Expertise',
@@ -145,7 +145,7 @@ export default function AboutPage() {
                 e.target.parentElement.style.alignItems = 'center';
                 e.target.parentElement.style.justifyContent = 'center';
                 e.target.parentElement.style.fontSize = '4rem';
-                e.target.parentElement.innerHTML = '<img src="/happy-baby-logo.png" style="width:80%;height:80%;object-fit:contain" alt="happy baby"/>';
+                e.target.parentElement.innerHTML = '<img src="/happy-baby-logo.png" style="width:80%;height:80%;object-fit:contain" alt="hapby baby"/>';
               }}
             />
           </div>
