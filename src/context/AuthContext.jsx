@@ -105,23 +105,37 @@ export function AuthProvider({ children }) {
   // ── Supabase helpers ──
 
   async function fetchProfile(userId) {
-    const { data, error } = await supabase
-      .from('profiles')
-      .select('*')
-      .eq('id', userId)
-      .single();
-    if (error || !data) return null;
-    return {
-      id: data.id,
-      name: data.name,
-      email: data.email,
-      role: data.role,
-      idNumber: data.id_number,
-      lmpDate: data.lmp_date,
-      status: data.status,
-      subscriptionStatus: data.subscription_status,
-      joined: data.created_at?.split('T')[0],
-    };
+    try {
+      const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
+      const supabaseKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
+      const { data: { session } } = await supabase.auth.getSession();
+      const res = await fetch(
+        `${supabaseUrl}/rest/v1/profiles?id=eq.${userId}&select=*`,
+        {
+          headers: {
+            'apikey': supabaseKey,
+            'Authorization': `Bearer ${session?.access_token || supabaseKey}`,
+          },
+        }
+      );
+      if (!res.ok) return null;
+      const rows = await res.json();
+      if (!rows.length) return null;
+      const data = rows[0];
+      return {
+        id: data.id,
+        name: data.name,
+        email: data.email,
+        role: data.role,
+        idNumber: data.id_number,
+        lmpDate: data.lmp_date,
+        status: data.status,
+        subscriptionStatus: data.subscription_status,
+        joined: data.created_at?.split('T')[0],
+      };
+    } catch {
+      return null;
+    }
   }
 
   // ── Mock mode helpers ──
@@ -225,29 +239,34 @@ export function AuthProvider({ children }) {
         }
       }
 
-      // Step 3: Create profile with timeout to prevent infinite hang
+      // Step 3: Create profile via direct REST call
+      // (Supabase JS client's .upsert() hangs in some environments)
       const adminStatus = role === 'admin' ? 'approved' : 'pending';
       try {
-        const upsertPromise = supabase.from('profiles').upsert({
-          id: userId,
-          name,
-          email,
-          role,
-          id_number: idNumber,
-          lmp_date: lmpDate || null,
-          status: adminStatus,
-        }, { onConflict: 'id' });
-
-        const timeoutPromise = new Promise((_, reject) =>
-          setTimeout(() => reject(new Error('timeout')), 8000)
-        );
-
-        const { error: profileError } = await Promise.race([upsertPromise, timeoutPromise]);
-        if (profileError) {
-          console.error('Profile creation error:', profileError);
+        const { data: { session: currentSession } } = await supabase.auth.getSession();
+        const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
+        const supabaseKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
+        const res = await fetch(`${supabaseUrl}/rest/v1/profiles`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'apikey': supabaseKey,
+            'Authorization': `Bearer ${currentSession?.access_token || supabaseKey}`,
+            'Prefer': 'resolution=merge-duplicates',
+          },
+          body: JSON.stringify({
+            id: userId, name, email, role,
+            id_number: idNumber,
+            lmp_date: lmpDate || null,
+            status: adminStatus,
+          }),
+        });
+        if (!res.ok) {
+          const errText = await res.text();
+          console.error('Profile creation error:', res.status, errText);
         }
       } catch (e) {
-        console.error('Profile upsert failed/timed out:', e.message);
+        console.error('Profile creation failed:', e.message);
       }
 
       if (role === 'admin') {
