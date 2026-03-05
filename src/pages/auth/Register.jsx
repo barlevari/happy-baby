@@ -145,17 +145,23 @@ export default function Register() {
     e.preventDefault();
     if (!validateStep2()) return;
     setLoading(true);
-    const result = await register({ ...form, role });
-    setLoading(false);
-    if (!result.ok) { setSubmitError(result.error); return; }
+    setSubmitError('');
+    try {
+      const result = await register({ ...form, role });
+      setLoading(false);
+      if (!result.ok) { setSubmitError(result.error); return; }
 
-    if (role === 'admin') {
-      navigate('/admin');
-    } else if (result.pending) {
-      setRegistered(true);
-    } else {
-      if (role === 'moms') navigate('/moms');
-      else if (role === 'student') navigate('/academy');
+      if (role === 'admin') {
+        navigate('/admin');
+      } else if (result.pending) {
+        setRegistered(true);
+      } else {
+        if (role === 'moms') navigate('/moms');
+        else if (role === 'student') navigate('/academy');
+      }
+    } catch (err) {
+      setLoading(false);
+      setSubmitError(err.message || 'שגיאה לא צפויה, נסו שוב');
     }
   };
 
@@ -276,8 +282,8 @@ export default function Register() {
         border: '1px solid var(--color-border)',
       }}>
         {/* Logo */}
-        <div style={{ textAlign: 'center', marginBottom: 24 }}>
-          <img src="/happy-baby-logo.png" alt="happy baby" style={{ height: 56, objectFit: 'contain', mixBlendMode: 'multiply' }} />
+        <div style={{ display: 'flex', justifyContent: 'center', marginBottom: 20 }}>
+          <img src="/happy-baby-logo.png" alt="happy baby" style={{ height: 72, objectFit: 'contain' }} />
         </div>
 
         {/* Progress */}
@@ -420,15 +426,18 @@ export default function Register() {
               {role === 'moms' && (
                 <div className="form-group">
                   <label className="form-label">{pt('lmpLabel')}</label>
-                  <input
-                    type="date"
-                    lang="en"
-                    className={`form-input${errors.lmpDate ? ' error' : ''}`}
-                    value={form.lmpDate}
-                    onChange={e => updateField('lmpDate', e.target.value)}
-                    dir="ltr"
-                    max={new Date().toISOString().split('T')[0]}
-                  />
+                  <div lang="en" dir="ltr">
+                    <input
+                      type="date"
+                      lang="en"
+                      className={`form-input${errors.lmpDate ? ' error' : ''}`}
+                      value={form.lmpDate}
+                      onChange={e => updateField('lmpDate', e.target.value)}
+                      dir="ltr"
+                      max={new Date().toISOString().split('T')[0]}
+                      style={{ width: '100%' }}
+                    />
+                  </div>
                   {errors.lmpDate && <span className="form-error">{errors.lmpDate}</span>}
                   <span style={{ fontSize: '0.75rem', color: 'var(--color-text-muted)' }}>
                     {pt('lmpHint')}

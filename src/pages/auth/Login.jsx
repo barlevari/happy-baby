@@ -80,18 +80,23 @@ export default function Login() {
       return;
     }
     setLoading(true);
-    const result = await login(email, password);
-    setLoading(false);
-    if (!result.ok) {
-      if (result.pending) setIsPending(true);
-      setError(result.error);
-      return;
+    try {
+      const result = await login(email, password);
+      setLoading(false);
+      if (!result.ok) {
+        if (result.pending) setIsPending(true);
+        setError(result.error);
+        return;
+      }
+      const { user } = result;
+      if (user.role === 'moms') navigate('/moms');
+      else if (user.role === 'student') navigate('/academy');
+      else if (user.role === 'admin') navigate('/admin');
+      else navigate('/');
+    } catch (err) {
+      setLoading(false);
+      setError(err.message || 'שגיאה לא צפויה, נסו שוב');
     }
-    const { user } = result;
-    if (user.role === 'moms') navigate('/moms');
-    else if (user.role === 'student') navigate('/academy');
-    else if (user.role === 'admin') navigate('/admin');
-    else navigate('/');
   };
 
   const [forgotError, setForgotError] = useState('');
@@ -278,8 +283,8 @@ export default function Login() {
         border: '1px solid var(--color-border)',
       }}>
         {/* Logo */}
-        <div style={{ textAlign: 'center', marginBottom: 32 }}>
-          <img src="/happy-baby-logo.png" alt="happy baby" style={{ height: 64, objectFit: 'contain', mixBlendMode: 'multiply' }} />
+        <div style={{ display: 'flex', justifyContent: 'center', marginBottom: 28 }}>
+          <img src="/happy-baby-logo.png" alt="happy baby" style={{ height: 72, objectFit: 'contain' }} />
         </div>
 
         <h1 style={{ textAlign: 'center', fontSize: '1.4rem', fontWeight: 800, marginBottom: 28, color: 'var(--color-text)' }}>
