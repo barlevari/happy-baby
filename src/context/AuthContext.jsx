@@ -195,7 +195,7 @@ export function AuthProvider({ children }) {
     if (isSupabaseConfigured) {
       setAuthLoading(true);
 
-      // Step 1: Create auth user (without trigger-dependent metadata)
+      // Step 1: Create auth user
       const { data, error } = await supabase.auth.signUp({
         email,
         password,
@@ -208,25 +208,27 @@ export function AuthProvider({ children }) {
         if (error.message.includes('already registered')) {
           return { ok: false, error: 'כתובת האימייל כבר רשומה במערכת' };
         }
-        // If trigger failed, try creating profile manually
-        if (error.message.includes('Database error')) {
-          // Sign up without trigger by retrying
-          const retry = await supabase.auth.signUp({ email, password, options: { data: { name } } });
-          if (retry.error) {
-            setAuthLoading(false);
-            return { ok: false, error: retry.error.message };
-          }
-        } else {
-          setAuthLoading(false);
-          return { ok: false, error: error.message };
+        return { ok: false, error: error.message };
+      }
+
+      const userId = data?.user?.id;
+      if (!userId) {
+        setAuthLoading(false);
+        return { ok: false, error: 'שגיאה ביצירת המשתמש' };
+      }
+
+      // Step 2: Ensure we have a valid session (signUp may not return one)
+      if (!data.session) {
+        const { error: signInErr } = await supabase.auth.signInWithPassword({ email, password });
+        if (signInErr) {
+          console.error('Post-signup sign-in failed:', signInErr);
         }
       }
 
-      // Step 2: Create profile manually (in case trigger didn't fire)
-      const userId = data?.user?.id;
-      if (userId) {
-        const adminStatus = role === 'admin' ? 'approved' : 'pending';
-        const { error: profileError } = await supabase.from('profiles').upsert({
+      // Step 3: Create profile with timeout to prevent infinite hang
+      const adminStatus = role === 'admin' ? 'approved' : 'pending';
+      try {
+        const upsertPromise = supabase.from('profiles').upsert({
           id: userId,
           name,
           email,
@@ -236,16 +238,23 @@ export function AuthProvider({ children }) {
           status: adminStatus,
         }, { onConflict: 'id' });
 
+        const timeoutPromise = new Promise((_, reject) =>
+          setTimeout(() => reject(new Error('timeout')), 8000)
+        );
+
+        const { error: profileError } = await Promise.race([upsertPromise, timeoutPromise]);
         if (profileError) {
           console.error('Profile creation error:', profileError);
         }
+      } catch (e) {
+        console.error('Profile upsert failed/timed out:', e.message);
+      }
 
-        if (role === 'admin') {
-          const profile = await fetchProfile(userId);
-          setUser(profile);
-          setAuthLoading(false);
-          return { ok: true, user: profile };
-        }
+      if (role === 'admin') {
+        const profile = await fetchProfile(userId);
+        setUser(profile);
+        setAuthLoading(false);
+        return { ok: true, user: profile };
       }
 
       setAuthLoading(false);
