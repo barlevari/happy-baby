@@ -338,56 +338,107 @@ export function AuthProvider({ children }) {
     return { ok: true };
   }, []);
 
+  // ── Supabase REST helper (avoids hanging PostgREST client) ──
+
+  async function sbRest(path, { method = 'GET', body, token } = {}) {
+    const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
+    const supabaseKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
+    let accessToken = token;
+    if (!accessToken) {
+      try {
+        const { data: { session } } = await supabase.auth.getSession();
+        accessToken = session?.access_token;
+      } catch { /* ignore */ }
+    }
+    const headers = {
+      'apikey': supabaseKey,
+      'Authorization': `Bearer ${accessToken || supabaseKey}`,
+    };
+    if (body) headers['Content-Type'] = 'application/json';
+    const res = await fetch(`${supabaseUrl}/rest/v1/${path}`, {
+      method,
+      headers,
+      body: body ? JSON.stringify(body) : undefined,
+    });
+    if (method === 'GET') return res.ok ? res.json() : [];
+    return res.ok;
+  }
+
+  // ── Admin: load users from Supabase ──
+
+  const loadSupabaseUsers = useCallback(async () => {
+    if (!isSupabaseConfigured || user?.role !== 'admin') return;
+    try {
+      const rows = await sbRest('profiles?role=neq.admin&order=created_at.desc');
+      const mapped = rows.map(d => ({
+        id: d.id, name: d.name || '', email: d.email || '',
+        role: d.role, status: d.status,
+        idNumber: d.id_number, lmpDate: d.lmp_date,
+        joined: d.created_at?.split('T')[0],
+      }));
+      setUsers(mapped);
+    } catch (e) {
+      console.error('Failed to load users:', e);
+    }
+  }, [user]);
+
+  // Auto-load users when admin logs in
+  useEffect(() => {
+    if (isSupabaseConfigured && user?.role === 'admin') {
+      loadSupabaseUsers();
+    }
+  }, [user?.role, loadSupabaseUsers]);
+
   // ── Admin actions ──
 
   const getAllUsers = useCallback(() => {
-    if (isSupabaseConfigured) {
-      // In Supabase mode this is async, but we keep the sync API for mock.
-      // Components should migrate to use the async dataService.getAllProfiles() instead.
-      return users.filter(u => u.role !== 'admin');
-    }
     return users.filter(u => u.role !== 'admin');
   }, [users]);
 
   const approveUser = useCallback(async (id) => {
     if (isSupabaseConfigured) {
-      await supabase.from('profiles').update({ status: 'approved', updated_at: new Date().toISOString() }).eq('id', id);
+      await sbRest(`profiles?id=eq.${id}`, { method: 'PATCH', body: { status: 'approved', updated_at: new Date().toISOString() } });
+      await loadSupabaseUsers();
       return;
     }
     updateUsers(prev => prev.map(u => u.id === id ? { ...u, status: 'approved' } : u));
-  }, [updateUsers]);
+  }, [updateUsers, loadSupabaseUsers]);
 
   const blockUser = useCallback(async (id) => {
     if (isSupabaseConfigured) {
-      await supabase.from('profiles').update({ status: 'blocked', updated_at: new Date().toISOString() }).eq('id', id);
+      await sbRest(`profiles?id=eq.${id}`, { method: 'PATCH', body: { status: 'blocked', updated_at: new Date().toISOString() } });
+      await loadSupabaseUsers();
       return;
     }
     updateUsers(prev => prev.map(u => u.id === id ? { ...u, status: 'blocked' } : u));
-  }, [updateUsers]);
+  }, [updateUsers, loadSupabaseUsers]);
 
   const unblockUser = useCallback(async (id) => {
     if (isSupabaseConfigured) {
-      await supabase.from('profiles').update({ status: 'approved', updated_at: new Date().toISOString() }).eq('id', id);
+      await sbRest(`profiles?id=eq.${id}`, { method: 'PATCH', body: { status: 'approved', updated_at: new Date().toISOString() } });
+      await loadSupabaseUsers();
       return;
     }
     updateUsers(prev => prev.map(u => u.id === id ? { ...u, status: 'approved' } : u));
-  }, [updateUsers]);
+  }, [updateUsers, loadSupabaseUsers]);
 
   const deleteUser = useCallback(async (id) => {
     if (isSupabaseConfigured) {
-      await supabase.from('profiles').delete().eq('id', id);
+      await sbRest(`profiles?id=eq.${id}`, { method: 'DELETE' });
+      await loadSupabaseUsers();
       return;
     }
     updateUsers(prev => prev.filter(u => u.id !== id));
-  }, [updateUsers]);
+  }, [updateUsers, loadSupabaseUsers]);
 
   const changeRole = useCallback(async (id, newRole) => {
     if (isSupabaseConfigured) {
-      await supabase.from('profiles').update({ role: newRole, updated_at: new Date().toISOString() }).eq('id', id);
+      await sbRest(`profiles?id=eq.${id}`, { method: 'PATCH', body: { role: newRole, updated_at: new Date().toISOString() } });
+      await loadSupabaseUsers();
       return;
     }
     updateUsers(prev => prev.map(u => u.id === id ? { ...u, role: newRole } : u));
-  }, [updateUsers]);
+  }, [updateUsers, loadSupabaseUsers]);
 
   // ── Pregnancy week calculator ──
 
