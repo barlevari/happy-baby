@@ -2,7 +2,7 @@ import { lazy, Suspense } from 'react';
 import { Routes, Route, Navigate } from 'react-router-dom';
 import { useAuth } from './context/AuthContext';
 import { ProtectedRoute } from './components/ProtectedRoute';
-import Paywall from './components/Paywall';
+
 import NavBar from './components/NavBar';
 import WhatsAppButton from './components/WhatsAppButton';
 import AIChatWidget from './components/AIChatWidget';
@@ -89,7 +89,7 @@ export default function App() {
       {/* Auto-redirect after login */}
       <Route path="/dashboard" element={<RoleRedirect />} />
 
-      {/* Moms – dashboard is free, content pages are premium */}
+      {/* Moms */}
       <Route path="/moms" element={
         <ProtectedRoute requiredRole="moms">
           <AppShell><MomsDashboard /></AppShell>
@@ -97,21 +97,21 @@ export default function App() {
       } />
       <Route path="/moms/nutrition" element={
         <ProtectedRoute requiredRole="moms">
-          <AppShell><Paywall feature="nutrition"><NutritionPage /></Paywall></AppShell>
+          <AppShell><NutritionPage /></AppShell>
         </ProtectedRoute>
       } />
       <Route path="/moms/mental" element={
         <ProtectedRoute requiredRole="moms">
-          <AppShell><Paywall feature="mental"><MentalPage /></Paywall></AppShell>
+          <AppShell><MentalPage /></AppShell>
         </ProtectedRoute>
       } />
       <Route path="/moms/videos" element={
         <ProtectedRoute requiredRole="moms">
-          <AppShell><Paywall feature="videos"><MomsVideosPage /></Paywall></AppShell>
+          <AppShell><MomsVideosPage /></AppShell>
         </ProtectedRoute>
       } />
 
-      {/* Academy – dashboard is free, content pages are premium */}
+      {/* Academy */}
       <Route path="/academy" element={
         <ProtectedRoute requiredRole="student">
           <AppShell><AcademyDashboard /></AppShell>
@@ -119,17 +119,17 @@ export default function App() {
       } />
       <Route path="/academy/videos" element={
         <ProtectedRoute requiredRole="student">
-          <AppShell><Paywall feature="videos"><VideosPage /></Paywall></AppShell>
+          <AppShell><VideosPage /></AppShell>
         </ProtectedRoute>
       } />
       <Route path="/academy/library" element={
         <ProtectedRoute requiredRole="student">
-          <AppShell><Paywall feature="library"><LibraryPage /></Paywall></AppShell>
+          <AppShell><LibraryPage /></AppShell>
         </ProtectedRoute>
       } />
       <Route path="/academy/practice" element={
         <ProtectedRoute requiredRole="student">
-          <AppShell><Paywall feature="practice"><PracticePage /></Paywall></AppShell>
+          <AppShell><PracticePage /></AppShell>
         </ProtectedRoute>
       } />
       <Route path="/academy/events" element={

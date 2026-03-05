@@ -692,6 +692,37 @@ export default function MomsDashboard() {
         <p style={{ color: 'var(--color-text-muted)', fontSize: 'var(--font-sm)' }}>{today}</p>
       </div>
 
+      {/* Upgrade banner */}
+      <div style={{
+        background: 'linear-gradient(135deg, var(--color-sage-ultra), var(--color-rose-light))',
+        border: '1px solid var(--color-sage-light)',
+        borderRadius: 'var(--radius-lg)',
+        padding: '18px 24px',
+        marginBottom: 24,
+        display: 'flex',
+        alignItems: 'center',
+        gap: 16,
+      }}>
+        <span style={{ fontSize: '2rem' }}>✨</span>
+        <div style={{ flex: 1 }}>
+          <div style={{ fontWeight: 800, fontSize: '1rem', color: 'var(--color-sage-dark)', marginBottom: 4 }}>
+            {isRTL ? 'שדרגי לפרימיום' : 'Upgrade to Premium'}
+          </div>
+          <div style={{ fontSize: '0.85rem', color: 'var(--color-text-muted)', lineHeight: 1.5 }}>
+            {isRTL
+              ? 'קבלי גישה לתכנים בלעדיים, כלים מתקדמים וליווי אישי לאורך כל ההריון.'
+              : 'Get access to exclusive content, advanced tools, and personal guidance throughout your pregnancy.'}
+          </div>
+        </div>
+        <Link
+          to="/settings"
+          className="btn btn-primary btn-sm"
+          style={{ whiteSpace: 'nowrap', flexShrink: 0 }}
+        >
+          {isRTL ? '✨ שדרגי עכשיו' : '✨ Upgrade Now'}
+        </Link>
+      </div>
+
       {/* LMP missing prompt */}
       {!hasLmp && (
         <div style={{

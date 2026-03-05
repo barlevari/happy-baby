@@ -132,7 +132,7 @@ export default function Landing() {
     { icon: '🤰', label: pt('weeklyTracking') },
     { icon: '🥗', label: pt('nutritionLabel') },
     { icon: '🎥', label: pt('videosLabel') },
-    { icon: '🤖', label: pt('supportLabel') },
+    { icon: '💬', label: pt('supportLabel') },
     { icon: '📅', label: pt('eventsLabel') },
   ];
 

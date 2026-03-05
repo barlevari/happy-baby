@@ -41,7 +41,7 @@ export const TRANSLATIONS = {
     newPassword: 'סיסמה חדשה',
     confirmPassword: 'אימות סיסמה חדשה',
     savePassword: 'שמור סיסמה',
-    aiChat: '🤖 צ\'אט AI',
+    aiChat: '💬 צ\'אט AI',
     aiChatNav: 'צ\'אט',
   },
   en: {
@@ -82,7 +82,7 @@ export const TRANSLATIONS = {
     newPassword: 'New Password',
     confirmPassword: 'Confirm New Password',
     savePassword: 'Save Password',
-    aiChat: '🤖 AI Chat',
+    aiChat: '💬 AI Chat',
     aiChatNav: 'Chat',
   },
 };

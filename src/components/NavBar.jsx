@@ -28,7 +28,7 @@ export default function NavBar() {
       { to: '/moms/videos', label: t('videos'), icon: '🎥' },
       { to: '/moms/nutrition', label: t('nutrition'), icon: '🥗' },
       { to: '/moms/mental', label: t('mental'), icon: '🧘' },
-      { to: '/chat', label: t('aiChatNav'), icon: '🤖' },
+      { to: '/chat', label: t('aiChatNav'), icon: '💬' },
       { to: '/settings', label: t('settings'), icon: '⚙️' },
       { to: '/about', label: t('about'), icon: 'ℹ️' },
     ],
@@ -38,7 +38,7 @@ export default function NavBar() {
       { to: '/academy/library', label: t('library'), icon: '📚' },
       { to: '/academy/practice', label: t('practice'), icon: '✍️' },
       { to: '/academy/events', label: t('events'), icon: '📅' },
-      { to: '/chat', label: t('aiChatNav'), icon: '🤖' },
+      { to: '/chat', label: t('aiChatNav'), icon: '💬' },
       { to: '/settings', label: t('settings'), icon: '⚙️' },
       { to: '/about', label: t('about'), icon: 'ℹ️' },
     ],
@@ -74,6 +74,7 @@ export default function NavBar() {
         <div className="sidebar-logo" style={{
           padding: '24px 20px 16px',
           borderBottom: '1px solid var(--color-border)',
+          textAlign: 'center',
         }}>
           <img
             src="/happy-baby-logo.png"
@@ -87,8 +88,10 @@ export default function NavBar() {
           padding: '16px 20px',
           borderBottom: '1px solid var(--color-border)',
           display: 'flex',
+          flexDirection: 'column',
           alignItems: 'center',
-          gap: '12px',
+          gap: '8px',
+          textAlign: 'center',
         }}>
           <div style={{
             width: 42,
@@ -132,7 +135,7 @@ export default function NavBar() {
         </div>
 
         {/* Nav Links */}
-        <nav className="sidebar-nav" style={{ flex: 1, padding: '12px 12px', overflowY: 'auto' }}>
+        <nav className="sidebar-nav" style={{ flex: 1, padding: '12px 12px', overflowY: 'auto', display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
           {links.map(link => (
             <NavLink
               key={link.to}
@@ -141,6 +144,7 @@ export default function NavBar() {
               style={({ isActive }) => ({
                 display: 'flex',
                 alignItems: 'center',
+                justifyContent: 'center',
                 gap: '10px',
                 padding: '10px 12px',
                 borderRadius: '10px',
@@ -194,6 +198,7 @@ export default function NavBar() {
               width: '100%',
               display: 'flex',
               alignItems: 'center',
+              justifyContent: 'center',
               gap: '10px',
               padding: '10px 12px',
               borderRadius: '10px',
