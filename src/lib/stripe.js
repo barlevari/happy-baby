@@ -32,7 +32,7 @@ export async function redirectToCheckout({ priceId, userId, userEmail, successUr
       priceId,
       userId,
       userEmail,
-      successUrl: successUrl || `${window.location.origin}/payment/success`,
+      successUrl: successUrl || `${window.location.origin}/payment/success?session_id={CHECKOUT_SESSION_ID}`,
       cancelUrl: cancelUrl || `${window.location.origin}/payment/cancel`,
     }),
   });
