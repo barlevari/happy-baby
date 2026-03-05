@@ -79,7 +79,7 @@ export default function NavBar() {
           <img
             src="/happy-baby-logo.png"
             alt="happy baby"
-            style={{ height: 48, objectFit: 'contain', opacity: 0.95, mixBlendMode: 'multiply' }}
+            style={{ height: 48, objectFit: 'contain', opacity: 0.95, mixBlendMode: 'multiply', filter: 'brightness(1.25) contrast(1.1)' }}
           />
         </div>
 

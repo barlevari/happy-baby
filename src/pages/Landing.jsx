@@ -189,10 +189,10 @@ export default function Landing() {
           width: '100%',
           height: '100%',
           objectFit: 'cover',
-          opacity: 0.12,
+          opacity: 0.3,
           zIndex: 0,
           pointerEvents: 'none',
-          filter: 'blur(2px) saturate(0.7)',
+          filter: 'blur(1px) saturate(0.8)',
         }}
       >
         <source src="/bg-video.mp4" type="video/mp4" />
@@ -206,7 +206,7 @@ export default function Landing() {
           left: 0,
           width: '100%',
           height: '100%',
-          background: 'linear-gradient(160deg, rgba(var(--color-cream-rgb, 255,250,240), 0.6) 0%, rgba(var(--color-sage-ultra-rgb, 230,240,235), 0.5) 50%, rgba(var(--color-rose-light-rgb, 252,235,240), 0.6) 100%)',
+          background: 'linear-gradient(160deg, rgba(var(--color-cream-rgb, 255,250,240), 0.35) 0%, rgba(var(--color-sage-ultra-rgb, 230,240,235), 0.3) 50%, rgba(var(--color-rose-light-rgb, 252,235,240), 0.35) 100%)',
           zIndex: 0,
           pointerEvents: 'none',
         }}
@@ -373,6 +373,7 @@ export default function Landing() {
             objectFit: 'contain',
             marginBottom: 12,
             mixBlendMode: 'multiply',
+            filter: 'brightness(1.25) contrast(1.1)',
             opacity: introPhase >= 2 ? 1 : 0,
             animation: introPhase >= 2 ? `logoBloom 1.2s ${SPRING} both` : 'none',
             position: 'relative',
