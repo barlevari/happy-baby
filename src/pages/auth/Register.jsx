@@ -103,20 +103,8 @@ const PAGE_TEXT = {
   },
 };
 
-function validateIsraeliIdLocal(id) {
-  const str = String(id).padStart(9, '0');
-  if (str.length !== 9) return false;
-  let sum = 0;
-  for (let i = 0; i < 9; i++) {
-    let c = Number(str[i]) * ((i % 2) + 1);
-    if (c > 9) c -= 9;
-    sum += c;
-  }
-  return sum % 10 === 0;
-}
-
 export default function Register() {
-  const { register } = useAuth();
+  const { register, validateIsraeliId } = useAuth();
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const preRole = searchParams.get('role');
@@ -146,7 +134,7 @@ export default function Register() {
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(form.email)) newErrors.email = pt('errEmail');
     if (form.password.length < 8) newErrors.password = pt('errPassword');
-    if (!validateIsraeliIdLocal(form.idNumber)) newErrors.idNumber = pt('errId');
+    if (!validateIsraeliId(form.idNumber)) newErrors.idNumber = pt('errId');
     if (role === 'moms' && !form.lmpDate) newErrors.lmpDate = pt('errLmp');
     if (role === 'admin' && !form.adminCode) newErrors.adminCode = pt('errAdminCode');
     setErrors(newErrors);
@@ -386,8 +374,8 @@ export default function Register() {
                 <label className="form-label">
                   {pt('idLabel')}
                   {form.idNumber.length >= 7 && (
-                    <span style={{ ...(isRTL ? { marginRight: 8 } : { marginLeft: 8 }), fontSize: '0.75rem', color: validateIsraeliIdLocal(form.idNumber) ? '#2E7D32' : 'var(--color-danger)' }}>
-                      {validateIsraeliIdLocal(form.idNumber) ? pt('idValid') : pt('idInvalid')}
+                    <span style={{ ...(isRTL ? { marginRight: 8 } : { marginLeft: 8 }), fontSize: '0.75rem', color: validateIsraeliId(form.idNumber) ? '#2E7D32' : 'var(--color-danger)' }}>
+                      {validateIsraeliId(form.idNumber) ? pt('idValid') : pt('idInvalid')}
                     </span>
                   )}
                 </label>
