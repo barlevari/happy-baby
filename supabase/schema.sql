@@ -72,7 +72,21 @@ ALTER TABLE test_tracking ENABLE ROW LEVEL SECURITY;
 ALTER TABLE health_metrics ENABLE ROW LEVEL SECURITY;
 ALTER TABLE chat_messages ENABLE ROW LEVEL SECURITY;
 
--- Profiles: users can read/update their own, admins can read all
+-- Drop existing policies (safe re-run)
+DROP POLICY IF EXISTS "Users can insert own profile" ON profiles;
+DROP POLICY IF EXISTS "Users can view own profile" ON profiles;
+DROP POLICY IF EXISTS "Users can update own profile" ON profiles;
+DROP POLICY IF EXISTS "Admins can view all profiles" ON profiles;
+DROP POLICY IF EXISTS "Admins can update all profiles" ON profiles;
+DROP POLICY IF EXISTS "Users manage own video progress" ON video_progress;
+DROP POLICY IF EXISTS "Users manage own test tracking" ON test_tracking;
+DROP POLICY IF EXISTS "Users manage own health metrics" ON health_metrics;
+DROP POLICY IF EXISTS "Users manage own chat messages" ON chat_messages;
+
+-- Profiles: users can create/read/update their own, admins can read all
+CREATE POLICY "Users can insert own profile" ON profiles
+  FOR INSERT WITH CHECK (auth.uid() = id);
+
 CREATE POLICY "Users can view own profile" ON profiles
   FOR SELECT USING (auth.uid() = id);
 

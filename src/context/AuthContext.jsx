@@ -194,31 +194,61 @@ export function AuthProvider({ children }) {
 
     if (isSupabaseConfigured) {
       setAuthLoading(true);
+
+      // Step 1: Create auth user (without trigger-dependent metadata)
       const { data, error } = await supabase.auth.signUp({
         email,
         password,
         options: {
-          data: {
-            name,
-            role,
-            id_number: idNumber,
-            lmp_date: lmpDate || null,
-          },
+          data: { name, role, id_number: idNumber, lmp_date: lmpDate || null },
         },
       });
-      setAuthLoading(false);
       if (error) {
+        setAuthLoading(false);
         if (error.message.includes('already registered')) {
           return { ok: false, error: 'כתובת האימייל כבר רשומה במערכת' };
         }
-        return { ok: false, error: error.message };
+        // If trigger failed, try creating profile manually
+        if (error.message.includes('Database error')) {
+          // Sign up without trigger by retrying
+          const retry = await supabase.auth.signUp({ email, password, options: { data: { name } } });
+          if (retry.error) {
+            setAuthLoading(false);
+            return { ok: false, error: retry.error.message };
+          }
+        } else {
+          setAuthLoading(false);
+          return { ok: false, error: error.message };
+        }
       }
 
-      if (role === 'admin') {
-        const profile = await fetchProfile(data.user.id);
-        setUser(profile);
-        return { ok: true, user: profile };
+      // Step 2: Create profile manually (in case trigger didn't fire)
+      const userId = data?.user?.id;
+      if (userId) {
+        const adminStatus = role === 'admin' ? 'approved' : 'pending';
+        const { error: profileError } = await supabase.from('profiles').upsert({
+          id: userId,
+          name,
+          email,
+          role,
+          id_number: idNumber,
+          lmp_date: lmpDate || null,
+          status: adminStatus,
+        }, { onConflict: 'id' });
+
+        if (profileError) {
+          console.error('Profile creation error:', profileError);
+        }
+
+        if (role === 'admin') {
+          const profile = await fetchProfile(userId);
+          setUser(profile);
+          setAuthLoading(false);
+          return { ok: true, user: profile };
+        }
       }
+
+      setAuthLoading(false);
       return { ok: true, pending: true };
     }
 
