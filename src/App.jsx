@@ -1,3 +1,4 @@
+import { lazy, Suspense } from 'react';
 import { Routes, Route, Navigate } from 'react-router-dom';
 import { useAuth } from './context/AuthContext';
 import { ProtectedRoute } from './components/ProtectedRoute';
@@ -6,32 +7,53 @@ import NavBar from './components/NavBar';
 import WhatsAppButton from './components/WhatsAppButton';
 import AIChatWidget from './components/AIChatWidget';
 
-// Pages
+// Eager-loaded pages (public / always needed)
 import Landing from './pages/Landing';
 import Login from './pages/auth/Login';
 import Register from './pages/auth/Register';
-import MomsDashboard from './pages/moms/MomsDashboard';
-import NutritionPage from './pages/moms/NutritionPage';
-import MentalPage from './pages/moms/MentalPage';
-import MomsVideosPage from './pages/moms/MomsVideosPage';
-import AcademyDashboard from './pages/academy/AcademyDashboard';
-import VideosPage from './pages/academy/VideosPage';
-import LibraryPage from './pages/academy/LibraryPage';
-import PracticePage from './pages/academy/PracticePage';
-import EventsPage from './pages/academy/EventsPage';
-import AdminDashboard from './pages/admin/AdminDashboard';
-import UsersTable from './pages/admin/UsersTable';
-import VideoAnalytics from './pages/admin/VideoAnalytics';
-import AboutPage from './pages/shared/AboutPage';
-import Settings from './pages/shared/Settings';
-import ChatPage from './pages/shared/ChatPage';
+
+// Lazy-loaded pages (only loaded when visited)
+const MomsDashboard = lazy(() => import('./pages/moms/MomsDashboard'));
+const NutritionPage = lazy(() => import('./pages/moms/NutritionPage'));
+const MentalPage = lazy(() => import('./pages/moms/MentalPage'));
+const MomsVideosPage = lazy(() => import('./pages/moms/MomsVideosPage'));
+const AcademyDashboard = lazy(() => import('./pages/academy/AcademyDashboard'));
+const VideosPage = lazy(() => import('./pages/academy/VideosPage'));
+const LibraryPage = lazy(() => import('./pages/academy/LibraryPage'));
+const PracticePage = lazy(() => import('./pages/academy/PracticePage'));
+const EventsPage = lazy(() => import('./pages/academy/EventsPage'));
+const AdminDashboard = lazy(() => import('./pages/admin/AdminDashboard'));
+const UsersTable = lazy(() => import('./pages/admin/UsersTable'));
+const VideoAnalytics = lazy(() => import('./pages/admin/VideoAnalytics'));
+const AboutPage = lazy(() => import('./pages/shared/AboutPage'));
+const Settings = lazy(() => import('./pages/shared/Settings'));
+const ChatPage = lazy(() => import('./pages/shared/ChatPage'));
+const PaymentSuccess = lazy(() => import('./pages/shared/PaymentSuccess'));
+const PaymentCancel = lazy(() => import('./pages/shared/PaymentCancel'));
+
+// Loading fallback
+function PageLoader() {
+  return (
+    <div style={{
+      display: 'flex', alignItems: 'center', justifyContent: 'center',
+      minHeight: '60vh',
+    }}>
+      <div style={{ textAlign: 'center' }}>
+        <div style={{ fontSize: '2.5rem', marginBottom: 12 }}>🍼</div>
+        <div style={{ color: 'var(--color-text-muted)', fontSize: '0.9rem' }}>טוען...</div>
+      </div>
+    </div>
+  );
+}
 
 function AppShell({ children }) {
   return (
     <div className="app-shell">
       <NavBar />
       <main className="main-content">
-        {children}
+        <Suspense fallback={<PageLoader />}>
+          {children}
+        </Suspense>
       </main>
       <AIChatWidget />
     </div>
@@ -43,7 +65,7 @@ function AboutWrapper() {
   if (user) {
     return <AppShell><AboutPage /><WhatsAppButton /></AppShell>;
   }
-  return <><AboutPage /><WhatsAppButton /></>;
+  return <Suspense fallback={<PageLoader />}><AboutPage /><WhatsAppButton /></Suspense>;
 }
 
 function RoleRedirect() {
@@ -142,6 +164,18 @@ export default function App() {
       <Route path="/chat" element={
         <ProtectedRoute>
           <AppShell><ChatPage /></AppShell>
+        </ProtectedRoute>
+      } />
+
+      {/* Payment result pages */}
+      <Route path="/payment/success" element={
+        <ProtectedRoute>
+          <Suspense fallback={<PageLoader />}><PaymentSuccess /></Suspense>
+        </ProtectedRoute>
+      } />
+      <Route path="/payment/cancel" element={
+        <ProtectedRoute>
+          <Suspense fallback={<PageLoader />}><PaymentCancel /></Suspense>
         </ProtectedRoute>
       } />
 
