@@ -141,11 +141,11 @@ export default function Register() {
     return Object.keys(newErrors).length === 0;
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     if (!validateStep2()) return;
     setLoading(true);
-    const result = register({ ...form, role });
+    const result = await register({ ...form, role });
     setLoading(false);
     if (!result.ok) { setSubmitError(result.error); return; }
 

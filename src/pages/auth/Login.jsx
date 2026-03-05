@@ -58,7 +58,7 @@ const PAGE_TEXT = {
 };
 
 export default function Login() {
-  const { login } = useAuth();
+  const { login, resetPassword, isSupabaseMode } = useAuth();
   const navigate = useNavigate();
   const pt = usePageText(PAGE_TEXT);
   const { isRTL } = useLanguage();
@@ -80,7 +80,7 @@ export default function Login() {
       return;
     }
     setLoading(true);
-    const result = login(email, password);
+    const result = await login(email, password);
     setLoading(false);
     if (!result.ok) {
       if (result.pending) setIsPending(true);
@@ -94,9 +94,20 @@ export default function Login() {
     else navigate('/');
   };
 
-  const handleForgot = (e) => {
+  const [forgotError, setForgotError] = useState('');
+
+  const handleForgot = async (e) => {
     e.preventDefault();
     if (!forgotEmail) return;
+    if (isSupabaseMode) {
+      setLoading(true);
+      const result = await resetPassword(forgotEmail);
+      setLoading(false);
+      if (!result.ok) {
+        setForgotError(result.error);
+        return;
+      }
+    }
     setForgotSent(true);
   };
 
@@ -149,22 +160,38 @@ export default function Login() {
 
           {forgotSent ? (
             <div style={{ textAlign: 'center' }}>
-              <div style={{ fontSize: '3rem', marginBottom: 16 }}>💬</div>
-              <p style={{ fontWeight: 700, marginBottom: 8, color: 'var(--color-text)' }}>
-                {pt('forgotQuestion')}
-              </p>
-              <p style={{ color: 'var(--color-text-muted)', lineHeight: 1.7, marginBottom: 20, fontSize: '0.9rem', whiteSpace: 'pre-line' }}>
-                {pt('forgotExplanation')}
-              </p>
-              <a
-                href={`https://wa.me/972522218646?text=${encodeURIComponent(`${pt('whatsappMsg')}${forgotEmail}`)}`}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="btn w-full"
-                style={{ background: '#25D366', color: 'white', border: 'none', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8, marginBottom: 12, textDecoration: 'none' }}
-              >
-                {pt('whatsappBtn')}
-              </a>
+              {isSupabaseMode ? (
+                <>
+                  <div style={{ fontSize: '3rem', marginBottom: 16 }}>📧</div>
+                  <p style={{ fontWeight: 700, marginBottom: 8, color: 'var(--color-text)' }}>
+                    {isRTL ? 'קישור לאיפוס נשלח!' : 'Reset link sent!'}
+                  </p>
+                  <p style={{ color: 'var(--color-text-muted)', lineHeight: 1.7, marginBottom: 20, fontSize: '0.9rem' }}>
+                    {isRTL
+                      ? `שלחנו קישור לאיפוס סיסמה ל-${forgotEmail}. בדקי את תיבת הדואר שלך.`
+                      : `We sent a password reset link to ${forgotEmail}. Check your inbox.`}
+                  </p>
+                </>
+              ) : (
+                <>
+                  <div style={{ fontSize: '3rem', marginBottom: 16 }}>💬</div>
+                  <p style={{ fontWeight: 700, marginBottom: 8, color: 'var(--color-text)' }}>
+                    {pt('forgotQuestion')}
+                  </p>
+                  <p style={{ color: 'var(--color-text-muted)', lineHeight: 1.7, marginBottom: 20, fontSize: '0.9rem', whiteSpace: 'pre-line' }}>
+                    {pt('forgotExplanation')}
+                  </p>
+                  <a
+                    href={`https://wa.me/972522218646?text=${encodeURIComponent(`${pt('whatsappMsg')}${forgotEmail}`)}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="btn w-full"
+                    style={{ background: '#25D366', color: 'white', border: 'none', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8, marginBottom: 12, textDecoration: 'none' }}
+                  >
+                    {pt('whatsappBtn')}
+                  </a>
+                </>
+              )}
               <button
                 className="btn btn-ghost w-full"
                 onClick={() => { setShowForgot(false); setForgotSent(false); setForgotEmail(''); }}
@@ -323,8 +350,8 @@ export default function Login() {
           </Link>
         </div>
 
-        {/* Demo credentials hint */}
-        <div style={{
+        {/* Demo credentials hint (only in mock mode) */}
+        {!isSupabaseMode && <div style={{
           marginTop: 24,
           padding: '12px 16px',
           background: 'var(--color-sage-ultra)',
@@ -337,7 +364,7 @@ export default function Login() {
           🤰 sarah@test.com / test1234<br />
           🎓 michal@test.com / test1234<br />
           🛡️ admin@happybaby.com / admin1234
-        </div>
+        </div>}
       </div>
     </div>
   );
