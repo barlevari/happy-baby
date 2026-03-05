@@ -249,24 +249,48 @@ export default function Footer() {
               </a>
             </li>
             <li>
-              <span style={{ color: 'rgba(255,255,255,0.7)', fontSize: '0.85rem' }}>
+              <Link to="/faq" style={{
+                color: 'rgba(255,255,255,0.7)', textDecoration: 'none',
+                fontSize: '0.85rem', transition: 'color 0.2s',
+              }}
+              onMouseEnter={e => e.currentTarget.style.color = 'white'}
+              onMouseLeave={e => e.currentTarget.style.color = 'rgba(255,255,255,0.7)'}
+              >
                 {t.faq}
-              </span>
+              </Link>
             </li>
             <li>
-              <span style={{ color: 'rgba(255,255,255,0.7)', fontSize: '0.85rem' }}>
+              <Link to="/terms" style={{
+                color: 'rgba(255,255,255,0.7)', textDecoration: 'none',
+                fontSize: '0.85rem', transition: 'color 0.2s',
+              }}
+              onMouseEnter={e => e.currentTarget.style.color = 'white'}
+              onMouseLeave={e => e.currentTarget.style.color = 'rgba(255,255,255,0.7)'}
+              >
                 {t.termsOfUse}
-              </span>
+              </Link>
             </li>
             <li>
-              <span style={{ color: 'rgba(255,255,255,0.7)', fontSize: '0.85rem' }}>
+              <Link to="/privacy" style={{
+                color: 'rgba(255,255,255,0.7)', textDecoration: 'none',
+                fontSize: '0.85rem', transition: 'color 0.2s',
+              }}
+              onMouseEnter={e => e.currentTarget.style.color = 'white'}
+              onMouseLeave={e => e.currentTarget.style.color = 'rgba(255,255,255,0.7)'}
+              >
                 {t.privacyPolicy}
-              </span>
+              </Link>
             </li>
             <li>
-              <span style={{ color: 'rgba(255,255,255,0.7)', fontSize: '0.85rem' }}>
+              <Link to="/accessibility" style={{
+                color: 'rgba(255,255,255,0.7)', textDecoration: 'none',
+                fontSize: '0.85rem', transition: 'color 0.2s',
+              }}
+              onMouseEnter={e => e.currentTarget.style.color = 'white'}
+              onMouseLeave={e => e.currentTarget.style.color = 'rgba(255,255,255,0.7)'}
+              >
                 {t.accessibility}
-              </span>
+              </Link>
             </li>
           </ul>
 

@@ -31,6 +31,11 @@ const Settings = lazy(() => import('./pages/shared/Settings'));
 const ChatPage = lazy(() => import('./pages/shared/ChatPage'));
 const PaymentSuccess = lazy(() => import('./pages/shared/PaymentSuccess'));
 const PaymentCancel = lazy(() => import('./pages/shared/PaymentCancel'));
+const PricingPage = lazy(() => import('./pages/shared/PricingPage'));
+const FAQPage = lazy(() => import('./pages/shared/FAQPage'));
+const TermsPage = lazy(() => import('./pages/shared/TermsPage'));
+const PrivacyPage = lazy(() => import('./pages/shared/PrivacyPage'));
+const AccessibilityPage = lazy(() => import('./pages/shared/AccessibilityPage'));
 
 // Loading fallback
 function PageLoader() {
@@ -70,6 +75,46 @@ function AboutWrapper() {
   return <Suspense fallback={<PageLoader />}><AboutPage /><WhatsAppButton /></Suspense>;
 }
 
+function PricingWrapper() {
+  const { user } = useAuth();
+  if (user) {
+    return <AppShell><PricingPage /><WhatsAppButton /></AppShell>;
+  }
+  return <Suspense fallback={<PageLoader />}><PricingPage /><WhatsAppButton /></Suspense>;
+}
+
+function FAQWrapper() {
+  const { user } = useAuth();
+  if (user) {
+    return <AppShell><FAQPage /><WhatsAppButton /></AppShell>;
+  }
+  return <Suspense fallback={<PageLoader />}><FAQPage /><WhatsAppButton /></Suspense>;
+}
+
+function TermsWrapper() {
+  const { user } = useAuth();
+  if (user) {
+    return <AppShell><TermsPage /><WhatsAppButton /></AppShell>;
+  }
+  return <Suspense fallback={<PageLoader />}><TermsPage /><WhatsAppButton /></Suspense>;
+}
+
+function PrivacyWrapper() {
+  const { user } = useAuth();
+  if (user) {
+    return <AppShell><PrivacyPage /><WhatsAppButton /></AppShell>;
+  }
+  return <Suspense fallback={<PageLoader />}><PrivacyPage /><WhatsAppButton /></Suspense>;
+}
+
+function AccessibilityWrapper() {
+  const { user } = useAuth();
+  if (user) {
+    return <AppShell><AccessibilityPage /><WhatsAppButton /></AppShell>;
+  }
+  return <Suspense fallback={<PageLoader />}><AccessibilityPage /><WhatsAppButton /></Suspense>;
+}
+
 function RoleRedirect() {
   const { user } = useAuth();
   if (!user) return <Navigate to="/login" replace />;
@@ -87,6 +132,11 @@ export default function App() {
       <Route path="/login" element={<Login />} />
       <Route path="/register" element={<Register />} />
       <Route path="/about" element={<AboutWrapper />} />
+      <Route path="/pricing" element={<PricingWrapper />} />
+      <Route path="/faq" element={<FAQWrapper />} />
+      <Route path="/terms" element={<TermsWrapper />} />
+      <Route path="/privacy" element={<PrivacyWrapper />} />
+      <Route path="/accessibility" element={<AccessibilityWrapper />} />
 
       {/* Auto-redirect after login */}
       <Route path="/dashboard" element={<RoleRedirect />} />
