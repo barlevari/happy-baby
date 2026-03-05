@@ -1,0 +1,15 @@
+{
+  "appId": "com.happybaby.app",
+  "appName": "Happy Baby",
+  "webDir": "dist",
+  "server": {
+    "androidScheme": "https"
+  },
+  "ios": {
+    "contentInset": "automatic",
+    "backgroundColor": "#FFF8F0"
+  },
+  "android": {
+    "backgroundColor": "#FFF8F0"
+  }
+}
