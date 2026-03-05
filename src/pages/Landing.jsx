@@ -2,6 +2,7 @@ import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { useLanguage, usePageText } from '../context/LanguageContext';
 import { useEffect, useState, useRef } from 'react';
+import Footer from '../components/Footer';
 
 const PAGE_TEXT = {
   he: {
@@ -373,7 +374,6 @@ export default function Landing() {
             objectFit: 'contain',
             marginBottom: 12,
             mixBlendMode: 'multiply',
-            filter: 'brightness(1.25) contrast(1.1)',
             opacity: introPhase >= 2 ? 1 : 0,
             animation: introPhase >= 2 ? `logoBloom 1.2s ${SPRING} both` : 'none',
             position: 'relative',
@@ -614,20 +614,9 @@ export default function Landing() {
       </div>
 
       {/* ===== FOOTER ===== */}
-      <footer style={{
-        marginTop: 'auto',
-        textAlign: 'center',
-        color: 'var(--color-text-muted)',
-        fontSize: '0.8rem',
-        paddingTop: 24,
-        borderTop: '1px solid rgba(255,255,255,0.3)',
-        width: '100%',
-        maxWidth: 600,
-        position: 'relative',
-        zIndex: 1,
-      }}>
-        {pt('footer')}
-      </footer>
+      <div style={{ width: '100%', position: 'relative', zIndex: 1, marginTop: 'auto' }}>
+        <Footer />
+      </div>
     </div>
   );
 }

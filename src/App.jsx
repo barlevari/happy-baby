@@ -6,6 +6,7 @@ import { ProtectedRoute } from './components/ProtectedRoute';
 import NavBar from './components/NavBar';
 import WhatsAppButton from './components/WhatsAppButton';
 import AIChatWidget from './components/AIChatWidget';
+import Footer from './components/Footer';
 
 // Eager-loaded pages (public / always needed)
 import Landing from './pages/Landing';
@@ -54,6 +55,7 @@ function AppShell({ children }) {
         <Suspense fallback={<PageLoader />}>
           {children}
         </Suspense>
+        <Footer />
       </main>
       <AIChatWidget />
     </div>

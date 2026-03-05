@@ -714,13 +714,15 @@ export default function MomsDashboard() {
               : 'Get access to exclusive content, advanced tools, and personal guidance throughout your pregnancy.'}
           </div>
         </div>
-        <Link
-          to="/settings"
+        <a
+          href={`https://wa.me/972547767676?text=${encodeURIComponent(isRTL ? 'היי רויטל, אשמח לשמוע על מסלול הפרימיום 💜' : 'Hi Revital, I\'d love to hear about the premium plan 💜')}`}
+          target="_blank"
+          rel="noopener noreferrer"
           className="btn btn-primary btn-sm"
-          style={{ whiteSpace: 'nowrap', flexShrink: 0 }}
+          style={{ whiteSpace: 'nowrap', flexShrink: 0, textDecoration: 'none' }}
         >
           {isRTL ? '✨ שדרגי עכשיו' : '✨ Upgrade Now'}
-        </Link>
+        </a>
       </div>
 
       {/* LMP missing prompt */}

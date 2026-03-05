@@ -79,7 +79,7 @@ export default function NavBar() {
           <img
             src="/happy-baby-logo.png"
             alt="happy baby"
-            style={{ height: 48, objectFit: 'contain', opacity: 0.95, mixBlendMode: 'multiply', filter: 'brightness(1.25) contrast(1.1)' }}
+            style={{ height: 48, objectFit: 'contain' }}
           />
         </div>
 
@@ -135,7 +135,7 @@ export default function NavBar() {
         </div>
 
         {/* Nav Links */}
-        <nav className="sidebar-nav" style={{ flex: 1, padding: '12px 12px', overflowY: 'auto', display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
+        <nav className="sidebar-nav" style={{ flex: 1, padding: '8px 12px', overflowY: 'auto', display: 'flex', flexDirection: 'column' }}>
           {links.map(link => (
             <NavLink
               key={link.to}

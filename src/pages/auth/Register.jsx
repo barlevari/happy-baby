@@ -283,7 +283,7 @@ export default function Register() {
       }}>
         {/* Logo */}
         <div style={{ display: 'flex', justifyContent: 'center', marginBottom: 20 }}>
-          <img src="/happy-baby-logo.png" alt="happy baby" style={{ height: 72, objectFit: 'contain', mixBlendMode: 'multiply', filter: 'brightness(1.25) contrast(1.1)' }} />
+          <img src="/happy-baby-logo.png" alt="happy baby" style={{ height: 72, objectFit: 'contain' }} />
         </div>
 
         {/* Progress */}
