@@ -83,7 +83,11 @@ DROP POLICY IF EXISTS "Users manage own test tracking" ON test_tracking;
 DROP POLICY IF EXISTS "Users manage own health metrics" ON health_metrics;
 DROP POLICY IF EXISTS "Users manage own chat messages" ON chat_messages;
 
--- Profiles: users can create/read/update their own, admins can read all
+-- Profiles: users can create/read/update their own profile.
+-- NOTE: Admin policies that used EXISTS(SELECT FROM profiles WHERE role='admin')
+-- were removed because they caused recursive RLS evaluation, making all profile
+-- queries hang or fail. Admin operations on other users' profiles should use
+-- a service-role key (server-side) or Supabase dashboard instead.
 CREATE POLICY "Users can insert own profile" ON profiles
   FOR INSERT WITH CHECK (auth.uid() = id);
 
@@ -92,16 +96,6 @@ CREATE POLICY "Users can view own profile" ON profiles
 
 CREATE POLICY "Users can update own profile" ON profiles
   FOR UPDATE USING (auth.uid() = id);
-
-CREATE POLICY "Admins can view all profiles" ON profiles
-  FOR SELECT USING (
-    EXISTS (SELECT 1 FROM profiles WHERE id = auth.uid() AND role = 'admin')
-  );
-
-CREATE POLICY "Admins can update all profiles" ON profiles
-  FOR UPDATE USING (
-    EXISTS (SELECT 1 FROM profiles WHERE id = auth.uid() AND role = 'admin')
-  );
 
 -- Video progress: users can manage their own
 CREATE POLICY "Users manage own video progress" ON video_progress
@@ -120,36 +114,42 @@ CREATE POLICY "Users manage own chat messages" ON chat_messages
   FOR ALL USING (auth.uid() = user_id);
 
 -- ============================================================
--- Auto-create profile on signup (trigger)
+-- Profile creation on signup
 -- ============================================================
-
-CREATE OR REPLACE FUNCTION handle_new_user()
-RETURNS TRIGGER AS $$
-BEGIN
-  INSERT INTO profiles (id, name, email, role, id_number, lmp_date, status)
-  VALUES (
-    NEW.id,
-    COALESCE(NEW.raw_user_meta_data->>'name', ''),
-    NEW.email,
-    COALESCE(NEW.raw_user_meta_data->>'role', 'moms'),
-    COALESCE(NEW.raw_user_meta_data->>'id_number', ''),
-    CASE
-      WHEN NEW.raw_user_meta_data->>'lmp_date' IS NOT NULL
-      THEN (NEW.raw_user_meta_data->>'lmp_date')::DATE
-      ELSE NULL
-    END,
-    CASE
-      WHEN COALESCE(NEW.raw_user_meta_data->>'role', 'moms') = 'admin' THEN 'approved'
-      ELSE 'pending'
-    END
-  );
-  RETURN NEW;
-END;
-$$ LANGUAGE plpgsql SECURITY DEFINER;
-
-CREATE OR REPLACE TRIGGER on_auth_user_created
-  AFTER INSERT ON auth.users
-  FOR EACH ROW EXECUTE FUNCTION handle_new_user();
+-- NOTE: The database trigger approach was removed because it caused
+-- "Database error saving new user" failures during signUp.
+-- Profile creation is now handled in the client code (AuthContext.jsx)
+-- via a manual upsert after supabase.auth.signUp() succeeds.
+--
+-- If you need to restore the trigger in the future, uncomment below:
+--
+-- CREATE OR REPLACE FUNCTION handle_new_user()
+-- RETURNS TRIGGER AS $$
+-- BEGIN
+--   INSERT INTO profiles (id, name, email, role, id_number, lmp_date, status)
+--   VALUES (
+--     NEW.id,
+--     COALESCE(NEW.raw_user_meta_data->>'name', ''),
+--     NEW.email,
+--     COALESCE(NEW.raw_user_meta_data->>'role', 'moms'),
+--     COALESCE(NEW.raw_user_meta_data->>'id_number', ''),
+--     CASE
+--       WHEN NEW.raw_user_meta_data->>'lmp_date' IS NOT NULL
+--       THEN (NEW.raw_user_meta_data->>'lmp_date')::DATE
+--       ELSE NULL
+--     END,
+--     CASE
+--       WHEN COALESCE(NEW.raw_user_meta_data->>'role', 'moms') = 'admin' THEN 'approved'
+--       ELSE 'pending'
+--     END
+--   );
+--   RETURN NEW;
+-- END;
+-- $$ LANGUAGE plpgsql SECURITY DEFINER;
+--
+-- CREATE OR REPLACE TRIGGER on_auth_user_created
+--   AFTER INSERT ON auth.users
+--   FOR EACH ROW EXECUTE FUNCTION handle_new_user();
 
 -- ============================================================
 -- Indexes
