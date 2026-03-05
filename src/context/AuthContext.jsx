@@ -72,7 +72,7 @@ export function AuthProvider({ children }) {
       // Supabase mode: listen for auth changes
       supabase.auth.getSession().then(async ({ data: { session } }) => {
         if (session?.user) {
-          const profile = await fetchProfile(session.user.id);
+          const profile = await fetchProfile(session.user.id, session.access_token);
           setUser(profile);
         }
         setAuthLoading(false);
@@ -81,7 +81,7 @@ export function AuthProvider({ children }) {
       const { data: { subscription } } = supabase.auth.onAuthStateChange(
         async (event, session) => {
           if (event === 'SIGNED_IN' && session?.user) {
-            const profile = await fetchProfile(session.user.id);
+            const profile = await fetchProfile(session.user.id, session.access_token);
             setUser(profile);
           } else if (event === 'SIGNED_OUT') {
             setUser(null);
@@ -104,34 +104,41 @@ export function AuthProvider({ children }) {
 
   // ── Supabase helpers ──
 
-  async function fetchProfile(userId) {
+  async function fetchProfile(userId, accessToken) {
     try {
       const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
       const supabaseKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
-      const { data: { session } } = await supabase.auth.getSession();
+      // Use provided token, or try to get one from the session
+      let token = accessToken;
+      if (!token) {
+        try {
+          const { data: { session } } = await supabase.auth.getSession();
+          token = session?.access_token;
+        } catch { /* ignore */ }
+      }
       const res = await fetch(
         `${supabaseUrl}/rest/v1/profiles?id=eq.${userId}&select=*`,
         {
           headers: {
             'apikey': supabaseKey,
-            'Authorization': `Bearer ${session?.access_token || supabaseKey}`,
+            'Authorization': `Bearer ${token || supabaseKey}`,
           },
         }
       );
       if (!res.ok) return null;
       const rows = await res.json();
       if (!rows.length) return null;
-      const data = rows[0];
+      const d = rows[0];
       return {
-        id: data.id,
-        name: data.name,
-        email: data.email,
-        role: data.role,
-        idNumber: data.id_number,
-        lmpDate: data.lmp_date,
-        status: data.status,
-        subscriptionStatus: data.subscription_status,
-        joined: data.created_at?.split('T')[0],
+        id: d.id,
+        name: d.name,
+        email: d.email,
+        role: d.role,
+        idNumber: d.id_number,
+        lmpDate: d.lmp_date,
+        status: d.status,
+        subscriptionStatus: d.subscription_status,
+        joined: d.created_at?.split('T')[0],
       };
     } catch {
       return null;
@@ -160,7 +167,7 @@ export function AuthProvider({ children }) {
           ? 'אימייל או סיסמה שגויים'
           : error.message };
       }
-      const profile = await fetchProfile(data.user.id);
+      const profile = await fetchProfile(data.user.id, data.session?.access_token);
       if (!profile) {
         setAuthLoading(false);
         return { ok: false, error: 'לא נמצא פרופיל למשתמש' };
